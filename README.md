@@ -1,1 +1,1 @@
-# quantum_computer_simulator
+# Eshyana: The Quantum Computer Simulator
