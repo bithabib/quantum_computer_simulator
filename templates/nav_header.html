@@ -9,14 +9,25 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
     <script>
         $(document).ready(function () {
-            $('.nav-link').click(function () {
-                $('.nav-link').removeClass('active');
-                $(this).addClass('active');
+            // $('.nav-link').click(function () {
+            //     $('.nav-link').removeClass('active');
+            //     $(this).addClass('active');
+            // });
+
+            // Add the following code to set the active link based on the current page
+            var currentPath = window.location.pathname;
+            $('.nav-link').each(function () {
+                var href = $(this).attr('href');
+                if (href === currentPath) {
+                    $(this).addClass('active');
+                }
             });
         });
     </script>
+
 </head>
 
 <body>
@@ -35,7 +46,8 @@
                     <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="quantum_historical_experiment_simulator.html">Quantum Experiment Simulator</a>
+                    <a class="nav-link" href="/">Quantum Experiment
+                        Simulator</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="quantum_gate_simulator.html">Quantum Gate Simulator</a>
