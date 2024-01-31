@@ -1,4 +1,3 @@
-# 
 <h1 align="center">
   <strong><a href="https://bithabib.github.io/quantum_computer_simulator/templates/quantum_gate_simulator.html">Eshyana: The Quantum Computer Simulator</a></strong>
 </h1>
