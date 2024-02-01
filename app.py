@@ -4,9 +4,14 @@ app.secret_key = "super secret key"
 
 # Import the views public and private
 # import public views
+from views.public import home
 from views.public import quantum_programming
 from views.public import quantum_gate_simulator
 from views.public import quantum_historical_experiment_simulator
-from views.public import home
+
+# import private views
+from views import login_required_function
+from views import token
+from views.admin import login
 
 app.run()
