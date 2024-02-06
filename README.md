@@ -24,4 +24,5 @@ Eshyana: The Quantum Computer Simulator is an immersive and interactive quantum 
  ## References:
    - [Quantum States And The Bloch Sphere](https://medium.com/quantum-untangled/quantum-states-and-the-bloch-sphere-9f3c0c445ea3)
    - [Visualizing Single Qubit Quantum Logic Gates](https://medium.com/quantum-untangled/visualizing-quantum-logic-gates-part-1-515bb7b58916)
+   - [The basics of Quantum Computing](https://www.quantum-inspire.com/kbase/introduction-to-quantum-computing)
 
