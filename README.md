@@ -19,3 +19,9 @@ Eshyana: The Quantum Computer Simulator is an immersive and interactive quantum 
  - CCZ Gate (Controlled-Controlled-Z Gate): Applies a phase shift to the target qubit if both control qubits are |1⟩.
  - CS Gate (Controlled-S Gate): Applies a phase shift to the target qubit if the control qubit is |1⟩.
  - CRx, CRy, CRz Gates (Controlled-Rotation Gates): Controlled versions of the single-qubit rotation gates.
+
+
+ ## References:
+   - [Quantum States And The Bloch Sphere](https://medium.com/quantum-untangled/quantum-states-and-the-bloch-sphere-9f3c0c445ea3)
+   - [Visualizing Single Qubit Quantum Logic Gates](https://medium.com/quantum-untangled/visualizing-quantum-logic-gates-part-1-515bb7b58916)
+
