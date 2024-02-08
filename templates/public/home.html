@@ -2,34 +2,301 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Bloch sphere visualizer</title>
+
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <link type="text/css" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+        media="screen,projection" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <!-- Custom CSS-->
+    <link type="text/css" rel="stylesheet" href="static/src/css/style.css" media="screen,projection" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="logo_v1.svg">
+
+    <!--Let browser know website is optimized for mobile-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="Simulate the evolution of a qubit or spin on the Bloch sphere. This tool is ideal to understand quantum operations and to generate plots for presentations or publications.">
+
+    <link rel="canonical" href="https://bloch.kherb.io/" />
+
 </head>
 
-<body>
+<body class="indigo lighten-5">
     {% include 'includes/nav_header.html' %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="box" style="height: 60vh; border: 1px solid #ccc;">Box 1</div>
-            </div>
-            <div class="col-md-6">
-                <div class="box" style="height: 60vh; border: 1px solid #ccc;">Box 2</div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="description" style="height: 40vh; border: 1px solid #ccc; padding: 10px;">
-                    <p>Gate simulator</p>
+    <main>
+        <div class="container" style="min-width:1200px">
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    $('.collapsible').collapsible();
+                });
+            </script>
+
+            <div class="row lighten-5 grey">
+                <div class="col s12 indigo"></div>
+                <div class="col s12" style="margin-top:1em;"><a class="waves-effect waves-light btn-small"
+                        onclick="restart()">Init</a>
+                    <a class="waves-effect waves-light btn-small" onclick="undo()">Undo</a>
+                </div>
+
+
+                <div class="col s6">
+
+                    <div id='myDiv' class='card' style='padding-bottom: 100%;'><noscript>Javascript necessary</noscript>
+                    </div>
+                    <a class="waves-effect waves-light btn-small" onclick="export_png()"
+                        style="margin-bottom: 1em;">Download</a>
+
+
+                </div>
+                <div class="col s6">
+
+                    <ul class="collapsible expandable">
+                        <li class="active">
+                            <div class="collapsible-header"><i class="material-icons">rotate_right</i>Rotations around
+                                default axes
+                            </div>
+                            <div class="collapsible-body">
+                                <table>
+                                    <tr>
+                                        <td style="min-width:4em;">
+                                            x axis
+                                        </td>
+                                        <td>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('x',math.PI/2);">+90°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('x',-math.PI/2);">-90°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('x',math.PI);">+180°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('x',-math.PI);">-180°</a>
+                                            <div class="input-field inline" style="width:3em; margin-left:1em;">
+                                                <input id="x_angle" type="number" style="width:2em;" placeholder="45">°
+                                            </div>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('x',-document.getElementById('x_angle').value/180*math.PI);">-</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('x',document.getElementById('x_angle').value/180*math.PI);">+</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="min-width:4em;">
+                                            y axis</td>
+                                        <td>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('y',math.PI/2);">+90°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('y',-math.PI/2);">-90°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('y',math.PI);">+180°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('y',-math.PI);">-180°</a>
+                                            <div class="input-field inline" style="width:3em; margin-left:1em;">
+                                                <input id="y_angle" type="number" style="width:2em;" placeholder="45">°
+                                            </div>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('y',-document.getElementById('y_angle').value/180*math.PI);">-</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('y',document.getElementById('y_angle').value/180*math.PI);">+</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="min-width:4em;">
+                                            z axis</td>
+                                        <td>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',math.PI/2);">+90°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',-math.PI/2);">-90°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',math.PI);">+180°</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',-math.PI);">-180°</a>
+                                            <div class="input-field inline" style="width:3em; margin-left:1em;">
+                                                <input id="z_angle" type="number" style="width:2em;" placeholder="45">°
+                                            </div>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',-document.getElementById('z_angle').value/180*math.PI);">-</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',document.getElementById('z_angle').value/180*math.PI);">+</a>
+                                        </td>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">rotate_right</i>Rotations around
+                                custom axis
+                            </div>
+                            <div class="collapsible-body">
+                                <table>
+                                    <tr>
+                                        <td>Polar angle</td>
+                                        <td><input id="custom_axis_polar" type="number"
+                                                style="width:4em;margin-left:0.5em;" value="90">°
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Azimuthal angle</td>
+                                        <td><input id="custom_axis_azimuth" type="number"
+                                                style="width:4em;margin-left:0.5em;" value="0">°
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Rotation angle</td>
+                                        <td><input id="custom_axis_rot_angle" type="number"
+                                                style="width:4em;margin-left:0.5em;" value="90" step="1">°</td>
+                                    </tr>
+                                </table><br />
+                                <a class="waves-effect waves-light btn-small blue-grey"
+                                    onclick="custom_rotate_state();">Apply
+                                    rotation</a>
+                            </div>
+                        </li>
+
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">clear</i>Quantum gates</div>
+                            <div class="collapsible-body">
+                                <table>
+                                    <tr>
+                                        <td>Pauli gates</td>
+                                        <td>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('x',math.PI);">X</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('y',math.PI);">Y</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',math.PI);">Z</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Hadamard</td>
+                                        <td> <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('y',math.PI/2);rotate_state('x',math.PI);">H</a>
+                                    </tr>
+                                    <tr>
+                                        <td>Phase</td>
+                                        <td> <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',math.PI/2);">S</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',-math.PI/2);">S†</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',math.PI/4);">T</a>
+                                            <a class="waves-effect waves-light btn-small blue-grey"
+                                                onclick="rotate_state('z',-math.PI/4);">T†</a>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i class="material-icons">rss_feed</i>Pulses</div>
+                            <div class="collapsible-body">
+                                <table>
+                                    <tr>
+                                        <td>Detuning</td>
+                                        <td><input id="detuning" type="number" style="width:4em;margin-left:0.5em;"
+                                                value="0" step="0.01" onchange="rabi_plot();"></td>
+                                        <td>Phase</td>
+                                        <td><input id="phase" type="number" style="width:4em;margin-left:0.5em;"
+                                                value="0" step="1" max="360" onchange="rabi_plot();">°</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Amplitude</td>
+                                        <td><input id="amplitude" type="number" style="width:4em;margin-left:0.5em;"
+                                                value="1" step="0.01" onchange="rabi_plot();"></td>
+                                        <td>Pulse length</td>
+                                        <td><input id="pulselength" type="number" style="width:4em;margin-left:0.5em;"
+                                                value="0.5" step="0.01" onchange="rabi_plot();"></td>
+                                    </tr>
+                                </table>
+                                <div>
+                                    <label>Transition probability plot</label>
+                                    <div id="rabi_div" style="width:100%;height:10em;"></div>
+                                </div>
+                                <div style="margin-top:4em;">
+                                    <a class="waves-effect waves-light btn-small blue-grey"
+                                        onclick="pulse_apply('x');">Apply pulse along
+                                        x</a>
+                                    <a class="waves-effect waves-light btn-small blue-grey"
+                                        onclick="pulse_apply('y');">Apply pulse along
+                                        y</a>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="collapsible-header"><i
+                                    class="material-icons">settings_input_component</i>Settings</div>
+                            <div class="collapsible-body">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            Spin color
+                                        </td>
+                                        <td><input type="color" id="spin_color" value="#1a237e"
+                                                onchange="update_state_plot();"></td>
+                                        <td>Histrory trace color</td>
+                                        <td><input type="color" id="phosphor_color" value="#1a237e" /></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Top state text</td>
+                                        <td><input type="text" id="north_text" value="0" style="width:5em"
+                                                onchange="BLOCHSPHERE =  gen_bloch_sphere();update_state_plot(full_update=true)">
+                                        </td>
+                                        <td>Bottom state text</td>
+                                        <td><input type="text" id="south_text" value="1" style="width:5em"
+                                                onchange="BLOCHSPHERE =  gen_bloch_sphere();update_state_plot(full_update=true)">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>History trace length</td>
+                                        <td><input type="number" id="phosphor_length" value="10" min="0" step="1"
+                                                style="width:5em"></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Export size</td>
+                                        <td>
+                                            <input id="export_size" type="number" value="800" style="width:5em"> px
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </li>
+                    </ul>
+
+
+
                 </div>
             </div>
         </div>
-    </div>
+    </main>
+
+
+    <script src="static/src/js/plotly-2.16.1.min.js"></script>
+
+
+
+    <!--Math-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.2.1/math.js"
+        integrity="sha512-47N5yVdAeXJ+9qstVMTH2Z0EpX618sjYZcswRwhpldSTD0IbW6yQPtzg4RLrPp/2+TIgEF1elT68/ZBu82nqJA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="static/src/js/helper.js"></script>
+    <script src="static/src/js/quantum.js"></script>
+    <script type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script type="text/javascript" src="static/src/js/plot.js"></script>
+    <script type="text/javascript" src="static/src/js/ui.js"></script>
 
 </body>
 
