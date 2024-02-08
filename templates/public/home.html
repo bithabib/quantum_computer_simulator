@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Bloch sphere visualizer</title>
+    <title>Bloch Sphere Simulator</title>
 
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -11,11 +11,10 @@
         href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
         media="screen,projection" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
-    <!-- Custom CSS-->
-    <link type="text/css" rel="stylesheet" href="static/src/css/style.css" media="screen,projection" />
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="logo_v1.svg">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -37,14 +36,13 @@
             </script>
 
             <div class="row lighten-5 grey">
-                <div class="col s12 indigo"></div>
-                <div class="col s12" style="margin-top:1em;"><a class="waves-effect waves-light btn-small"
+                <div class="col-md-12" style="margin-top:1em;"><a class="waves-effect waves-light btn-small"
                         onclick="restart()">Init</a>
                     <a class="waves-effect waves-light btn-small" onclick="undo()">Undo</a>
                 </div>
 
 
-                <div class="col s6">
+                <div class="col-md-6">
 
                     <div id='myDiv' class='card' style='padding-bottom: 100%;'><noscript>Javascript necessary</noscript>
                     </div>
@@ -53,7 +51,7 @@
 
 
                 </div>
-                <div class="col s6">
+                <div class="col-md-6">
 
                     <ul class="collapsible expandable">
                         <li class="active">
@@ -284,8 +282,6 @@
 
 
     <script src="static/src/js/plotly-2.16.1.min.js"></script>
-
-
 
     <!--Math-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.2.1/math.js"
