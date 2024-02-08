@@ -30,7 +30,22 @@ The probability amplitude is a complex number that represents the probability of
 
 In quantum mechanics, the probability of a particular outcome is related to the square of the magnitude of the probability amplitude. When considering the combination of two probability amplitudes, alpha1 and alpha2, the probability formula involves the interference between them. This README explains the derivation of the probability formula including the interference term.
 
-## Derivation
+## Complex Conjugates
+
+In the context of complex numbers, the complex conjugate of a complex number $ z $, denoted as $ z^* $ or $ \bar{z} $, is formed by changing the sign of the imaginary part of $ z $.
+
+If $ z = a + bi $ where $ a $ and $ b $ are real numbers and $ i $ is the imaginary unit, then the complex conjugate $ z^* $ is given by:
+
+$$ z^* = a - bi $$
+
+In other words, the complex conjugate of a complex number simply reflects the point representing that number across the real axis on the complex plane. Geometrically, if you have a point representing a complex number in the complex plane, its complex conjugate is the reflection of that point across the real axis.
+
+The complex conjugate is particularly useful when dealing with operations involving complex numbers, such as multiplication, division, and taking the modulus. For example, when multiplying a complex number by its conjugate, the imaginary parts cancel out, resulting in a real number:
+
+$$ z \cdot z^* = (a + bi)(a - bi) = a^2 + b^2 $$
+
+This property is often used in various mathematical and physical contexts, including quantum mechanics, where complex numbers and their conjugates play a crucial role in describing the behavior of quantum systems.
+
 
 ### Step 1: Combined Probability Amplitude
 
