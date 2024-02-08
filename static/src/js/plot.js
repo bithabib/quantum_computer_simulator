@@ -58,7 +58,7 @@ function init_plotting(data) {
         annotations: [
             {
                 showarrow: false,
-                text: 'bloch.kherb.io',
+                text: 'eshyana',
                 x:1.0,
                 y:0.0,
                 xref: 'paper',
