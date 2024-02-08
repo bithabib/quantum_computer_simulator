@@ -3,10 +3,6 @@
 
 <head>
     <title>Bloch Sphere Simulator</title>
-
-    <!--Import Google Icon Font-->
-    <!-- <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"> -->
-    <!--Import materialize.css-->
     <link type="text/css" rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
         media="screen,projection" />
@@ -23,7 +19,7 @@
 
 </head>
 
-<body class="indigo lighten-5">
+<body class="lighten-5">
     {% include 'includes/nav_header.html' %}
     <main>
         <div class="container" style="min-width:1200px">
@@ -33,10 +29,10 @@
                 });
             </script>
 
-            <div class="row lighten-5 grey">
-                <div class="col-md-12" style="margin-top:1em;"><a class="waves-effect waves-light btn-small"
-                        onclick="restart()">Reset</a>
-                    <a class="waves-effect waves-light btn-small" onclick="undo()">Undo</a>
+            <div class="row lighten-5">
+                <div class="col-md-12" style="margin-top:1em;">
+                    <button class="btn" onclick="restart()">Reset</button>
+                    <button class="btn" onclick="undo()">Undo</button>
                 </div>
 
 
@@ -44,8 +40,8 @@
 
                     <div id='myDiv' class='card' style='padding-bottom: 100%;'><noscript>Javascript necessary</noscript>
                     </div>
-                    <a class="waves-effect waves-light btn-small" onclick="export_png()"
-                        style="margin-bottom: 1em;">Download</a>
+
+                    <button class="btn" onclick="export_png()">Download</button>
 
 
                 </div>
@@ -53,8 +49,7 @@
 
                     <ul class="collapsible expandable">
                         <li class="active">
-                            <div class="collapsible-header"><i class="material-icons">rotate_right</i>Rotations around
-                                default axes
+                            <div class="collapsible-header">Rotations around default axes
                             </div>
                             <div class="collapsible-body">
                                 <table>
@@ -63,63 +58,51 @@
                                             x axis
                                         </td>
                                         <td>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('x',math.PI/2);">+90°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('x',-math.PI/2);">-90°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('x',math.PI);">+180°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('x',-math.PI);">-180°</a>
+                                            <button class="btn" onclick="rotate_state('x',math.PI/2);">+90°</button>
+                                            <button class="btn" onclick="rotate_state('x',-math.PI/2);">-90°</button>
+                                            <button class="btn" onclick="rotate_state('x',math.PI);">+180°</button>
+                                            <button class="btn" onclick="rotate_state('x',-math.PI);">-180°</button>
                                             <div class="input-field inline" style="width:3em; margin-left:1em;">
                                                 <input id="x_angle" type="number" style="width:2em;" placeholder="45">°
                                             </div>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('x',-document.getElementById('x_angle').value/180*math.PI);">-</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('x',document.getElementById('x_angle').value/180*math.PI);">+</a>
+                                            <button class="btn"
+                                                onclick="rotate_state('x',-document.getElementById('x_angle').value/180*math.PI);">-</button>
+                                            <button class="btn"
+                                                onclick="rotate_state('x',document.getElementById('x_angle').value/180*math.PI);">+</button>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="min-width:4em;">
                                             y axis</td>
                                         <td>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('y',math.PI/2);">+90°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('y',-math.PI/2);">-90°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('y',math.PI);">+180°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('y',-math.PI);">-180°</a>
+                                            <button class="btn" onclick="rotate_state('y',math.PI/2);">+90°</button>
+                                            <button class="btn" onclick="rotate_state('y',-math.PI/2);">-90°</button>
+                                            <button class="btn" onclick="rotate_state('y',math.PI);">+180°</button>
+                                            <button class="btn" onclick="rotate_state('y',-math.PI);">-180°</button>
                                             <div class="input-field inline" style="width:3em; margin-left:1em;">
                                                 <input id="y_angle" type="number" style="width:2em;" placeholder="45">°
                                             </div>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('y',-document.getElementById('y_angle').value/180*math.PI);">-</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('y',document.getElementById('y_angle').value/180*math.PI);">+</a>
+                                            <button class="btn"
+                                                onclick="rotate_state('y',-document.getElementById('y_angle').value/180*math.PI);">-</button>
+                                            <button class="btn"
+                                                onclick="rotate_state('y',document.getElementById('y_angle').value/180*math.PI);">+</button>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td style="min-width:4em;">
                                             z axis</td>
                                         <td>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',math.PI/2);">+90°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',-math.PI/2);">-90°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',math.PI);">+180°</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',-math.PI);">-180°</a>
+                                            <button class="btn" onclick="rotate_state('z',math.PI/2);">+90°</button>
+                                            <button class="btn" onclick="rotate_state('z',-math.PI/2);">-90°</button>
+                                            <button class="btn" onclick="rotate_state('z',math.PI);">+180°</button>
+                                            <button class="btn" onclick="rotate_state('z',-math.PI);">-180°</button>
                                             <div class="input-field inline" style="width:3em; margin-left:1em;">
                                                 <input id="z_angle" type="number" style="width:2em;" placeholder="45">°
                                             </div>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',-document.getElementById('z_angle').value/180*math.PI);">-</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',document.getElementById('z_angle').value/180*math.PI);">+</a>
+                                            <button class="btn"
+                                                onclick="rotate_state('z',-document.getElementById('z_angle').value/180*math.PI);">-</button>
+                                            <button class="btn"
+                                                onclick="rotate_state('z',document.getElementById('z_angle').value/180*math.PI);">+</button>
                                         </td>
                                     </tr>
                                 </table>
@@ -150,9 +133,8 @@
                                                 style="width:4em;margin-left:0.5em;" value="90" step="1">°</td>
                                     </tr>
                                 </table><br />
-                                <a class="waves-effect waves-light btn-small blue-grey"
-                                    onclick="custom_rotate_state();">Apply
-                                    rotation</a>
+                                <button class="btn" onclick="custom_rotate_state();">Apply
+                                    rotation</button>
                             </div>
                         </li>
 
@@ -163,29 +145,22 @@
                                     <tr>
                                         <td>Pauli gates</td>
                                         <td>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('x',math.PI);">X</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('y',math.PI);">Y</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',math.PI);">Z</a>
+                                            <button class="btn" onclick="rotate_state('x',math.PI);">X</button>
+                                            <button class="btn" onclick="rotate_state('y',math.PI);">Y</button>
+                                            <button class="btn" onclick="rotate_state('z',math.PI);">Z</button>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td>Hadamard</td>
-                                        <td> <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('y',math.PI/2);rotate_state('x',math.PI);">H</a>
+                                        <td> <button class="btn"
+                                                onclick="rotate_state('y',math.PI/2);rotate_state('x',math.PI);">H</button>
                                     </tr>
                                     <tr>
                                         <td>Phase</td>
-                                        <td> <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',math.PI/2);">S</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',-math.PI/2);">S†</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',math.PI/4);">T</a>
-                                            <a class="waves-effect waves-light btn-small blue-grey"
-                                                onclick="rotate_state('z',-math.PI/4);">T†</a>
+                                        <td> <button class="btn" onclick="rotate_state('z',math.PI/2);">S</button>
+                                            <button class="btn" onclick="rotate_state('z',-math.PI/2);">S†</button>
+                                            <button class="btn" onclick="rotate_state('z',math.PI/4);">T</button>
+                                            <button class="btn" onclick="rotate_state('z',-math.PI/4);">T†</button>
                                         </td>
                                     </tr>
                                 </table>
@@ -218,12 +193,10 @@
                                     <div id="rabi_div" style="width:100%;height:10em;"></div>
                                 </div>
                                 <div style="margin-top:4em;">
-                                    <a class="waves-effect waves-light btn-small blue-grey"
-                                        onclick="pulse_apply('x');">Apply pulse along
-                                        x</a>
-                                    <a class="waves-effect waves-light btn-small blue-grey"
-                                        onclick="pulse_apply('y');">Apply pulse along
-                                        y</a>
+                                    <button class="btn" onclick="pulse_apply('x');">Apply pulse along
+                                        x</button>
+                                    <button class="btn" onclick="pulse_apply('y');">Apply pulse along
+                                        y</button>
                                 </div>
                             </div>
                         </li>
