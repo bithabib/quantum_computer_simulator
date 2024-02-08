@@ -51,34 +51,34 @@ This property is often used in various mathematical and physical contexts, inclu
 
 Let alpha be the combined probability amplitude:
 
-$ \alpha = \alpha_1 + \alpha_2 $
+$$ \alpha = \alpha_1 + \alpha_2 $$
 
 ### Step 2: Probability Calculation
 
 The probability of the outcome is given by the square of the magnitude of alpha:
 
-$ \text{Probability} = |\alpha|^2 = |\alpha_1 + \alpha_2|^2 $
+$$ \text{Probability} = |\alpha|^2 = |\alpha_1 + \alpha_2|^2 $$
 
 
 ### Step 3: Expansion
 
 Expanding the expression using complex conjugates:
 
-$ |\alpha_1 + \alpha_2|^2 = (\alpha_1 + \alpha_2) \cdot (\alpha_1^* + \alpha_2^*) $
+$$ |\alpha_1 + \alpha_2|^2 = (\alpha_1 + \alpha_2) \cdot (\alpha_1^* + \alpha_2^*) $$
 
-$ = \alpha_1 \alpha_1^* + \alpha_2 \alpha_2^* + \alpha_1 \alpha_2^* + \alpha_2 \alpha_1^* $
+$$ = \alpha_1 \alpha_1^* + \alpha_2 \alpha_2^* + \alpha_1 \alpha_2^* + \alpha_2 \alpha_1^* $$
 
 ### Step 4: Interference Term
 
 The interference term alpha1 alpha2^* contains the phase difference between alpha1 and alpha2, denoted by phi2 - phi1, where phi1 and phi2 are the phases of alpha1 and alpha2 respectively.
 
-$ \alpha_1 \alpha_2^* = |\alpha_1||\alpha_2|\cos(\phi_2 - \phi_1) $
+$$ \alpha_1 \alpha_2^* = |\alpha_1||\alpha_2|\cos(\phi_2 - \phi_1) $$
 
 ### Step 5: Final Probability Formula
 
 Substituting the interference term back into the expression:
 
-$ |\alpha_1 + \alpha_2|^2 = |\alpha_1|^2 + |\alpha_2|^2 + 2|\alpha_1||\alpha_2|\cos(\phi_2 - \phi_1) $
+$$ |\alpha_1 + \alpha_2|^2 = |\alpha_1|^2 + |\alpha_2|^2 + 2|\alpha_1||\alpha_2|\cos(\phi_2 - \phi_1) $$
 
 This formula accounts for the interference between the probability amplitudes and determines the probability of the outcome.
 
