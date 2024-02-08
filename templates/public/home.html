@@ -14,9 +14,6 @@
 
     <!--Let browser know website is optimized for mobile-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description"
-        content="Simulate the evolution of a qubit or spin on the Bloch sphere. This tool is ideal to understand quantum operations and to generate plots for presentations or publications.">
-
 </head>
 
 <body class="lighten-5">
@@ -49,7 +46,7 @@
 
                     <ul class="collapsible expandable">
                         <li class="active">
-                            <div class="collapsible-header">Rotations around default axes
+                            <div class="collapsible-header">Rotations Around Default Axes
                             </div>
                             <div class="collapsible-body">
                                 <table>
@@ -111,39 +108,39 @@
                         </li>
                         <li>
                             <div class="collapsible-header">
-                                Rotations around custom axis
+                                Rotations Around Custom Axis
                             </div>
                             <div class="collapsible-body">
                                 <table>
                                     <tr>
-                                        <td>Polar angle</td>
+                                        <td>Polar Angle</td>
                                         <td><input id="custom_axis_polar" type="number"
                                                 style="width:4em;margin-left:0.5em;" value="90">°
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Azimuthal angle</td>
+                                        <td>Azimuthal Angle</td>
                                         <td><input id="custom_axis_azimuth" type="number"
                                                 style="width:4em;margin-left:0.5em;" value="0">°
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>Rotation angle</td>
+                                        <td>Rotation Angle</td>
                                         <td><input id="custom_axis_rot_angle" type="number"
                                                 style="width:4em;margin-left:0.5em;" value="90" step="1">°</td>
                                     </tr>
                                 </table><br />
                                 <button class="btn" onclick="custom_rotate_state();">Apply
-                                    rotation</button>
+                                    Rotation</button>
                             </div>
                         </li>
 
                         <li>
-                            <div class="collapsible-header">Quantum gates</div>
+                            <div class="collapsible-header">Quantum Gates</div>
                             <div class="collapsible-body">
                                 <table>
                                     <tr>
-                                        <td>Pauli gates</td>
+                                        <td>Pauli Gates</td>
                                         <td>
                                             <button class="btn" onclick="rotate_state('x',math.PI);">X</button>
                                             <button class="btn" onclick="rotate_state('y',math.PI);">Y</button>
@@ -183,19 +180,19 @@
                                         <td>Amplitude</td>
                                         <td><input id="amplitude" type="number" style="width:4em;margin-left:0.5em;"
                                                 value="1" step="0.01" onchange="rabi_plot();"></td>
-                                        <td>Pulse length</td>
+                                        <td>Pulse Length</td>
                                         <td><input id="pulselength" type="number" style="width:4em;margin-left:0.5em;"
                                                 value="0.5" step="0.01" onchange="rabi_plot();"></td>
                                     </tr>
                                 </table>
                                 <div>
-                                    <label>Transition probability plot</label>
+                                    <label>Transition Probability Plot</label>
                                     <div id="rabi_div" style="width:100%;height:10em;"></div>
                                 </div>
                                 <div style="margin-top:4em;">
-                                    <button class="btn" onclick="pulse_apply('x');">Apply pulse along
+                                    <button class="btn" onclick="pulse_apply('x');">Apply Pulse Along
                                         x</button>
-                                    <button class="btn" onclick="pulse_apply('y');">Apply pulse along
+                                    <button class="btn" onclick="pulse_apply('y');">Apply Pulse Along
                                         y</button>
                                 </div>
                             </div>
@@ -206,32 +203,32 @@
                                 <table>
                                     <tr>
                                         <td>
-                                            Spin color
+                                            Spin Color
                                         </td>
                                         <td><input type="color" id="spin_color" value="#1a237e"
                                                 onchange="update_state_plot();"></td>
-                                        <td>Histrory trace color</td>
+                                        <td>Histrory Trace Color</td>
                                         <td><input type="color" id="phosphor_color" value="#1a237e" /></td>
                                     </tr>
                                     <tr>
-                                        <td>Top state text</td>
+                                        <td>Top State Text</td>
                                         <td><input type="text" id="north_text" value="0" style="width:5em"
                                                 onchange="BLOCHSPHERE =  gen_bloch_sphere();update_state_plot(full_update=true)">
                                         </td>
-                                        <td>Bottom state text</td>
+                                        <td>Bottom State Text</td>
                                         <td><input type="text" id="south_text" value="1" style="width:5em"
                                                 onchange="BLOCHSPHERE =  gen_bloch_sphere();update_state_plot(full_update=true)">
                                         </td>
                                     </tr>
                                     <tr>
-                                        <td>History trace length</td>
+                                        <td>History Trace Length</td>
                                         <td><input type="number" id="phosphor_length" value="10" min="0" step="1"
                                                 style="width:5em"></td>
                                         <td></td>
                                         <td></td>
                                     </tr>
                                     <tr>
-                                        <td>Export size</td>
+                                        <td>Export Size</td>
                                         <td>
                                             <input id="export_size" type="number" value="800" style="width:5em"> px
                                         </td>
