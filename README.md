@@ -33,9 +33,9 @@ In quantum mechanics, the probability of a particular outcome is related to the 
 ## Complex Conjugates
 
 $$ \text{In the context of complex numbers, the complex conjugate of a complex number } z,$$ 
-$$\text{denoted as } z^* \text{ or } \bar{z} \text{, is formed by changing the sign of the imaginary part of } z .$$
+$$ \text{denoted as } z^* \text{ or } \bar{z} \text{, is formed by changing the sign of the imaginary part of } z .$$
 
-$$ \text{If } z = a + bi \text{ where } a \text{ and } b \text{are real numbers and } i \text{is the imaginary unit, } $$ 
+$$ \text{If } z = a + bi \text{ where } a \text{ and } b \text{ are real numbers and } i \text{ is the imaginary unit, } $$ 
 $$ \text{ then the complex conjugate } z^* \text{ is given by: } $$
 
 $$ z^* = a - bi $$
