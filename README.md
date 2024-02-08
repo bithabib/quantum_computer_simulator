@@ -32,7 +32,7 @@ In quantum mechanics, the probability of a particular outcome is related to the 
 
 ## Complex Conjugates
 
-In the context of complex numbers, the complex conjugate of a complex number z , denoted as $ z^* $ or $ \bar{z} $, is formed by changing the sign of the imaginary part of $ z $.
+$$ \text{In the context of complex numbers, the complex conjugate of a complex number } z, \text{denoted as } z^* \text{ or } \bar{z} \text{, is formed by changing the sign of the imaginary part of } z .$$
 
 If $ z = a + bi $ where $ a $ and $ b $ are real numbers and $ i $ is the imaginary unit, then the complex conjugate $ z^* $ is given by:
 
@@ -57,7 +57,7 @@ $$ \alpha = \alpha_1 + \alpha_2 $$
 
 The probability of the outcome is given by the square of the magnitude of alpha:
 
-$ \text{Probability} = |\alpha|^2 = |\alpha_1 + \alpha_2|^2 $
+$$ \text{Probability} = |\alpha|^2 = |\alpha_1 + \alpha_2|^2 $$
 
 
 ### Step 3: Expansion
