@@ -21,6 +21,55 @@ Eshyana: The Quantum Computer Simulator is an immersive and interactive quantum 
  - CRx, CRy, CRz Gates (Controlled-Rotation Gates): Controlled versions of the single-qubit rotation gates.
 
 
+
+## Probability Amplitude:
+The probability amplitude is a complex number that represents the probability of finding a qubit in a particular state. The probability amplitude is a combination of the amplitude and phase of the qubit state. The amplitude is the magnitude of the probability amplitude, and the phase is the angle of the probability amplitude. The probability amplitude is used to calculate the probability of measuring a qubit in a particular state. The probability of measuring a qubit in a particular state is the square of the magnitude of the probability amplitude.
+# Derivation of Probability Formula for Quantum Mechanics
+
+## Introduction
+
+In quantum mechanics, the probability of a particular outcome is related to the square of the magnitude of the probability amplitude. When considering the combination of two probability amplitudes, alpha1 and alpha2, the probability formula involves the interference between them. This README explains the derivation of the probability formula including the interference term.
+
+## Derivation
+
+### Step 1: Combined Probability Amplitude
+
+Let alpha be the combined probability amplitude:
+
+$ \alpha = \alpha_1 + \alpha_2 $
+
+### Step 2: Probability Calculation
+
+The probability of the outcome is given by the square of the magnitude of alpha:
+
+$ \text{Probability} = |\alpha|^2 = |\alpha_1 + \alpha_2|^2 $
+
+
+### Step 3: Expansion
+
+Expanding the expression using complex conjugates:
+
+$ |\alpha_1 + \alpha_2|^2 = (\alpha_1 + \alpha_2) \cdot (\alpha_1^* + \alpha_2^*) $
+
+$ = \alpha_1 \alpha_1^* + \alpha_2 \alpha_2^* + \alpha_1 \alpha_2^* + \alpha_2 \alpha_1^* $
+
+### Step 4: Interference Term
+
+The interference term alpha1 alpha2^* contains the phase difference between alpha1 and alpha2, denoted by phi2 - phi1, where phi1 and phi2 are the phases of alpha1 and alpha2 respectively.
+
+$ \alpha_1 \alpha_2^* = |\alpha_1||\alpha_2|\cos(\phi_2 - \phi_1) $
+
+### Step 5: Final Probability Formula
+
+Substituting the interference term back into the expression:
+
+$ |\alpha_1 + \alpha_2|^2 = |\alpha_1|^2 + |\alpha_2|^2 + 2|\alpha_1||\alpha_2|\cos(\phi_2 - \phi_1) $
+
+This formula accounts for the interference between the probability amplitudes and determines the probability of the outcome.
+
+
+
+
  ## References:
    - [Quantum States And The Bloch Sphere](https://medium.com/quantum-untangled/quantum-states-and-the-bloch-sphere-9f3c0c445ea3)
    - [Visualizing Single Qubit Quantum Logic Gates](https://medium.com/quantum-untangled/visualizing-quantum-logic-gates-part-1-515bb7b58916)
