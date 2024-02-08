@@ -14,4 +14,5 @@ from views import login_required_function
 from views import token
 from views.admin import login
 
-app.run()
+# app.run()
+app.run(host='0.0.0.0')
