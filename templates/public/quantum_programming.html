@@ -9,6 +9,9 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.0.1/chartjs-plugin-zoom.min.js"></script>
 </head>
 
 <body>
@@ -16,26 +19,89 @@
     <div class="container">
         <div class="row">
             <div class="col-md-6">
-                <div class="box" style="height: 60vh; border: 1px solid #ccc;">Box 1</div>
-            </div>
-            <div class="col-md-6">
-                <div class="box" style="height: 60vh; border: 1px solid #ccc;">Box 2</div>
+                <div class="box" style="height: 60vh; border: 1px solid #ccc;">
+                    <canvas id="lineChartID" style="width: 100%; height: 100%;"></canvas>
+                </div>
+
+                <script>
+                    var canvas = document.getElementById('lineChartID');
+                    // get canvas width and height
+                    const width = canvas.width;
+                    const height = canvas.height;
+                    const scale = 100; // Scale for drawing
+                    const wavelength = 0.02; // Wavelength of the waves
+                    const slitSeparation = 0.2; // Distance between the slits
+                    const screenDistance = 1; // Distance from the slits to the screen
+
+                    // Function to calculate intensity at a given point (x) on the screen
+                    function intensity(x) {
+                        const k = 2 * Math.PI / wavelength;
+                        const d = slitSeparation;
+                        const D = screenDistance;
+                        const r1 = Math.sqrt(x * x + D * D);
+                        const r2 = Math.sqrt((x - d) * (x - d) + D * D);
+                        const phi = k * r1 - k * r2;
+                        return Math.pow(Math.cos(phi), 2);
+                    }
+
+                    // Function to calculate combined intensity at a given point (x) on the screen
+                    function combinedIntensity(x) {
+                        return intensity(x) + intensity(x - slitSeparation);
+                    }
+                    var labels = [];
+                    var intensityData = [];
+                    for (let x = 0; x < width; x++) {
+                        const intensityValue = combinedIntensity((x - width / 2) / scale);
+                        const y = height / 2 - intensityValue * scale;
+                        labels.push(x);
+                        intensityData.push(y);
+                    }
+                    
+                    // line chart 
+                    new Chart($("#lineChartID"), {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'My Dataset',
+                                data: intensityData,// End data 
+                                borderColor: 'green',
+                                fill: false,
+                                tension: 0.01,
+                                pointRadius: 0,
+                            }]// End datasets 
+                        },// End data
+                        options: {
+                            Plugins: {
+                                zoom: {
+                                    zoom: {
+                                        wheel: {
+                                            enabled: true,
+                                        },
+                                        pinch: {
+                                            enabled: true,
+                                        },
+                                        mode: 'x',
+                                    }
+                                }
+                            }
+                        }
+                    }); 
+                </script>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="description" style="height: 40vh; border: 1px solid #ccc; padding: 10px;">
-                    <p>This is the description below the boxes.</p>
-                </div>
+        <div class="col-md-6">
+            <div class="box" style="height: 60vh; border: 1px solid #ccc;">Box 2</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="description" style="height: 40vh; border: 1px solid #ccc; padding: 10px;">
+                <p>This is the description below the boxes.</p>
             </div>
         </div>
     </div>
-
-    <!-- Bootstrap JS and Popper.js -->
-    <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
-
+    </div>
 </body>
 
 </html>
