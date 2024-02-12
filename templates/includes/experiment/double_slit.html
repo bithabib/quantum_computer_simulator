@@ -152,10 +152,8 @@
         <label for="distance_bitween_two_slits">Distance between slits (micrometers)</label>
         <input type="range" min="5" max="20" value="2" id="slit_width">
         <label for="slit_width">Slit width (micrometers)</label>
-        <input type="range" min="2" max="30" value="2" id="screen_distance">
+        <input type="range" min="2" max="20" value="2" id="screen_distance">
         <label for="screen_distance">Distance to the screen (meters)</label>
-        <input type="range" min="2" max="30" value="2" id="wavelength">
-        <label for="wavelength">Wavelength (nano meters)</label>
     </div>
 
     <script>
@@ -163,23 +161,26 @@
             console.log("DOM fully loaded and parsed");
             var slit1 = document.getElementById("slit_1");
             var slit2 = document.getElementById("slit_2");
-            slitWidthHandler(document.getElementById("slit_width"));
+            slitDistanceWidthHandler(document.getElementById("slit_width"), document.getElementById("distance_bitween_two_slits"), document.getElementById("screen_distance"));
             // JavaScript to adjust the gap between slit_1 and slit_2
             var distance_bitween_two_slits = document.getElementById("distance_bitween_two_slits");
-
-
             distance_bitween_two_slits.addEventListener("input", function () {
                 var distance = this.value; // Get the value of the slider
                 slit1.style.marginRight = distance + "px"; // Set margin-right for slit_1
                 slit2.style.marginLeft = distance + "px"; // Set margin-left for slit_2
-
+                slitDistanceWidthHandler(document.getElementById("slit_width"), this, document.getElementById("screen_distance"));
             });
 
             // JavaScript to adjust the width of the slits
             var slit_width = document.getElementById("slit_width");
             slit_width.addEventListener("input", function () {
-                slitWidthHandler(this);
+                slitDistanceWidthHandler(this, document.getElementById("distance_bitween_two_slits"), document.getElementById("screen_distance"));
+            });
 
+            // JavaScript to adjust the distance to the screen
+            var screen_distance = document.getElementById("screen_distance");
+            screen_distance.addEventListener("input", function () {
+                slitDistanceWidthHandler(document.getElementById("slit_width"), document.getElementById("distance_bitween_two_slits"), this);
             });
 
 
@@ -203,17 +204,19 @@
             function combinedIntensity(x, wavelength, slitSeparation, screenDistance) {
                 return intensity(x, wavelength, slitSeparation, screenDistance) + intensity(x - slitSeparation, wavelength, slitSeparation, screenDistance);
             }
-            function slitWidthHandler(eventHandler) {
-                var width = eventHandler.value; // Get the value of the slider
+            function slitDistanceWidthHandler(widthEventHandler, distanceEventHandler, screenDistanceEventHandler) {
+                var width = widthEventHandler.value; // Get the value of the slider
+                var distanceSplit = distanceEventHandler.value; // Get the value of the slider
+                var sDistance = screenDistanceEventHandler.value; // Get the value of the slider
                 slit1.style.width = width + "px"; // Set width for slit_1
                 slit2.style.width = width + "px"; // Set width for slit_2
-
+                console.log(distanceSplit);
                 const canvasWidth = 800;
                 const canvasHeight = 400;
                 const scale = 100; // Scale for drawing
                 const wavelength = 0.02 + (width / 1000); // Wavelength of the waves
-                const slitSeparation = 0.2; // Distance between the slits
-                const screenDistance = 1; // Distance from the slits to the screen
+                const slitSeparation = 0.2 + (distanceSplit / 100); // Distance between the slits
+                const screenDistance = 1 + (sDistance/10); // Distance from the slits to the screen
                 var labels = [];
                 var intensityData = [];
                 for (let x = 0; x < canvasWidth; x++) {
@@ -223,7 +226,7 @@
                     intensityData.push(y);
                 }
                 // line chart 
-                var downGradeBy = canvasWidth/15;
+                var downGradeBy = canvasWidth / 15;
                 var downsampledlabels = _.chunk(labels, downGradeBy).map(chunk => _.mean(chunk));
                 var downsampledintensityData = _.chunk(intensityData, downGradeBy).map(chunk => _.mean(chunk));
                 // find max intensity
