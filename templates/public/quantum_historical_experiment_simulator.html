@@ -23,13 +23,13 @@
                 <div class="row">
                     <div class="col">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="experiment1">
+                            <input type="checkbox" class="custom-control-input" id="experiment1" onchange="toggleExperiment('experiment1')" checked>
                             <label class="custom-control-label" for="experiment1">Double-slit Experiment</label>
                         </div>
                     </div>
                     <div class="col">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="experiment2">
+                            <input type="checkbox" class="custom-control-input" id="experiment2" onchange="toggleExperiment('experiment2')">
                             <label class="custom-control-label" for="experiment2">Three Polarizing Filters
                                 Experiment</label>
                         </div>
@@ -50,23 +50,52 @@
             </div>
 
             <!-- Multiple Choice selection field -->
-            <div class="col-md-12 row m-2 mt-4">
+            <div class="col-md-12 row m-2 mt-4" id="double-slit" style="display: none;">
                 <div class="col-md-6">
-                    {% include 'includes/experiment/box1/double_slit.html' %}
-
+                    {% include 'includes/experiment/double_slit/box1/double_slit.html' %}
                 </div>
                 <div class="col-md-6">
                     <div class="box row" style="height: 80vh; border: 1px solid #ccc; overflow: auto;">
-                        {% include 'includes/experiment/box2/description.html' %}
+                        {% include 'includes/experiment/double_slit/box2/description.html' %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 row m-2 mt-4" id="polarization" style="display: none;">
+                <div class="col-md-6">
+                    {% include 'includes/experiment/polarization/box1/polarization.html' %}
+                </div>
+                <div class="col-md-6">
+                    <div class="box row" style="height: 80vh; border: 1px solid #ccc; overflow: auto;">
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Bootstrap JS and Popper.js -->
-        <!-- <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script> -->
+        <script>
+            // Function to toggle experiment description based on checkbox selection
+            function toggleExperiment(checkboxId) {
+                var doubleSlitDiv = document.getElementById('double-slit');
+                var polarizationDiv = document.getElementById('polarization');
+                var isChecked = document.getElementById(checkboxId).checked;
+        
+                if (isChecked) {
+                    if (checkboxId === 'experiment1') {
+                        doubleSlitDiv.style.display = 'block';
+                        polarizationDiv.style.display = 'none';
+                        document.getElementById('experiment2').checked = false;
+                    } else if (checkboxId === 'experiment2') {
+                        polarizationDiv.style.display = 'block';
+                        doubleSlitDiv.style.display = 'none';
+                        document.getElementById('experiment1').checked = false;
+
+                    }
+                }
+            }
+            // Call toggleExperiment function with the ID of the double slit experiment checkbox
+            window.onload = function() {
+                toggleExperiment('experiment1');
+            };
+        </script>
 
 </body>
 
