@@ -147,13 +147,21 @@
         </div>
     </div>
 
-    <div class="col-md-12 mt-2">
-        <input type="range" min="2" max="30" value="2" id="distance_bitween_two_slits">
-        <label for="distance_bitween_two_slits">Distance between slits (micrometers)</label>
-        <input type="range" min="5" max="20" value="2" id="slit_width">
-        <label for="slit_width">Slit width (micrometers)</label>
-        <input type="range" min="2" max="60" value="2" id="screen_distance">
-        <label for="screen_distance">Distance to the screen (meters)</label>
+    <div class="col-md-12 mt-2 row" style="height: 30%;">
+        <div class="col-md-12">
+            <input type="range" min="2" max="30" value="2" id="distance_bitween_two_slits">
+            <label for="distance_bitween_two_slits">Distance between slits (micrometers)</label>
+        </div>
+        <div class="col-md-12">
+            <input type="range" min="5" max="20" value="2" id="slit_width">
+            <label for="slit_width">Slit width (micrometers)</label>
+        </div>
+
+        <div class="col-md-12">
+            <input type="range" min="2" max="60" value="2" id="screen_distance">
+            <label for="screen_distance">Distance to the screen (meters)</label>
+        </div>
+
     </div>
 
     <script>
@@ -215,7 +223,7 @@
                 const scale = 100; // Scale for drawing
                 const wavelength = 0.02 + (width / 1000); // Wavelength of the waves
                 const slitSeparation = 0.2 + (distanceSplit / 100); // Distance between the slits
-                const screenDistance = 1 + (sDistance/10); // Distance from the slits to the screen
+                const screenDistance = 1 + (sDistance / 10); // Distance from the slits to the screen
                 var labels = [];
                 var intensityData = [];
                 for (let x = 0; x < canvasWidth; x++) {
@@ -285,10 +293,6 @@
 
         });
     </script>
-
-    <div class="col-md-12 mt-2" style="height: 30%; width: 100%;">
-
-    </div>
 
 
 </div>
