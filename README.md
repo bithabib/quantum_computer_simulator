@@ -97,6 +97,11 @@ This formula accounts for the interference between the probability amplitudes an
    - [Quantum Computing for Computer Scientists](https://www.cambridge.org/9781108481976)
    - [Quantum Computing Course based on a book](https://www.youtube.com/playlist?list=PLkespgaZN4gmu0nWNmfMflVRqw0VPkCGH)
 
+## References Course 
+   - [Quantum Computing Math Course](https://www.youtube.com/watch?v=3N2vN76E-QA&list=UULFjZeJQVSkkydgZmSUucB9kA&index=12)
+   - [Quantum Computing Course](https://www.youtube.com/playlist?list=PLkespgaZN4gmu0nWNmfMflVRqw0VPkCGH)
+
+
 
 ## Conference To Submit Paper 
 - [Quantum Computing Conference](https://quantum.technology/conf/index.html)
