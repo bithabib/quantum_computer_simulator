@@ -1,0 +1,55 @@
+<div>
+    <h1>The Double-Slit Experiment</h1>
+    <p>In a double-slit experiment, a particle (such as a photon) emitted from a source <strong>S</strong> can reach a
+        detector <strong>D</strong> by taking two different paths, e.g., through an upper or a lower slit in a barrier
+        between the source and the detector. After sufficiently many repetitions of this experiment, we can evaluate the
+        frequency of clicks in the detector <strong>D</strong> and show that it is inconsistent with the predictions
+        based on probability theory. Let us use the quantum approach to show how the discrepancy arises.</p>
+
+    <p>The particle emitted from <strong>S</strong> can reach detector <strong>D</strong> by taking two different paths,
+        which are assigned probability amplitudes <strong>z1</strong> and <strong>z2</strong>, respectively. We may then
+        say that the upper slit is taken with probability <strong>p1 = |z1|²</strong> and the lower slit with
+        probability <strong>p2 = |z2|²</strong>. These are two mutually exclusive events. With the two slits open,
+        allowing the particle to take either path, probability theory declares (by the Kolmogorov additivity axiom) that
+        the particle should reach the detector with probability <strong>p1 + p2 = |z1|² + |z2|²</strong>. But this is
+        not what happens experimentally!</p>
+
+    <p>That is, if one happens then the other one cannot. For example, "heads" and "tails" are mutually exclusive
+        outcomes of flipping a coin, but "heads" and "6" are not mutually exclusive outcomes of simultaneously flipping
+        a coin and rolling a dice.</p>
+
+    <p>Let us see what happens if we instead follow the two "quantum rules": first, we add the amplitudes, then we
+        square the absolute value of the sum to get the probability. Thus, the particle will reach the detector with
+        probability </p>
+    <p>\( p = |z|^2 \)</p>
+    <p>\( = |z_1 + z_2|^2 \)</p>
+    <p>\( = |z_1|^2 + |z_2|^2 + z_1^* z_2 + z_1 z_2^* \)</p>
+    <p>\( = p_1 + p_2 + |z_1| \cdot |z_2| (e^{i(\phi_2 - \phi_1)} + e^{-i(\phi_2 - \phi_1)}) \)</p>
+    <p>\( = p_1 + p_2 + 2p_1 p_2 \cos(\phi_2 - \phi_1) \)</p>
+    <p>The appearance of the interference terms marks the departure from the classical theory of probability. The
+        probability of any two seemingly mutually exclusive events is the sum of the probabilities of the individual
+        events modified by the interference term. Depending on the relative phase <strong>φ2 - φ1</strong>, the
+        interference term can be either negative (destructive interference) or positive (constructive interference),
+        leading to either suppression or enhancement, respectively, of the total probability <strong>p</strong>.</p>
+
+    <p>The algebra is simple; our focus is on the physical interpretation. Firstly, note that the important quantity
+        here is the relative phase <strong>φ2 - φ1</strong> rather than the individual phases <strong>φ1</strong> and
+        <strong>φ2</strong>. This observation implies that the particle reacts only to the difference of the two phases,
+        each pertaining to a separate path. Secondly, what has happened to the additivity axiom in probability theory?
+        What was wrong with it? One problem is the assumption that the processes of taking the upper or the lower slit
+        are mutually exclusive; in reality, as we have just mentioned, the two transitions both occur simultaneously.
+    </p>
+
+    <p>According to the philosopher Karl Popper (1902–1994), a theory is genuinely scientific only if it is possible, in
+        principle, to establish that it is false. Genuinely scientific theories are never finally confirmed because, no
+        matter how many confirming observations have been made, observations that are inconsistent with the empirical
+        predictions of the theory are always possible. There is no fundamental reason why Nature should conform to the
+        additivity axiom.</p>
+
+    <p>We find out how nature works by making "intelligent" guesses, running experiments, checking what happens, and
+        formulating physical theories. If our guess disagrees with experiments, then it is wrong, so we try another
+        intelligent guess, and another, etc. Right now, quantum theory is the best guess we have: it offers good
+        explanations and predictions that have not been falsified by any of the existing experiments. This said, rest
+        assured that one day quantum theory will be falsified, and then we will have to start guessing all over again.
+    </p>
+</div>
