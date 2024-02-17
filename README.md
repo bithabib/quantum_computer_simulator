@@ -100,6 +100,7 @@ This formula accounts for the interference between the probability amplitudes an
 ## References Course 
    - [Quantum Computing Math Course](https://www.youtube.com/watch?v=3N2vN76E-QA&list=UULFjZeJQVSkkydgZmSUucB9kA&index=12)
    - [Quantum Computing Course](https://www.youtube.com/playlist?list=PLkespgaZN4gmu0nWNmfMflVRqw0VPkCGH)
+   - [Book Link](https://qubit.guide/)
 
 
 
