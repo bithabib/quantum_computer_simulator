@@ -23,11 +23,15 @@
                     <h3>Chapters</h3>
                 </div>
                 <div class="col-md-12">
-                    <button class="bg-transparent border-0" onclick="showChapter('chapter_01')">1. Complex
+                    <button class="bg-transparent border-0" onclick="showChapter('chapter_01')">1. Why linear
+                        algebra?</button>
+                </div>
+                <div class="col-md-12">
+                    <button class="bg-transparent border-0" onclick="showChapter('chapter_02')">1. Complex
                         Number</button>
                 </div>
                 <div class="col-md-12">
-                    <button class="bg-transparent border-0" onclick="showChapter('chapter_02')">2. Probability
+                    <button class="bg-transparent border-0" onclick="showChapter('chapter_03')">2. Probability
                         Amplitude</button>
                 </div>
             </div>
@@ -39,6 +43,9 @@
             </div>
             <div class="chapter" id="chapter_02" style="display: none;">
                 {% include 'includes/book_chapter/chapter_02.html' %}
+            </div>
+            <div class="chapter" id="chapter_03" style="display: none;">
+                {% include 'includes/book_chapter/chapter_03.html' %}
             </div>
         </div>
 
