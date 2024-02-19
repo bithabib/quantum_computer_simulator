@@ -9,15 +9,53 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 </head>
 
 <body>
     {% include 'includes/nav_header.html' %}
-    
-    <div class="container">
-        {% include 'includes/book_chapter/chapter_01.html' %}
-    </div>
 
+
+
+    <div class="row m-5">
+        <div class="col-md-2">
+            <div class="row">
+                <div class="col-md-12">
+                    <h3>Chapters</h3>
+                </div>
+                <div class="col-md-12">
+                    <button onclick="showChapter('chapter_01')">1. Complex Number</button>
+                </div>
+                <div class="col-md-12">
+                    <button onclick="showChapter('chapter_02')">2. Probability Amplitude</button>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-md-10">
+            <div class="chapter" id="chapter_01" style="display: block;">
+                {% include 'includes/book_chapter/chapter_01.html' %}
+            </div>
+            <div class="chapter" id="chapter_02" style="display: none;">
+                {% include 'includes/book_chapter/chapter_02.html' %}
+            </div>
+        </div>
+
+    </div>
+    <script>
+        function showChapter(chapterId) {
+            // Hide all chapters
+            console.log(chapterId);
+            var chapters = document.getElementsByClassName('chapter');
+            for (var i = 0; i < chapters.length; i++) {
+                chapters[i].style.display = 'none';
+            }
+            // Show the selected chapter
+            document.getElementById(chapterId).style.display = 'block';
+        }
+    </script>
 </body>
 
 </html>
