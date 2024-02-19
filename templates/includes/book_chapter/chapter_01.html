@@ -1,46 +1,94 @@
-{% set equation = "x = \\frac{{-b \\pm \\sqrt{{b^2 - 4ac}}}}{{2a}}" %}
 <div>
-    
-    <h1 style="text-align: center; margin: 15px;">Chapter 01: Complex Number</h1>
-    <p>Let's start with the quadratic equation \( ax^2 + bx + c = 0 \), where \( a \), \( b \), and \( c \) are real
-        numbers
-        and \( x \) is the variable. When we attempt to solve this equation using the quadratic formula:</p>
-
-    {% set equation = "x = \\frac{{-b \\pm \\sqrt{{b^2 - 4ac}}}}{{2a}}" %}
-
-    \( {{ equation }} \)
-
-    <p>We encounter situations where the expression under the square root (\( b^2 - 4ac \)) can be negative. In the
-        realm of
-        real numbers, we know that the square root of a negative number is undefined. This leads to the inability to
-        find
-        real solutions to certain quadratic equations.</p>
-
-    <p>To circumvent this limitation, mathematicians introduced the concept of imaginary numbers. They defined the
-        imaginary
-        unit \( i \) such that \( i^2 = -1 \). With this definition, we can now take the square root of negative
-        numbers:
-    </p>
-
-    \[
-    \sqrt{-1} = i
-    \]
-
-    <p>With imaginary numbers, we can extend the real number system to the complex number system, where a complex number
-        is
-        expressed as \( a+bi \), with \( a \) and \( b \) being real numbers and \( i \) representing the imaginary
-        unit.
-    </p>
-
-    <p>Now, when we encounter situations where the expression under the square root (\( b^2 - 4ac \)) is negative while
-        solving quadratic equations, we can still find solutions by utilizing imaginary numbers. The solutions become
-        complex numbers with real and imaginary parts.</p>
-
-    <p>So, the introduction of the imaginary unit \( i \) was a mathematical invention to allow for the solution of
-        equations that couldn't be solved within the realm of real numbers alone, particularly quadratic equations with
-        no
-        real roots. It was a leap of abstraction that turned out to be incredibly useful in various branches of
-        mathematics
-        and physics.</p>
-
+    <p>Hi everyone, today, I am beginning a new  series called Maths of Quantum Mechanics.   Looking through youtube, I
+        found a lot of  amazing videos giving an overview of quantum   mechanics concepts like the wavefunction, 
+        quantum superposition, or tunneling,   but what I didn’t find were very  many videos giving intuition into   the
+        fundamental mathematics behind it all. I  was surprised, because I truly believe that   the mathematics behind
+        quantum mechanics  can be made intuitive and understandable. So, the point of this series is to take you  from
+        someone who knows quantum mechanics,   to someone who intuitively understands  quantum mechanics and all the
+        math behind it. And to give you an idea of what  we will dive into in this series,   here is a list of the
+        chapters  and the topics we will cover.   These are all questions that I remember wanting  intuition for when
+        learning quantum mechanics,   and hopefully you see questions that you have  also always wondered. I plan to add
+        more chapters   as time allows, so if you don’t see something  you’ve always wanted answered, please let me
+        know! Now, before we begin, we need to go over the  math I’ll assume you’re already familiar with.   First, I’ll
+        assume you have a working knowledge  of single variable calculus -- in other words,   you are comfortable with
+        derivatives, integrals,  and taylor series. You don’t have to remember how   to calculate these, just have an
+        understanding of  what they are and what they mean. It’s inevitable   that we’ll run into multivariable
+        calculus, but  we won’t need it for the majority of the series. Second, I’ll assume you are familiar with 
+        linear algebra at the level of 3blue1brown’s   ‘Essence of Linear Algebra.’ His series is  fantastic, and it
+        largely inspired this one,   so I recommend you go watch it if you haven’t  already – it will be linked in the
+        description.   The linear algebra concepts you should be  familiar with are shown on the screen now.   Go ahead
+        and pause it to look it over. Again, you  don’t need to remember how to calculate all these,   just have an
+        understanding of what they  are. Hopefully this list isn’t too daunting,   and don’t be afraid to brush up
+        whenever  you run into something unfamiliar. In this first episode, I want to show you  all why we want to use
+        linear algebra to   model the quantum world. We’re going  to think like theoretical physicists,   and find that
+        linear algebra pops out  naturally by considering physical observations. First, let’s review the basic
+        mathematical  model we have for classical physics. We know   that a classical particle carries with it physical 
+        quantities, like position, momentum, and energy. As this particle moves in space  and interacts with objects,  
+        we know that these quantities  change continuously in time. So, what are the takeaways? First, we know that 
+        classical physical quantities are single-valued,   meaning they only take on one value  at any one time. So, for
+        example,   a particle can’t be in two places at once,  and it can’t have two different velocities.   Second,
+        physical quantities are continuous,   meaning they vary smoothly as they evolve in  time, and they don’t change
+        values suddenly. Given these two observations, it hopefully  seems clear that the way to model these   physical
+        quantities is with a continuous  function. A function, by definition,   only takes on one value at any single
+        time, and a  continuous function doesn’t have any sudden jumps.   So, this is why in classical physics, we
+        represent  physical quantities with continuous functions! Now, this may seem kind of obvious.  I mean, what else
+        would we use?   Well to see when a model  like this one breaks down,   let us analyze a real physical system
+        and  compare the classical and quantum worlds. In particular, let’s focus on a hydrogen  atom, consisting of an
+        electron in motion   around a proton. Let’s see what we expect to  happen within the classical physics
+        framework.   As the electron orbits and falls towards  the proton, it will release energy in the   form of
+        light. This is a well known  fact from electricity and magnetism. By measuring the energy of light released,  we
+        can have a measure of how much energy the   electron has left, here in units of electron  volts. So, we can set
+        up a detector and do   exactly this. The electron’s energy is shown  on the left (in units of electron volts),  
+        and, as required in classical physics,  it is single-valued and continuous. Now let’s hop into the quantum world
+        and  get an actual hydrogen atom and a detector,   and let’s see what really happens. We would find that we only
+        get a few blips from  our detector, measuring only a few energies.   Ok, let’s reset the experiment  again and
+        give it another run. We only measure a few energies again,  but this time some of them are different.   We can
+        repeat this experiment over and over  again, and we would notice the following. First, it seems that we only
+        get  a certain set of energy values,   never measuring anything in between. Second, the  specific energy value
+        that we measure is random;   however, it does seem like some energy  values have a higher probability than
+        others. Let’s summarize these conclusions  and their implications.   First, our experiment showed that physical 
+        quantities can sometimes be discrete, meaning   we can list all the possible values it can take,  never equaling
+        something in between these values.   Note that this contradicts the idea that  physical quantities must be
+        continuous! Second, the particular value that we measure is  random, but probabilistic. This means that before  
+        making a measurement, we do not know which of the  possible energies we will get. However, we do know   that
+        some values are more likely than others, so  there is a probability attached to each value.   Note that this
+        also contradicts the single-valued  characteristic, since before the measurement,   we cannot determine a
+        singular value for  the quantity, it could be any of them. So, clearly a continuous function won’t work  to
+        model the quantum world...so what will?   It may seem like a daunting problem to solve,   but let’s put on our
+        theoretical physicist hats  and see what we can deduce from our conclusions. First, let’s find a way to
+        mathematically  model the randomness problem.   It seems like before we make a measurement,  the particle
+        somehow holds the information on   every possible outcome we could get. How do  we mathematically represent this
+        phenomenon? Well, let’s say that we know for  sure that the particle has energy A,   and let us say that the
+        particle is  represented by the mathematical object M_A.   Now M could be anything, it could  be a function, an
+        element of a ring,   a manifold -- just some mathematical object  that we have yet to determine. Now if the  
+        particle has energy B, then it is represented by  mathematical object M_B, and so on and so forth.   So we have
+        a mathematical object M for every  possible outcome we could get for our particle. Somehow, our particle is
+        represented by an  amalgamation of all of these mathematical objects,   holding on to each outcome until we
+        make  a measurement. So we need to put all these   mathematical objects together somehow.  Let’s use some
+        unknown ‘dot’ operation. This dot operation could be addition, it could  be multiplication, it could be
+        something even   more exotic. It’s just some unknown way for  us to combine our mathematical objects into   one
+        aggregate object that describes  our particle before the measurement. This is a really good start!   Next, we
+        also need to somehow codify the idea  that some outcomes are more likely than others.   So each mathematical
+        object also needs to  carry with it the probability of getting   that particular outcome. Well the simplest way 
+        to do this is just to add a number in front of   each mathematical object, a number that somehow  encodes how
+        likely each possibility is to occur. Now, lets take a step back  and look at what we have.   Having studied a
+        number of mathematical structures  in your past, hopefully you begin to see that this   looks suspiciously like
+        a linear combination of  some sort. You see that, right? This is our only   lead, so let’s go ahead and run with
+        it: our  particle is some sort of linear combination   of all outcome-possibilities, which we’ll  assume are
+        represented by some sort of vector.   This may seem like a big leap, but hopefully  you see how we came to these
+        conclusions. Now let’s move on to the discreteness problem.  This is now a question about how we represent   our
+        physical quantities. We know that functions  won’t work; we need a mathematical object that   allows us to
+        sometimes extract discrete  values. This is a little more difficult,   but if we follow our lead on linear
+        combinations,  we may guess that maybe linear operators ,AKA   matrices, represent physical quantities. I mean, 
+        a matrix consists of a discrete set of numbers,   so maybe we can somehow extract our  physical quantities from
+        that discrete set. So, putting it all together, we now have a really  solid guess into how we want to model
+        quantum   mechanics! Particles are represented by a linear  combination of vectors in some vector space,   and
+        physical quantities are represented  by linear operators within that space. Now, if this seems somewhat 
+        contrived and unfamiliar,   don’t worry. We developed the framework of  quantum mechanics in a handful of
+        minutes,   meanwhile it took the greatest physicists of the  world years to arrive at these same conclusions.  
+        What matters is that you see why linear algebra  is a good starting point for quantum mechanics. Now there are
+        still a lot of unanswered  questions. How is a particle a vector?   How are different probabilities calculated?
+        How  does a particle evolve in time? Next episode,   we’ll address the first of these questions,  and discuss
+        what kets and wavefunctions are.   Thank you all so much for watching – I  hope to see all throughout this
+        series,   as we explore the world of quantum math!</p>
 </div>
