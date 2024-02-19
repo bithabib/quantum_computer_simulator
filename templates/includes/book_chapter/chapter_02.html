@@ -1,0 +1,81 @@
+<div>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <h1 style="text-align: center; margin: 15px;">Chapter 02: Probability Amplitude</h1>
+    <p>The probability amplitude is a complex number that represents the probability of finding a qubit in a particular
+        state. The probability amplitude is a combination of the amplitude and phase of the qubit state. The amplitude
+        is the magnitude of the probability amplitude, and the phase is the angle of the probability amplitude. The
+        probability amplitude is used to calculate the probability of measuring a qubit in a particular state. The
+        probability of measuring a qubit in a particular state is the square of the magnitude of the probability
+        amplitude.</p>
+    <h2>Derivation of Probability Formula for Quantum Mechanics</h2>
+
+    <h3>Introduction</h3>
+    <p>In quantum mechanics, the probability of a particular outcome is related to the square of the magnitude of the
+        probability amplitude. When considering the combination of two probability amplitudes, alpha1 and alpha2, the
+        probability formula involves the interference between them.</p>
+
+    <h3>Complex Conjugates</h3>
+    <p>In the context of complex numbers, the complex conjugate of a complex number <em>z</em>, denoted as <em>z*</em>
+        or <em>√</em>z, is formed by changing the sign of the imaginary part of <em>z</em>.</p>
+    <p>If <em>z = a + bi</em> where <em>a</em> and <em>b</em> are real numbers and <em>i</em> is the imaginary unit,
+        then the complex conjugate <em>z*</em> is given by:</p>
+    <p>$$ z^* = a - bi $$</p>
+    <p>In other words, the complex conjugate of a complex number simply reflects the point representing that number
+        across the real axis on the complex plane. Geometrically, if you have a point representing a complex number in
+        the complex plane, its complex conjugate is the reflection of that point across the real axis.</p>
+    <p>The complex conjugate is particularly useful when dealing with operations involving complex numbers, such as
+        multiplication, division, and taking the modulus. For example, when multiplying a complex number by its
+        conjugate, the imaginary parts cancel out, resulting in a real number:</p>
+    <p>$$ z \cdot z^* = (a + bi)(a - bi) = a^2 + b^2 $$</p>
+    <p>This property is often used in various mathematical and physical contexts, including quantum mechanics, where
+        complex numbers and their conjugates play a crucial role in describing the behavior of quantum systems.</p>
+
+
+
+        
+    <h3>Probability Amplitude</h3>
+    <p>Whole quantum physics can be summarise by three Probability Amplitude rules </p>
+    <p>$$ \text{Probability} = |\alpha|^2 $$</p>
+    <p>$$ \alpha = \alpha_1 + \alpha_2$$</p>
+    <p>$$ \alpha = \alpha_1 * \alpha_2 $$</p>
+    <img src="static/src/fig_chapter_01/pa_add.png" alt="" style="height: 200px;">
+    <img src="static/src/fig_chapter_01/pa_mul.png" alt="" style="height: 200px;">
+    <h3>Step 1: Combined Probability Amplitude</h3>
+    <p>Let alpha be the combined probability amplitude:</p>
+    <p>$$ \alpha = \alpha_1 + \alpha_2 $$</p>
+
+    <h3>Step 2: Probability Calculation</h3>
+    <p>The probability of the outcome is given by the square of the magnitude of alpha:</p>
+    <p>$$ \text{Probability} = |\alpha|^2 = |\alpha_1 + \alpha_2|^2 $$</p>
+
+    <h3>Step 3: Expansion</h3>
+    <p>Expanding the expression using complex conjugates:</p>
+    <p>$$ |\alpha_1 + \alpha_2|^2 = (\alpha_1 + \alpha_2) \cdot (\alpha_1^* + \alpha_2^*) $$</p>
+    <p>$$ = \alpha_1 \alpha_1^* + \alpha_2 \alpha_2^* + \alpha_1 \alpha_2^* + \alpha_2 \alpha_1^* $$</p>
+
+    <h3>Step 4: Interference Term</h3>
+    <p>The interference term alpha1 alpha2* contains the phase difference between alpha1 and alpha2, denoted by phi2 -
+        phi1, where phi1 and phi2 are the phases of alpha1 and alpha2 respectively.</p>
+    <p>$$ \alpha_1 \alpha_2^* = |\alpha_1||\alpha_2|\cos(\phi_2 - \phi_1) $$</p>
+
+    <h3>Step 5: Final Probability Formula</h3>
+    <p>Substituting the interference term back into the expression:</p>
+    <p>$$ |\alpha_1 + \alpha_2|^2 = |\alpha_1|^2 + |\alpha_2|^2 + 2|\alpha_1||\alpha_2|\cos(\phi_2 - \phi_1) $$</p>
+    <p>This formula accounts for the interference between the probability amplitudes and determines the probability of
+        the outcome.</p>
+
+    <h3>References:</h3>
+    <ul>
+        <li><a href="https://medium.com/quantum-untangled/quantum-states-and-the-bloch-sphere-9f3c0c445ea3">Quantum
+                States And The Bloch Sphere</a></li>
+        <li><a href="https://medium.com/quantum-untangled/visualizing-quantum-logic-gates-part-1-515bb7b58916">Visualizing
+                Single Qubit Quantum Logic Gates</a></li>
+        <li><a href="https://www.quantum-inspire.com/kbase/introduction-to-quantum-computing">The basics of Quantum
+                Computing</a></li>
+        <li><a href="https://qubit.guide/">Quantum Computing Book under writing</a></li>
+        <li><a href="https://www.cambridge.org/9781108481976">Quantum Computing for Computer Scientists</a></li>
+        <li><a href="https://www.youtube.com/playlist?list=PLkespgaZN4gmu0nWNmfMflVRqw0VPkCGH">Quantum Computing Course
+                based on a book</a></li>
+    </ul>
+</div>
