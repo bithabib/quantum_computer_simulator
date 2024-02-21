@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Book</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link type="text/css" rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+        media="screen,projection" />
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -23,20 +26,23 @@
                     <h3>Chapters</h3>
                 </div>
                 <div class="col-md-12">
-                    <button class="bg-transparent border-0" style="text-align: left;" onclick="showChapter('chapter_01')">1. Why linear
+                    <button class="bg-transparent border-0" style="text-align: left;"
+                        onclick="showChapter('chapter_01')">1. Why linear
                         algebra?</button>
                 </div>
                 <div class="col-md-12">
-                    <button class="bg-transparent border-0" style="text-align: left;" onclick="showChapter('chapter_02')">1. Complex
+                    <button class="bg-transparent border-0" style="text-align: left;"
+                        onclick="showChapter('chapter_02')">1. Complex
                         Number</button>
                 </div>
                 <div class="col-md-12">
-                    <button class="bg-transparent border-0" style="text-align: left;" onclick="showChapter('chapter_03')">2. Probability
+                    <button class="bg-transparent border-0" style="text-align: left;"
+                        onclick="showChapter('chapter_03')">2. Probability
                         Amplitude</button>
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-10" style="height: 100vh; overflow: scroll;">
             <div class="chapter" id="chapter_01" style="display: block;">
                 {% include 'includes/book_chapter/chapter_01.html' %}
