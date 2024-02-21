@@ -1,0 +1,227 @@
+
+
+<div class="col-md-12" style="margin-top:1em;">
+    <button class="btn" onclick="restart()">Reset</button>
+    <button class="btn" onclick="undo()">Undo</button>
+</div>
+
+
+<div class="col-md-6">
+
+    <div id='myDiv' class='card' style='padding-bottom: 100%;'><noscript>Javascript necessary</noscript>
+    </div>
+
+    <button class="btn" onclick="export_png()">Download</button>
+
+
+</div>
+<div class="col-md-6">
+
+    <ul class="collapsible expandable">
+        <li class="active">
+            <div class="collapsible-header">Rotations Around Default Axes
+            </div>
+            <div class="collapsible-body">
+                <table>
+                    <tr>
+                        <td style="min-width:4em;">
+                            x axis
+                        </td>
+                        <td>
+                            <button class="btn" onclick="rotate_state('x',math.PI/2);">+90°</button>
+                            <button class="btn" onclick="rotate_state('x',-math.PI/2);">-90°</button>
+                            <button class="btn" onclick="rotate_state('x',math.PI);">+180°</button>
+                            <button class="btn" onclick="rotate_state('x',-math.PI);">-180°</button>
+                            <div class="input-field inline" style="width:3em; margin-left:1em;">
+                                <input id="x_angle" type="number" style="width:2em;" placeholder="45">°
+                            </div>
+                            <button class="btn"
+                                onclick="rotate_state('x',-document.getElementById('x_angle').value/180*math.PI);">-</button>
+                            <button class="btn"
+                                onclick="rotate_state('x',document.getElementById('x_angle').value/180*math.PI);">+</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="min-width:4em;">
+                            y axis</td>
+                        <td>
+                            <button class="btn" onclick="rotate_state('y',math.PI/2);">+90°</button>
+                            <button class="btn" onclick="rotate_state('y',-math.PI/2);">-90°</button>
+                            <button class="btn" onclick="rotate_state('y',math.PI);">+180°</button>
+                            <button class="btn" onclick="rotate_state('y',-math.PI);">-180°</button>
+                            <div class="input-field inline" style="width:3em; margin-left:1em;">
+                                <input id="y_angle" type="number" style="width:2em;" placeholder="45">°
+                            </div>
+                            <button class="btn"
+                                onclick="rotate_state('y',-document.getElementById('y_angle').value/180*math.PI);">-</button>
+                            <button class="btn"
+                                onclick="rotate_state('y',document.getElementById('y_angle').value/180*math.PI);">+</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="min-width:4em;">
+                            z axis</td>
+                        <td>
+                            <button class="btn" onclick="rotate_state('z',math.PI/2);">+90°</button>
+                            <button class="btn" onclick="rotate_state('z',-math.PI/2);">-90°</button>
+                            <button class="btn" onclick="rotate_state('z',math.PI);">+180°</button>
+                            <button class="btn" onclick="rotate_state('z',-math.PI);">-180°</button>
+                            <div class="input-field inline" style="width:3em; margin-left:1em;">
+                                <input id="z_angle" type="number" style="width:2em;" placeholder="45">°
+                            </div>
+                            <button class="btn"
+                                onclick="rotate_state('z',-document.getElementById('z_angle').value/180*math.PI);">-</button>
+                            <button class="btn"
+                                onclick="rotate_state('z',document.getElementById('z_angle').value/180*math.PI);">+</button>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </li>
+        <li>
+            <div class="collapsible-header">
+                Rotations Around Custom Axis
+            </div>
+            <div class="collapsible-body">
+                <table>
+                    <tr>
+                        <td>Polar Angle</td>
+                        <td><input id="custom_axis_polar" type="number" style="width:4em;margin-left:0.5em;"
+                                value="90">°
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Azimuthal Angle</td>
+                        <td><input id="custom_axis_azimuth" type="number" style="width:4em;margin-left:0.5em;"
+                                value="0">°
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Rotation Angle</td>
+                        <td><input id="custom_axis_rot_angle" type="number" style="width:4em;margin-left:0.5em;"
+                                value="90" step="1">°</td>
+                    </tr>
+                </table><br />
+                <button class="btn" onclick="custom_rotate_state();">Apply
+                    Rotation</button>
+            </div>
+        </li>
+
+        <li>
+            <div class="collapsible-header">Quantum Gates</div>
+            <div class="collapsible-body">
+                <table>
+                    <tr>
+                        <td>Pauli Gates</td>
+                        <td>
+                            <button class="btn" onclick="rotate_state('x',math.PI);">X</button>
+                            <button class="btn" onclick="rotate_state('y',math.PI);">Y</button>
+                            <button class="btn" onclick="rotate_state('z',math.PI);">Z</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Hadamard</td>
+                        <td> <button class="btn"
+                                onclick="rotate_state('y',math.PI/2);rotate_state('x',math.PI);">H</button>
+                    </tr>
+                    <tr>
+                        <td>Phase</td>
+                        <td> <button class="btn" onclick="rotate_state('z',math.PI/2);">S</button>
+                            <button class="btn" onclick="rotate_state('z',-math.PI/2);">S†</button>
+                            <button class="btn" onclick="rotate_state('z',math.PI/4);">T</button>
+                            <button class="btn" onclick="rotate_state('z',-math.PI/4);">T†</button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+
+        </li>
+        <li>
+            <div class="collapsible-header">Pulses</div>
+            <div class="collapsible-body">
+                <table>
+                    <tr>
+                        <td>Detuning</td>
+                        <td><input id="detuning" type="number" style="width:4em;margin-left:0.5em;" value="0"
+                                step="0.01" onchange="rabi_plot();"></td>
+                        <td>Phase</td>
+                        <td><input id="phase" type="number" style="width:4em;margin-left:0.5em;" value="0" step="1"
+                                max="360" onchange="rabi_plot();">°</td>
+                    </tr>
+                    <tr>
+                        <td>Amplitude</td>
+                        <td><input id="amplitude" type="number" style="width:4em;margin-left:0.5em;" value="1"
+                                step="0.01" onchange="rabi_plot();"></td>
+                        <td>Pulse Length</td>
+                        <td><input id="pulselength" type="number" style="width:4em;margin-left:0.5em;" value="0.5"
+                                step="0.01" onchange="rabi_plot();"></td>
+                    </tr>
+                </table>
+                <div>
+                    <label>Transition Probability Plot</label>
+                    <div id="rabi_div" style="width:100%;height:10em;"></div>
+                </div>
+                <div style="margin-top:4em;">
+                    <button class="btn" onclick="pulse_apply('x');">Apply Pulse Along
+                        x</button>
+                    <button class="btn" onclick="pulse_apply('y');">Apply Pulse Along
+                        y</button>
+                </div>
+            </div>
+        </li>
+        <li>
+            <div class="collapsible-header">Settings</div>
+            <div class="collapsible-body">
+                <table>
+                    <tr>
+                        <td>
+                            Spin Color
+                        </td>
+                        <td><input type="color" id="spin_color" value="#1a237e" onchange="update_state_plot();"></td>
+                        <td>Histrory Trace Color</td>
+                        <td><input type="color" id="phosphor_color" value="#1a237e" /></td>
+                    </tr>
+                    <tr>
+                        <td>Top State Text</td>
+                        <td><input type="text" id="north_text" value="0" style="width:5em"
+                                onchange="BLOCHSPHERE =  gen_bloch_sphere();update_state_plot(full_update=true)">
+                        </td>
+                        <td>Bottom State Text</td>
+                        <td><input type="text" id="south_text" value="1" style="width:5em"
+                                onchange="BLOCHSPHERE =  gen_bloch_sphere();update_state_plot(full_update=true)">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>History Trace Length</td>
+                        <td><input type="number" id="phosphor_length" value="10" min="0" step="1" style="width:5em">
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Export Size</td>
+                        <td>
+                            <input id="export_size" type="number" value="800" style="width:5em"> px
+                        </td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </li>
+    </ul>
+</div>
+
+<script src="static/src/js/plotly-2.16.1.min.js"></script>
+
+<!--Math-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.2.1/math.js"
+    integrity="sha512-47N5yVdAeXJ+9qstVMTH2Z0EpX618sjYZcswRwhpldSTD0IbW6yQPtzg4RLrPp/2+TIgEF1elT68/ZBu82nqJA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="static/src/js/helper.js"></script>
+<script src="static/src/js/quantum.js"></script>
+<script type="text/javascript"
+    src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+<script type="text/javascript" src="static/src/js/plot.js"></script>
+<script type="text/javascript" src="static/src/js/ui.js"></script>
