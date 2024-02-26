@@ -32,12 +32,16 @@
                 </div>
                 <div class="col-md-12">
                     <button class="bg-transparent border-0" style="text-align: left;"
-                        onclick="showChapter('chapter_02')">1. Complex
+                        onclick="showChapter('chapter_022')">2. Derivatives</button>
+                </div>
+                <div class="col-md-12">
+                    <button class="bg-transparent border-0" style="text-align: left;"
+                        onclick="showChapter('chapter_02')">3. Complex
                         Number</button>
                 </div>
                 <div class="col-md-12">
                     <button class="bg-transparent border-0" style="text-align: left;"
-                        onclick="showChapter('chapter_03')">2. Probability
+                        onclick="showChapter('chapter_03')">4. Probability
                         Amplitude</button>
                 </div>
             </div>
@@ -46,6 +50,9 @@
         <div class="col-md-10" style="height: 100vh; overflow: scroll;">
             <div class="chapter" id="chapter_01" style="display: block;">
                 {% include 'includes/book_chapter/chapter_01.html' %}
+            </div>
+            <div class="chapter" id="chapter_022" style="display: none;">
+                {% include 'includes/book_chapter/chapter_022.html' %}
             </div>
             <div class="chapter" id="chapter_02" style="display: none;">
                 {% include 'includes/book_chapter/chapter_02.html' %}
