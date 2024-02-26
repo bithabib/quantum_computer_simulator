@@ -1,10 +1,60 @@
-<div class="col-md-12 ">
+<style>
+    .qbit_gate_place {
+        position: relative;
+        height: 40px;
+        width: 40px;
+    }
+
+    .qbit_gate_place::after {
+        position: absolute;
+        left: -300%;
+        top: 50%;
+        height: 3px;
+        background: #c00;
+        content: "";
+        width: 700%;
+        display: block;
+    }
+</style>
+
+<div class="col-md-12 row">
     <!-- Draggable Button -->
 
-    <button id="draggableBtn" class="btn btn-primary draggable">Drag Me!</button>
-    <div class="col-md-12">
-        <img src="static/src/icon/bloch_sphere.png" width="40px" height="40px" alt="Qbit" />
+    <div class="col-md-12 row">
+        <div class="card m-2" style="height: 40px; width: 40px;" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <button id="draggableBtn" class="btn btn-primary" draggable="true" ondragstart="drag(event)"  style="z-index: 5;">H</button>
+        </div>
+        <div class="card m-2" style="height: 40px; width: 40px;">
+            <button id="draggableBtn1" class="btn btn-primary draggable" style="z-index: 5;">X</button>
+        </div>
+        <div class="card m-2" style="height: 40px; width: 40px;">
+            <button id="draggableBtn2" class="btn btn-primary draggable" style="z-index: 5;">Y</button>
+        </div>
+        <div class="card m-2" style="height: 40px; width: 40px;">
+            <button id="draggableBtn3" class="btn btn-primary draggable" style="z-index: 5;">Z</button>
+        </div>
+        <div class="card m-2" style="height: 40px; width: 40px;">
+            <button id="draggableBtn4" class="btn btn-primary draggable" style="z-index: 5;">Z</button>
+        </div>
+        <div class="card m-2" style="height: 40px; width: 40px;">
+            <button id="draggableBtn5" class="btn btn-primary draggable" style="z-index: 5;">Z</button>
+        </div>
+        <div class="card m-2" style="height: 40px; width: 40px;">
+            <button id="draggableBtn6" class="btn btn-primary draggable" style="z-index: 5;">Z</button>
+        </div>
+        <div class="card m-2" style="height: 40px; width: 40px;">
+            <button id="draggableBtn7" class="btn btn-primary draggable" style="z-index: 5;">Z</button>
+        </div>
     </div>
+
+    <div class="col-md-12" style="height: 60vh; width: 100%; display: flex; justify-content: center;">
+
+        <div class="card qbit_gate_place" id="drop_place" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
+
+    </div>
+
+
+
 </div>
 
 
