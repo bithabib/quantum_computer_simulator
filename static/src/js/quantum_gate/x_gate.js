@@ -1,3 +1,4 @@
+// include another js file
 function allowDrop(ev) {
   ev.preventDefault();
 }
@@ -60,6 +61,25 @@ function moveToGate() {
       if (currentPosition >= target.dropPlace.offsetLeft) {
         clearInterval(interval); // Stop the animation when the target position is reached
         // Move to the next target
+        // get the child of the drop_place
+        var child = target.dropPlace.children[0];
+        console.log(child);
+        if (child) {
+          // read the text of the child
+          var text = child.textContent;
+          console.log(text);
+          if (text === "X") {
+            rotate_state("x", math.PI);
+          }else if (text === "Y") {
+            rotate_state("y", math.PI);
+          }else if (text === "Z") {
+            rotate_state("z", math.PI);
+          }else if (text === "H") {
+            rotate_state('y',math.PI/2);
+            rotate_state('x',math.PI);
+          }
+          // rotate_state("x", math.PI);
+        }
         setTimeout(() => {
           moveToNextTarget(index + 1); // Move to the next target after the pause
         }, 1000);
