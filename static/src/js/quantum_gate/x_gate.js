@@ -54,29 +54,36 @@ function moveToGate() {
       // All targets reached, animation finished
       return;
     }
-
     const target = targets[index];
     const interval = setInterval(() => {
       currentPosition += target.step;
+
       if (currentPosition >= target.dropPlace.offsetLeft) {
+        if (index === 3) {
+          let i = 1;
+          while (i <= 35) {
+            currentPosition += target.step;
+            moving_qbit.style.left = currentPosition + "px";
+            i++;
+          }
+        }
         clearInterval(interval); // Stop the animation when the target position is reached
         // Move to the next target
         // get the child of the drop_place
         var child = target.dropPlace.children[0];
-        console.log(child);
         if (child) {
           // read the text of the child
           var text = child.textContent;
           console.log(text);
           if (text === "X") {
             rotate_state("x", math.PI);
-          }else if (text === "Y") {
+          } else if (text === "Y") {
             rotate_state("y", math.PI);
-          }else if (text === "Z") {
+          } else if (text === "Z") {
             rotate_state("z", math.PI);
-          }else if (text === "H") {
-            rotate_state('y',math.PI/2);
-            rotate_state('x',math.PI);
+          } else if (text === "H") {
+            rotate_state("y", math.PI / 2);
+            rotate_state("x", math.PI);
           }
           // rotate_state("x", math.PI);
         }
