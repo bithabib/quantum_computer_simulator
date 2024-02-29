@@ -4,22 +4,10 @@ function allowDrop(ev) {
 }
 function drag(ev) {
   ev.dataTransfer.setData("text", ev.target.id);
-  // get the parent of the ev
-  var parent = ev.target.parentNode;
-  // get the id of the paren of the ev
-  var parent_id = parent.id;
-  // check if the parent id contain drop_place
-  if (parent_id.includes("drop_place")) {
-    parent.style.height = "20px";
-    parent.style.width = "20px";
-  }
 }
 function drop(ev) {
   ev.preventDefault();
   var data = ev.dataTransfer.getData("text");
-  // change the style of the ev
-  ev.target.style.height = "60px";
-  ev.target.style.width = "60px";
   ev.target.appendChild(document.getElementById(data));
 }
 
@@ -61,7 +49,7 @@ function moveToGate() {
       if (currentPosition >= target.dropPlace.offsetLeft) {
         if (index === 3) {
           let i = 1;
-          while (i <= 35) {
+          while (i <= 100) {
             currentPosition += target.step;
             moving_qbit.style.left = currentPosition + "px";
             i++;
@@ -96,4 +84,24 @@ function moveToGate() {
     }, 10);
   }
   moveToNextTarget(0);
+}
+
+function selectedQbit(event) {
+  const selected_qbit = event.target;
+  if (selected_qbit.id === "checkbox_single_qbit") {
+    // lets see its checked or not
+    if (selected_qbit.checked) {
+    } else {
+    }
+  } else {
+    // lets see its checked or not
+    const sm_qbit_gate_holder = document.getElementById("sm_qbit_gate_holder");
+    if (selected_qbit.checked) {
+      document.getElementById("drop_place_multi").style.visibility = "visible";
+      sm_qbit_gate_holder.classList.add("checked");
+    } else {
+      document.getElementById("drop_place_multi").style.visibility = "hidden";
+      sm_qbit_gate_holder.classList.remove("checked");
+    }
+  }
 }
