@@ -9,11 +9,10 @@
     }
 
     .qbit_gate_place {
-        width: 20px;
-        height: 20px;
+        width: 50px;
+        height: 50px;
         background-color: white;
         /* Adjust color as needed */
-        border-radius: 50%;
         z-index: 1;
     }
 
@@ -29,7 +28,40 @@
         z-index: 0;
     }
 
+    .box_for_gate.checked::after {
+        content: "";
+        position: absolute;
+        top: 35%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: black;
+        /* Adjust color as needed */
+        z-index: 0;
+    }
+
+    .box_for_gate.checked::before {
+        content: "";
+        position: absolute;
+        top: 60%;
+        /* Adjust position as needed */
+        left: 0;
+        right: 0;
+        height: 1px;
+        background-color: black;
+        /* Adjust color as needed */
+        z-index: 0;
+    }
+
     #drop_place {
+        width: 40px;
+        height: 40px;
+        background-image: url('static/src/icon/qbit.png');
+        background-size: cover;
+        border-radius: 50%;
+    }
+
+    #drop_place_multi {
         width: 40px;
         height: 40px;
         background-image: url('static/src/icon/qbit.png');
@@ -51,6 +83,7 @@
     #draggableBtn7 {
         width: 100%;
         height: 100%;
+        font-size: clamp(5px, 2vw, 10px);
         z-index: 5;
     }
 
@@ -61,13 +94,32 @@
     }
 
     #gate {
-        width: 60px;
-        height: 60px;
+        width: 50px;
+        height: 50px;
     }
 </style>
 
 <div class="col-md-12">
-    <h3 class="m-5">Drag and Drop the qbit to the gate</h3>
+    <div class="mt-3" style="display: flex; justify-content: center;">
+        <h3>Drag and Drop the qbit to the gate</h3>
+    </div>
+    <div style="display: flex; justify-content: center;">
+        <label class="m-3">
+            <input type="checkbox" class="filled-in" id="checkbox_single_qbit" onclick="selectedQbit(event)" checked />
+            <span>
+                Signgle Qbit
+            </span>
+        </label>
+
+
+        <label class="m-3">
+            <input type="checkbox" class="filled-in" id="checkbox_multi_qbit" onclick="selectedQbit(event)" />
+            <span>
+                Multi Qbit
+            </span>
+        </label>
+
+    </div>
     <div class="row">
         <div class="col-md-12" id="gate_container">
             <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -83,8 +135,6 @@
                 <button id="draggableBtn3" class="btn btn-primary" draggable="true" ondragstart="drag(event)">X</button>
             </div>
 
-        </div>
-        <div class="col-md-12" id="gate_container">
             <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <button id="draggableBtn4" class="btn btn-primary" draggable="true" ondragstart="drag(event)">Y</button>
             </div>
@@ -97,12 +147,41 @@
             <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
                 <button id="draggableBtn7" class="btn btn-primary" draggable="true" ondragstart="drag(event)">Z</button>
             </div>
+
+        </div>
+        <div class="col-md-12" id="gate_container">
+            <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <button id="draggableBtn" class="btn btn-primary" draggable="true" ondragstart="drag(event)">CNOT</button>
+            </div>
+            <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <button id="draggableBtn1" class="btn btn-primary" draggable="true" ondragstart="drag(event)">SWAP</button>
+            </div>
+            <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <button id="draggableBtn2" class="btn btn-primary" draggable="true" ondragstart="drag(event)">CCNOT</button>
+            </div>
+            <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <button id="draggableBtn3" class="btn btn-primary" draggable="true" ondragstart="drag(event)">CSWAP</button>
+            </div>
+
+            <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <button id="draggableBtn4" class="btn btn-primary" draggable="true" ondragstart="drag(event)">CCZ</button>
+            </div>
+            <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <button id="draggableBtn5" class="btn btn-primary" draggable="true" ondragstart="drag(event)">CS</button>
+            </div>
+            <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <button id="draggableBtn6" class="btn btn-primary" draggable="true" ondragstart="drag(event)">Rx</button>
+            </div>
+            <div class="card m-2" id="gate" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <button id="draggableBtn7" class="btn btn-primary" draggable="true" ondragstart="drag(event)">CRx</button>
+            </div>
         </div>
     </div>
 
-    <div class="col-md-12 box_for_gate mt-5">
+    <div class="box_for_gate mt-5" id="sm_qbit_gate_holder">
 
         <div class="card" id="drop_place"></div>
+        <div class="card" id="drop_place_multi" style="visibility: hidden; margin-top: 40px;"></div>
         <div class="card qbit_gate_place" id="drop_place1" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
         <div class="card qbit_gate_place" id="drop_place2" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
         <div class="card qbit_gate_place" id="drop_place3" ondrop="drop(event)" ondragover="allowDrop(event)"></div>
