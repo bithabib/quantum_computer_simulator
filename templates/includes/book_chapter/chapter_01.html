@@ -1,5 +1,94 @@
 <div>
-    <h1 style="text-align: center; margin: 15px;">Chapter 01: Why linear algebra?</h1>
+
+    <h2>What is linear algebra? </h2>
+
+    <p>Linear algebra is a branch of mathematics that deals with vector spaces and linear mappings between these spaces.
+        It encompasses the study of vectors, matrices, systems of linear equations, and their properties and
+        relationships. It is a fundamental part of modern mathematics and has many applications in computer science,
+        physics, engineering, and other fields. In this chapter, we will introduce the basic concepts of linear algebra
+        and discuss some of its applications.</p>
+
+    <p>Linear map is a function between two vector spaces that preserves the operations of vector addition and scalar
+        multiplication. In other words, a linear map is a function that takes two vectors and returns a new vector that
+        is a linear combination of the input vectors. Linear maps are fundamental to the study of linear algebra and
+        have many applications in various fields.</p>
+
+    Linear map f: (vector) -> (vector) is a function that satisfies the following properties:
+    <ul class="row">
+        <div class="col-md-6">
+            <li>Linearity: f(u + v) = f(u) + f(v) and f(αu) = αf(u) for all vectors u, v and all scalars α.</li>
+            <li>Preservation of the zero vector: f(0) = 0, where 0 is the zero vector in the vector space.</li>
+
+            \( f = \begin{pmatrix} . & . & . \\ . & . & . \\ . & . & . \end{pmatrix} \)
+            <br>
+            \( v = \begin{pmatrix} . \\ . \\ . \end{pmatrix} \)
+            <br>
+            \( f(v) = \begin{pmatrix} . & . & . \\ . & . & . \\ . & . & . \end{pmatrix} \begin{pmatrix} . \\ . \\ .
+            \end{pmatrix} \) Matrix Operation
+
+            <p>
+                In the expression \( f(x) = x^2 + 2x + 1 \), \( x^2 + 2x + 1 \) represents the function itself, and \( x
+                \) is the variable.
+            </p>
+            <p>
+                Similarly, in the case of matrices, \( f(v) \) represents the function, where \( f \) is a linear
+                transformation represented by a matrix, and \( v \) is the variable (vector) that the function acts
+                upon.
+            </p>
+            <p>
+                So, just as \( x^2 + 2x + 1 \) is a function of the variable \( x \), \( f(v) \) is a function of the
+                variable \( v \), where \( v \) is a vector.
+            </p>
+        </div>
+    </ul>
+
+    <h2>Vector Spaces</h2>
+    <p>A vector space is a set of vectors that is closed under addition and scalar multiplication. In other words, if
+        you take any two vectors from the set and add them together, the result is also in the set. Similarly, if you
+        take any vector from the set and multiply it by a scalar, the result is also in the set.</p>
+
+    <p>We will consider vector in Hilbert spaces. Hilber space:a set of vectors with complex coefficients</p>
+
+    <!-- A table difference between Hilbert Space and Euclidean Space -->
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Euclidean Space</th>
+                <th>Hilbert Space</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Ket vectors</td>
+                <td>
+                    |ψ〉= α|0〉+β|1〉α,β∈C
+                </td>
+                <td>\( \vec{A} = a\hat{x} + b\hat{y} \)</td>
+            </tr>
+            <tr>
+                <td>Basis vectors</td>
+                <td>|0〉, |1〉, ...</td>
+                <td>\( a\hat{x} , b\hat{y}, .... \)</td>
+            </tr>
+            <tr>
+                <td>bra vectors</td>
+                <td>〈ψ|</td>
+                <td>\( \vec{A} \)</td>
+            </tr>
+            <tr>
+                <td>Inner product</td>
+                <td>〈ψ|φ〉</td>
+                <td>\( \vec{A}. \vec{B} \)</td>
+            </tr>
+        </tbody>
+
+    </table>
+
+    We will discuss the symbols sequentially, so there's no need to worry about them.
+
+
+    <h1 style="text-align: center; margin: 15px;">Why linear algebra?</h1>
     <p>You just need to have an understanding of  below list, what they are and what they mean</p>
     <ul>
         <li>derivatives</li>
