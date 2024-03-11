@@ -165,6 +165,28 @@
         fundamental concept in quantum mechanics and is used to describe the state of a quantum system and to perform
         calculations involving quantum states and operations.</p>
 
+    <h3>Delta Function</h3>
+    <p>In mathematics, the Dirac delta function, or simply the delta function, is a generalized function that is used to
+        represent a point mass or impulse. It is defined as a function that is zero everywhere except at a single point,
+        where it is infinite, and the area under the curve is equal to 1. The delta function is often used in physics and
+        engineering to represent a point mass or impulse in a system, and it has many applications in various fields.</p>
+    <p>In quantum mechanics, the delta function is used to represent the position of a particle in a quantum system. It
+        is used to describe the probability of finding a particle at a particular position, and it is used to perform
+        calculations involving quantum states and operations. The delta function is a fundamental concept in quantum
+        mechanics and is used to describe the behavior of quantum systems.</p>
+        <p>$$ \delta(x) = \begin{cases} \infty, & \text{if } x = 0 \\ 0, & \text{if } x \neq 0 \end{cases} $$</p>
+        <p>$$ \int_{-\infty}^{\infty} \delta(x) dx = 1 $$</p>
+        <p>$$ \int_{-\infty}^{\infty} f(x) \delta(x) dx = f(0) $$</p>
+        <p>$$ \int_{-\infty}^{\infty} f(x) \delta(x - a) dx = f(a) $$</p>
+        <p>$$ \int_{-\infty}^{\infty} \delta(x - a) \delta(x - b) dx = \delta(a - b) $$</p>
+        <p>$$ \int_{-\infty}^{\infty} f(x) \delta'(x - a) dx = -f'(a) $$</p>
+        <p>$$ \int_{-\infty}^{\infty} f(x) \delta''(x - a) dx = f''(a) $$</p>
+        <p>$$ \int_{-\infty}^{\infty} f(x) \delta^{(n)}(x - a) dx = (-1)^n f^{(n)}(a) $$</p>
+        <p>$$ \delta(x) = \lim_{\epsilon \to 0} \frac{1}{\sqrt{\pi \epsilon}} e^{-x^2/\epsilon} $$</p>
+        <p>$$ \delta(x) = \lim_{\epsilon \to 0} \frac{1}{\pi} \frac{\epsilon}{x^2 + \epsilon^2} $$</p>
+        <p>$$ \delta(x) = \lim_{\epsilon \to 0} \frac{1}{\pi} \frac{\sin(x/\epsilon)}{x} $$</p>
+        <p>$$ \delta(x) = \lim_{\epsilon \to 0} \frac{1}{\pi} \frac{\epsilon}{x^2 + \epsilon^2} $$</p>
+
     <h3 class="mt-5">Inner product</h3>
     <p>In quantum mechanics, the inner product of two quantum states \( | \psi \rangle \) and \( | \phi \rangle \) is
         denoted as \( \langle \psi | \phi \rangle \) and is defined as the complex conjugate of the transpose of the
@@ -177,6 +199,26 @@
         probability of measuring a quantum state in a particular state. The inner product is also used to perform
         calculations involving quantum states and operations, and it plays a crucial role in the mathematical
         formalism of quantum mechanics.</p>
+
+    <p>
+        \( \langle \psi | \phi \rangle = \begin{pmatrix} \alpha^* & \beta^*
+        \end{pmatrix} \begin{pmatrix} \gamma \\ \delta \end{pmatrix} = \alpha^* \gamma + \beta^* \delta \)
+<br/>
+        \( \langle \psi | \psi \rangle  = \begin{pmatrix} \alpha^* & \beta^*
+        \end{pmatrix} \begin{pmatrix} \alpha \\ \beta \end{pmatrix} = \alpha^* \alpha + \beta^* \beta = |\alpha|^2 + |\beta|^2 \)
+        <br/>
+        norm of a vector \( | \psi \rangle \) is given by \( \sqrt{\langle \psi | \psi \rangle} \)
+        <br/>
+        1. \( |0〉= \begin{pmatrix} 1 \\ 0 \end{pmatrix} \) and \( |1〉= \begin{pmatrix} 0 \\ 1 \end{pmatrix} \) basis vector 
+        <br/> 
+        2. \( \langle 0 | 1 \rangle = \begin{pmatrix} 1 & 0 \end{pmatrix} \begin{pmatrix} 0 \\ 1 \end{pmatrix} = 0 \) basis vector 
+        <br/>
+        3. \( \langle 0 | 0 \rangle = \begin{pmatrix} 1 & 0 \end{pmatrix} \begin{pmatrix} 1 \\ 0 \end{pmatrix} = 1 \) basis vector
+        <br/>
+        4. \( \langle 1 | 1 \rangle = \begin{pmatrix} 0 & 1 \end{pmatrix} \begin{pmatrix} 0 \\ 1 \end{pmatrix} = 1 \) basis vector
+        <br/>
+        5. \( \langle 1 | 0 \rangle = \begin{pmatrix} 0 & 1 \end{pmatrix} \begin{pmatrix} 1 \\ 0 \end{pmatrix} = 0 \) basis vector
+    </p>
 
 
 
