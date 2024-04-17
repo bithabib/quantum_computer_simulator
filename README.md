@@ -36,6 +36,7 @@ Eshyana: The Quantum Computer Simulator is an immersive and interactive quantum 
          - change of basis
    - eigenvalues
    - eigenvectors
+   - diagonalization
 
 
 
