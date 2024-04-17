@@ -4,6 +4,40 @@
 </h1>
 Eshyana: The Quantum Computer Simulator is an immersive and interactive quantum computing simulator designed to demystify the complexities of quantum mechanics. Embark on a journey through the fascinating realm of quantum computing, where users can experiment with a comprehensive set of quantum gates, manipulate qubits, and witness the intriguing principles of superposition, entanglement, and quantum parallelism in action. Whether you are a novice curious about the quantum world or a seasoned enthusiast eager to deepen your understanding, EshyQuantum Explorer provides a user-friendly interface for exploring the limitless possibilities of quantum information processing. Dive into the quantum frontier, unravel the mysteries of quantum gates, and unlock the potential of quantum computing in this educational and engaging simulation experience.
 
+## Linear Algebra for Quantum Machanics 
+   - bra 
+   - ket
+   - vector propurties for quantum machanics
+   - dimension of vector space
+   - basis 
+   - span
+   - linear independence
+         - linear dependent 
+         - linear independent
+   - inner product
+   - orthogonal 
+   - orthonormal
+   - normailzation
+   - orthonormal basis
+   - componeent of vector
+   - complex conjugate
+   - linear transformation
+   - matrices 
+   - matrix properties
+         - Transpose
+         - Symmetric
+         - Antisymmetric
+         - complex conjugate
+               - real
+               - imaginary
+         - Hermitian conjugate
+         - anti-Hermitian
+         - unitary
+         - change of basis
+         
+
+
+
 ## All Quantum Gates: 
  - Pauli X Gate (NOT Gate): Flips the state of a qubit from |0⟩ to |1⟩ and vice versa.
  - Pauli Y Gate: Similar to the Pauli X gate but includes a phase flip.
