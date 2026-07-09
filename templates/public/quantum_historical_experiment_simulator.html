@@ -128,7 +128,7 @@
             // charts render blank if drawn while their container is display:none).
             var EXPERIMENTS = {
                 experiment1: { panel: 'double-slit', draw: null },
-                experiment2: { panel: 'polarization', draw: null },
+                experiment2: { panel: 'polarization', draw: function () { if (window.drawPolarization) window.drawPolarization(); } },
                 experiment3: { panel: 'stern-gerlach', draw: function () { if (window.drawSternGerlach) window.drawSternGerlach(); } },
                 experiment4: { panel: 'ramsey', draw: function () { if (window.drawRamsey) window.drawRamsey(); } }
             };
