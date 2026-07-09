@@ -13,6 +13,10 @@ env/
 *.pem
 data_storage/*.pem
 
+# Generated datasets (regenerate with qml_bp.generate)
+data_bp/
+*.parquet
+
 # OS / editor
 .DS_Store
 .vscode/
