@@ -1,0 +1,5 @@
+# Extra deps for the barren-plateau dataset pipeline (qml_bp).
+# The web app itself only needs the top-level requirements.txt (flask, numpy).
+numpy>=1.21
+pandas>=1.3
+scikit-learn>=1.3
