@@ -1,0 +1,38 @@
+<div>
+    <h1>The Stern&ndash;Gerlach Experiment</h1>
+    <p>In 1922, Otto Stern and Walther Gerlach sent a beam of silver atoms through a strong,
+        <em>inhomogeneous</em> magnetic field. Each atom carries a magnetic moment, so classically the field
+        should deflect atoms by an amount proportional to the component of that moment along the field &mdash;
+        and since the moments point in every direction, the beam should spread into a single continuous smear
+        on the detector.</p>
+
+    <p>Instead, the beam split into <strong>two discrete spots</strong>. The component of angular momentum
+        along the measurement axis is <strong>quantised</strong>: for a spin-&frac12; particle it can only take
+        the values \( +\tfrac{\hbar}{2} \) (&ldquo;up&rdquo;) or \( -\tfrac{\hbar}{2} \) (&ldquo;down&rdquo;).</p>
+
+    <h3>Sequential measurements &mdash; what the simulator shows</h3>
+    <p>Prepare an atom to be <strong>spin-up along Z</strong> using a first apparatus. Now measure it again
+        with a second Stern&ndash;Gerlach magnet whose axis \( \hat{n} \) is rotated by an angle \( \theta \)
+        from Z. The state \( |{\uparrow_z}\rangle \) written in the basis of the tilted apparatus is:</p>
+
+    <p>\( |{\uparrow_z}\rangle = \cos\tfrac{\theta}{2}\,|{\uparrow_n}\rangle
+        + \sin\tfrac{\theta}{2}\,|{\downarrow_n}\rangle \)</p>
+
+    <p>so the probabilities of the two outcomes are given by the Born rule:</p>
+
+    <p>\( P(\uparrow_n) = \cos^2\!\tfrac{\theta}{2}, \qquad P(\downarrow_n) = \sin^2\!\tfrac{\theta}{2} \)</p>
+
+    <ul>
+        <li><strong>&theta; = 0&deg;</strong>: the two magnets agree &mdash; every atom comes out &ldquo;up&rdquo;
+            (P = 1). The result is repeatable.</li>
+        <li><strong>&theta; = 90&deg;</strong>: a Z-up atom has no definite value along the new axis; the outcome
+            is a perfect 50/50 coin flip. Measuring along X has also <em>erased</em> the original Z information.</li>
+        <li><strong>&theta; = 180&deg;</strong>: the second magnet is upside-down, so &ldquo;up&rdquo; and
+            &ldquo;down&rdquo; swap &mdash; every atom now comes out &ldquo;down&rdquo; (P = 1).</li>
+    </ul>
+
+    <p>The half-angle \( \theta/2 \) is the fingerprint of spin-&frac12;: you must rotate the apparatus by a
+        full \( 360^\circ \) &mdash; not \( 180^\circ \) &mdash; to return to the original probabilities. This
+        experiment is the cleanest demonstration that measurement in quantum mechanics is probabilistic, that
+        observables can be incompatible, and that a measurement changes the state it acts on.</p>
+</div>
