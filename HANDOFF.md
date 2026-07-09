@@ -53,7 +53,7 @@ A first dataset was generated **on the server** at
 so NOT in the repo). To use it on another machine: `scp` it from the server, or just
 regenerate locally (see `qml_bp/README.md`) — the M4 is faster and safer for big runs.
 
-## How to run on the Mac (M4)
+## How to run on the target machine (Ubuntu / Linux — or Mac)
 ```bash
 git clone https://github.com/bithabib/quantum_computer_simulator.git
 cd quantum_computer_simulator
@@ -62,10 +62,13 @@ pip install -r qml_bp/requirements.txt
 # sanity:
 python -m qml_bp.generate --n-specs 300 --samples 80 --qubit-max 8 --out data_bp/sample.csv
 python -m qml_bp.train --data data_bp/sample.csv
-# big run (~30-45 min on M4):
-python -m qml_bp.generate --n-specs 100000 --samples 200 --qubit-max 12 --workers 10 --out data_bp/bp_dataset.csv
+# big run — set --workers to the core count:
+python -m qml_bp.generate --n-specs 100000 --samples 200 --qubit-max 12 \
+  --workers "$(nproc)" --out data_bp/bp_dataset.csv
 python -m qml_bp.train --data data_bp/bp_dataset.csv
 ```
+On Ubuntu, `--workers "$(nproc)"` uses all cores. A big box will finish a 100k-row
+set in well under an hour.
 
 ## Deploy mechanism (for the live web app)
 - Server: `187.127.120.234` (Ubuntu, 2 cores), app at `/root/quantum_computer_simulator`,
