@@ -1,0 +1,13 @@
+# LaTeX build artifacts (sources + IEEEtran.cls/.bst are tracked)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+*.toc
+b1.log
+b2.log
+b3.log
+bib.log
+build*.log

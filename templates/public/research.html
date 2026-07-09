@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Research &amp; Reproducibility — Eshyana</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+    <style>
+        html, body { overflow-x: hidden; }
+        body { background: #f7f9fc; color: #1f2733; }
+        .research-hero {
+            background: linear-gradient(135deg, #1a237e 0%, #3949ab 100%);
+            color: #fff; padding: 3rem 0 2.5rem;
+        }
+        .research-hero h1 { font-weight: 700; font-size: 2.1rem; }
+        @media (max-width: 600px) {
+            .research-hero { padding: 2rem 0 1.6rem; }
+            .research-hero h1 { font-size: 1.5rem; }
+            section h2 { font-size: 1.3rem; }
+        }
+        .research-hero .authors { opacity: .9; margin-top: .5rem; }
+        .research-hero .badge-venue {
+            background: rgba(255,255,255,.15); color:#fff; font-weight:500;
+            margin-right:.4rem; padding:.4em .7em;
+        }
+        main .container { max-width: 960px; }
+        section { margin-top: 2.4rem; }
+        section h2 {
+            font-weight: 700; font-size: 1.5rem; color:#1e3a5f;
+            border-bottom: 2px solid #e2e8f0; padding-bottom:.4rem; margin-bottom:1rem;
+        }
+        .lead-abstract { font-size: 1.02rem; line-height:1.6; }
+        .metric-row { display:flex; flex-wrap:wrap; gap:1rem; margin:1rem 0; }
+        .metric-card {
+            flex:1 1 160px; background:#fff; border:1px solid #e2e8f0; border-radius:10px;
+            padding:1rem; text-align:center; box-shadow:0 1px 3px rgba(0,0,0,.04);
+        }
+        .metric-card .val { font-size:1.8rem; font-weight:700; color:#2c5282; }
+        .metric-card .lbl { font-size:.82rem; color:#64748b; margin-top:.2rem; }
+        figure.fig { background:#fff; border:1px solid #e2e8f0; border-radius:10px; padding:1rem; text-align:center; }
+        figure.fig img { max-width:100%; height:auto; }
+        figure.fig figcaption { font-size:.85rem; color:#64748b; margin-top:.6rem; }
+        table.data { background:#fff; }
+        table.data thead th { background:#eef2f8; border-top:none; }
+        .codeblock { position:relative; }
+        .codeblock pre {
+            background:#0f172a; color:#e2e8f0; border-radius:8px; padding:1rem 1rem;
+            font-size:.86rem; overflow-x:auto; margin-bottom:1rem;
+        }
+        .codeblock .copy-btn {
+            position:absolute; top:.5rem; right:.5rem; font-size:.72rem;
+            background:#334155; color:#fff; border:none; border-radius:5px; padding:.25em .6em; cursor:pointer;
+        }
+        .codeblock .copy-btn:hover { background:#475569; }
+        .step-num {
+            display:inline-block; width:1.7rem; height:1.7rem; line-height:1.7rem; text-align:center;
+            background:#2c5282; color:#fff; border-radius:50%; font-weight:700; margin-right:.5rem;
+        }
+        .callout { background:#fff8e6; border-left:4px solid #f0b429; padding:.8rem 1rem; border-radius:6px; }
+        .btn-dl { margin:.3rem .3rem 0 0; }
+        footer.research-foot { margin:3rem 0 2rem; color:#64748b; font-size:.85rem; text-align:center; }
+    </style>
+</head>
+
+<body>
+    {% include 'includes/nav_header.html' %}
+<div id="vwdbg" style="position:fixed;top:0;right:0;background:red;color:#fff;z-index:99999;font-size:22px;padding:4px">?</div><script>document.getElementById("vwdbg").textContent="iw="+window.innerWidth;</script>
+
+
+    <div class="research-hero">
+        <div class="container" style="max-width:960px;">
+            <div>
+                <span class="badge badge-venue">Preprint</span>
+                <span class="badge badge-venue">IEEE Access &middot; MDPI Entropy (in prep.)</span>
+            </div>
+            <h1>Predicting the Trainability of Variational Quantum Circuits:
+                A Data-Driven Model for Barren Plateaus</h1>
+            <div class="authors">Habibur Rahman and Jaeho Kim &middot;
+                Department of Aerospace and Software Engineering, Gyeongsang National University</div>
+        </div>
+    </div>
+
+    <main>
+        <div class="container">
+
+            <section id="abstract">
+                <h2>Abstract</h2>
+                <p class="lead-abstract">
+                    Barren plateaus &mdash; the exponential vanishing of cost-function gradients as a
+                    variational quantum circuit is scaled &mdash; are the central obstacle to training
+                    quantum machine-learning models, and diagnosing them today requires expensive gradient
+                    sampling on each candidate circuit. We reframe barren-plateau diagnosis as
+                    <strong>supervised prediction</strong>: given only a circuit's architecture (qubit count,
+                    depth, ansatz type, entanglement pattern, entangler gate, and cost-observable locality),
+                    can a classical model predict its trainability <em>without sampling a single gradient?</em>
+                    Using this simulator's exact statevector engine we generate 20,000 random variational
+                    circuits, each labelled by the gradient variance measured over 200 random parameter
+                    vectors via the parameter-shift rule. A gradient-boosted model predicts the trainability
+                    and, crucially, <strong>extrapolates from small circuits to larger qubit counts</strong>
+                    that are progressively harder to simulate. We make no quantum-advantage claim &mdash; this
+                    is classical machine learning <em>about</em> quantum circuits, offering a cheap
+                    ansatz-screening heuristic.
+                </p>
+                <div class="metric-row">
+                    <div class="metric-card"><div class="val">20,000</div><div class="lbl">circuits (2&ndash;12 qubits)</div></div>
+                    <div class="metric-card"><div class="val">0.991</div><div class="lbl">classifier AUC (barren vs. trainable)</div></div>
+                    <div class="metric-card"><div class="val">0.685</div><div class="lbl">regression R&sup2; (hold-out)</div></div>
+                    <div class="metric-card"><div class="val">0.719</div><div class="lbl">regression R&sup2; (extrapolation)</div></div>
+                </div>
+            </section>
+
+            <section id="method">
+                <h2>Method</h2>
+                <p>Each data point is a random circuit <em>spec</em>. The circuit is built and simulated
+                    exactly with this project's <code>qsim</code> statevector engine; the parameter-shift
+                    gradient of the cost is sampled over 200 random parameter vectors to form the
+                    gradient-variance label <em>y</em>. Cheap closed-form architectural features <em>X</em> are
+                    read directly from the spec. A gradient-boosted model is trained on (<em>X</em>, <em>y</em>)
+                    to predict trainability &mdash; as regression (log<sub>10</sub> of the gradient variance) and
+                    as classification (barren vs. trainable).</p>
+                <figure class="fig">
+                    <img src="../static/research/pipeline.png" alt="Method pipeline diagram">
+                    <figcaption>The full pipeline: spec &rarr; simulate &rarr; parameter-shift gradients
+                        &rarr; variance label; the spec also yields features; a gradient-boosted model predicts
+                        trainability.</figcaption>
+                </figure>
+            </section>
+
+            <section id="data">
+                <h2>Dataset</h2>
+                <p>The design space is sampled independently and uniformly. Every circuit is seeded
+                    reproducibly, so the exact dataset regenerates from a single command (below).</p>
+                <div class="table-responsive">
+                    <table class="table table-sm data">
+                        <thead><tr><th>Design choice</th><th>Count</th>
+                            <th>Mean log<sub>10</sub>Var</th><th>Barren %</th></tr></thead>
+                        <tbody>
+                            <tr><td>Local cost <em>Z<sub>0</sub></em></td><td>9,974</td><td>&minus;2.33</td><td>30.9%</td></tr>
+                            <tr><td><strong>Global cost <em>Z<sup>&otimes;n</sup></em></strong></td><td>10,026</td><td><strong>&minus;4.49</strong></td><td><strong>62.4%</strong></td></tr>
+                            <tr><td>Entanglement: linear</td><td>6,649</td><td>&minus;2.50</td><td>38.5%</td></tr>
+                            <tr><td>Entanglement: all-to-all</td><td>6,603</td><td>&minus;4.79</td><td>52.8%</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted" style="font-size:.9rem;">The data reproduces barren-plateau theory
+                    directly: global cost observables are ~2 orders of magnitude more barren than local ones,
+                    exactly the cost-locality effect predicted by Cerezo et&nbsp;al. (2021).</p>
+                <figure class="fig">
+                    <img src="../static/research/qubit_trend.png" alt="Gradient variance vs qubit count">
+                    <figcaption>Mean gradient variance vs. qubit count. Global costs show the exponential
+                        decay that defines a barren plateau; local costs decay far more slowly.</figcaption>
+                </figure>
+            </section>
+
+            <section id="results">
+                <h2>Results</h2>
+                <p>We compared six model families on both a random hold-out split and an extrapolation split
+                    (train on &le;10 qubits, test on larger). Gradient-boosted trees won both tasks.</p>
+                <div class="table-responsive">
+                    <table class="table table-sm data">
+                        <thead><tr><th>Model</th><th>Reg. R&sup2; (hold-out)</th><th>Reg. R&sup2; (extrap.)</th>
+                            <th>AUC (hold-out)</th><th>AUC (extrap.)</th></tr></thead>
+                        <tbody>
+                            <tr><td><strong>Hist Gradient Boosting</strong></td><td><strong>0.685</strong></td><td>0.719</td><td><strong>0.991</strong></td><td>0.989</td></tr>
+                            <tr><td>MLP (neural net)</td><td>0.665</td><td>0.752</td><td>0.990</td><td>0.991</td></tr>
+                            <tr><td>k-NN</td><td>0.645</td><td>0.639</td><td>0.986</td><td>0.979</td></tr>
+                            <tr><td>Random Forest</td><td>0.640</td><td>0.716</td><td>0.985</td><td>0.988</td></tr>
+                            <tr><td>Extra Trees</td><td>0.610</td><td>0.707</td><td>0.968</td><td>0.988</td></tr>
+                            <tr><td>Linear baseline</td><td>0.274</td><td>0.297</td><td>0.953</td><td>0.889</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-md-6"><figure class="fig">
+                        <img src="../static/research/predicted.png" alt="Predicted vs true">
+                        <figcaption>Predicted vs. true log<sub>10</sub> gradient variance (hold-out).</figcaption>
+                    </figure></div>
+                    <div class="col-md-6"><figure class="fig">
+                        <img src="../static/research/importance.png" alt="Feature importance">
+                        <figcaption>Feature importance: cost locality &amp; entanglement dominate.</figcaption>
+                    </figure></div>
+                </div>
+            </section>
+
+            <section id="reproduce">
+                <h2>Reproduce it yourself</h2>
+                <p>The entire study &mdash; data generation, model training, model comparison, and the
+                    paper's figures/tables &mdash; regenerates from the open-source repository with fixed
+                    random seeds. On any machine with Python&nbsp;3.10+:</p>
+
+                <p><span class="step-num">1</span><strong>Get the code and install dependencies</strong></p>
+                <div class="codeblock">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>git clone https://github.com/bithabib/quantum_computer_simulator.git
+cd quantum_computer_simulator
+python3 -m venv .venv &amp;&amp; source .venv/bin/activate
+pip install -r qml_bp/requirements.txt</pre>
+                </div>
+
+                <p><span class="step-num">2</span><strong>Quick sanity check</strong> (~1 minute, small dataset)</p>
+                <div class="codeblock">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>python -m qml_bp.generate --n-specs 300 --samples 80 --qubit-max 8 --out data_bp/sample.csv
+python -m qml_bp.train --data data_bp/sample.csv</pre>
+                </div>
+
+                <p><span class="step-num">3</span><strong>Regenerate the full 20,000-circuit dataset</strong>
+                    (set <code>--workers</code> to your core count; ~1&nbsp;hour on 16 cores)</p>
+                <div class="codeblock">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>python -m qml_bp.generate --n-specs 20000 --samples 200 \
+    --qubit-min 2 --qubit-max 12 --layer-min 1 --layer-max 20 \
+    --workers "$(nproc)" --out data_bp/bp_dataset.csv</pre>
+                </div>
+
+                <p><span class="step-num">4</span><strong>Train, compare models, and describe the data</strong></p>
+                <div class="codeblock">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre># headline model + extrapolation split + feature importance
+python -m qml_bp.train --data data_bp/bp_dataset.csv
+
+# compare six model families (picks the best)
+python -m qml_bp.compare_models --data data_bp/bp_dataset.csv
+
+# dataset descriptive-statistics tables
+python -m qml_bp.describe_data --data data_bp/bp_dataset.csv --outdir paper/latex</pre>
+                </div>
+
+                <p><span class="step-num">5</span><strong>Rebuild the paper figures and PDFs</strong></p>
+                <div class="codeblock">
+                    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre>python paper/latex/make_figures.py --data data_bp/bp_dataset.csv
+python paper/latex/fill_results.py --data data_bp/bp_dataset.csv   # syncs numbers into all papers
+(cd paper/ieee-access &amp;&amp; ./build.sh)   # IEEE Access PDF
+(cd paper/mdpi &amp;&amp; ./build.sh)          # MDPI Entropy PDF</pre>
+                </div>
+
+                <div class="callout">
+                    <strong>Reproducibility note.</strong> Every circuit spec is seeded from a fixed root
+                    <code>SeedSequence</code>, and all models use fixed <code>random_state</code>, so the numbers
+                    above regenerate exactly. Labels are computed with the ideal (noiseless) statevector
+                    simulator; hardware noise is out of scope.
+                </div>
+            </section>
+
+            <section id="downloads">
+                <h2>Code &amp; data</h2>
+                <p>
+                    <a class="btn btn-primary btn-dl" href="https://github.com/bithabib/quantum_computer_simulator" target="_blank" rel="noopener">Source repository</a>
+                    <a class="btn btn-outline-secondary btn-dl" href="/programming">Try the Quantum Lab</a>
+                    <a class="btn btn-outline-secondary btn-dl" href="/experiment">Interactive experiments</a>
+                </p>
+                <p class="text-muted" style="font-size:.9rem;">The <code>qml_bp/</code> package (data generation,
+                    training, model comparison) and the <code>qsim/</code> statevector simulator that produces the
+                    labels are both in the repository. The dataset is regenerable end-to-end; it is not committed
+                    because it is large and deterministic.</p>
+            </section>
+
+            <footer class="research-foot">
+                Eshyana &middot; Educational quantum-computing simulator &middot;
+                <a href="https://quantum.qbithabib.com">quantum.qbithabib.com</a>
+            </footer>
+        </div>
+    </main>
+
+    <script>
+        function copyCode(btn) {
+            var code = btn.parentElement.querySelector('pre').innerText;
+            navigator.clipboard.writeText(code).then(function () {
+                var old = btn.innerText; btn.innerText = 'Copied!';
+                setTimeout(function () { btn.innerText = old; }, 1400);
+            });
+        }
+    </script>
+</body>
+
+</html>

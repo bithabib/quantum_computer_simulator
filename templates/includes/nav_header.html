@@ -1,69 +1,82 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- Eshyana site navigation. Self-contained (own styles + vanilla-JS toggle),
+     so it renders consistently on every page and needs no Bootstrap JS. -->
+<style>
+    :root { --eshyana-indigo: #1a237e; --eshyana-indigo-soft: #3949ab; }
+    .esh-nav * { box-sizing: border-box; }
+    .esh-nav {
+        position: sticky; top: 0; z-index: 1030;
+        background: #ffffff; border-bottom: 1px solid #e6e8ef;
+        box-shadow: 0 1px 4px rgba(16,24,64,.05);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .esh-nav__inner {
+        max-width: 1200px; margin: 0 auto; padding: 0 1rem;
+        display: flex; align-items: center; justify-content: space-between; min-height: 60px;
+    }
+    .esh-brand { display: flex; align-items: center; gap: .55rem; text-decoration: none; }
+    .esh-brand img { width: 30px; height: 30px; border-radius: 6px; }
+    .esh-brand span { font-size: 1.25rem; font-weight: 700; color: var(--eshyana-indigo); letter-spacing: .2px; }
+    .esh-toggle {
+        display: none; background: none; border: 1px solid #d3d7e3; border-radius: 8px;
+        padding: .4rem .55rem; cursor: pointer; line-height: 0;
+    }
+    .esh-toggle span { display: block; width: 22px; height: 2px; background: var(--eshyana-indigo); margin: 4px 0; border-radius: 2px; transition: .25s; }
+    .esh-links { display: flex; align-items: center; gap: .25rem; list-style: none; margin: 0; padding: 0; }
+    .esh-links a {
+        display: block; text-decoration: none; color: #3a4256; font-size: .95rem; font-weight: 500;
+        padding: .5rem .8rem; border-radius: 8px; transition: background .15s, color .15s; white-space: nowrap;
+    }
+    .esh-links a:hover { background: #eef0f8; color: var(--eshyana-indigo); }
+    .esh-links a.active { color: var(--eshyana-indigo); font-weight: 700; }
+    .esh-links a.esh-login {
+        background: var(--eshyana-indigo); color: #fff; padding: .5rem 1.1rem;
+    }
+    .esh-links a.esh-login:hover { background: var(--eshyana-indigo-soft); color: #fff; }
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home Page</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    @media (max-width: 900px) {
+        .esh-toggle { display: inline-block; }
+        .esh-links {
+            position: absolute; top: 60px; left: 0; right: 0;
+            flex-direction: column; align-items: stretch; gap: 0;
+            background: #fff; border-bottom: 1px solid #e6e8ef;
+            box-shadow: 0 8px 16px rgba(16,24,64,.08);
+            max-height: 0; overflow: hidden; transition: max-height .28s ease;
+        }
+        .esh-nav.open .esh-links { max-height: 460px; }
+        .esh-links a { padding: .85rem 1.2rem; border-radius: 0; border-top: 1px solid #f0f1f6; }
+        .esh-links a.esh-login { text-align: center; margin: .6rem 1rem; border-radius: 8px; border-top: none; }
+        .esh-nav.open .esh-toggle span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+        .esh-nav.open .esh-toggle span:nth-child(2) { opacity: 0; }
+        .esh-nav.open .esh-toggle span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+    }
+</style>
 
-    <script>
-        $(document).ready(function () {
-            // $('.nav-link').click(function () {
-            //     $('.nav-link').removeClass('active');
-            //     $(this).addClass('active');
-            // });
-
-            // Add the following code to set the active link based on the current page
-            var currentPath = window.location.pathname;
-            $('.nav-link').each(function () {
-                var href = $(this).attr('href');
-                if (href === currentPath) {
-                    $(this).addClass('active');
-                }
-            });
-        });
-    </script>
-
-</head>
-
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="/">
-            <img src="../static/src/icon/icon.png" width="30" height="30" alt="" loading="lazy">
-            Eshyana
+<nav class="esh-nav" id="eshNav">
+    <div class="esh-nav__inner">
+        <a class="esh-brand" href="/">
+            <img src="/static/src/icon/icon.png" alt="Eshyana logo" loading="lazy">
+            <span>Eshyana</span>
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+        <button class="esh-toggle" aria-label="Toggle navigation" aria-expanded="false"
+            onclick="(function(b){var n=document.getElementById('eshNav');n.classList.toggle('open');b.setAttribute('aria-expanded',n.classList.contains('open'));})(this)">
+            <span></span><span></span><span></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/experiment">Quantum Experiment
-                        Simulator</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/gate">Quantum Gate Simulator</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/programming">Quantum Lab</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/book">Book</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/login">Login</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-</body>
-
-</html>
+        <ul class="esh-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/experiment">Quantum Experiment Simulator</a></li>
+            <li><a href="/gate">Quantum Gate Simulator</a></li>
+            <li><a href="/programming">Quantum Lab</a></li>
+            <li><a href="/book">Book</a></li>
+            <li><a href="/research">Research</a></li>
+            <li><a class="esh-login" href="/login">Login</a></li>
+        </ul>
+    </div>
+</nav>
+<script>
+    (function () {
+        var path = window.location.pathname;
+        document.querySelectorAll('.esh-links a').forEach(function (a) {
+            if (a.getAttribute('href') === path) a.classList.add('active');
+        });
+    })();
+</script>

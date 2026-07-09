@@ -1,0 +1,17 @@
+# LaTeX build artifacts (the IEEE Access class, fonts, .bst, and sources are tracked)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+a1.log
+a2.log
+a3.log
+abib.log
+pipe.log
+acc.log
+main.build.log
+pipeline_src.pdf
+figs/*.pdf
+# do NOT ignore the template's own example PDF removal is fine; regenerable

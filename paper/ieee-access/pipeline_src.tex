@@ -1,0 +1,10 @@
+% Standalone source for the method pipeline diagram.
+% Compiled to figs/pipeline.pdf (see build.sh); both papers \includegraphics it,
+% which avoids loading TikZ inside the fragile ieeeaccess.cls.
+\documentclass[border=4pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,fit}
+\usepackage{amsmath,amssymb}
+\begin{document}
+\input{fig_pipeline}
+\end{document}
