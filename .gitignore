@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets / credentials (do NOT commit)
+*.pem
+data_storage/*.pem
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
