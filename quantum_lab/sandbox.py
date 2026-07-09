@@ -64,6 +64,17 @@ def execute(code, challenge=None, timeout=DEFAULT_TIMEOUT):
     except Exception as exc:  # noqa: BLE001
         return {"ok": False, "error": "Sandbox error: %s" % exc, "stage": "internal"}
 
+    # On POSIX a negative return code means the child was killed by a signal -
+    # e.g. SIGXCPU/SIGKILL from the CPU or memory resource limits, which is how
+    # a busy infinite loop gets stopped before the wall-clock timeout.
+    if proc.returncode is not None and proc.returncode < 0:
+        return {
+            "ok": False,
+            "error": "Your code was terminated for exceeding resource limits "
+            "(CPU/memory) - likely an infinite loop or too much computation.",
+            "stage": "timeout",
+        }
+
     if not proc.stdout.strip():
         detail = proc.stderr.strip()[-500:] or "no output"
         return {
