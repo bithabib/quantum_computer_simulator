@@ -43,6 +43,7 @@
 
 <script>
     (function () {
+        var animPhase = 0;                                      // advances each frame -> travelling wave
         function deg2rad(d) { return d * Math.PI / 180; }
         function malus(dThetaDeg) { return Math.pow(Math.cos(deg2rad(dThetaDeg)), 2); }
 
@@ -122,19 +123,27 @@
                 ctx.fillText('laser', x + 12, y - 26);
             }
 
-            // --- red laser beam; brightness ∝ intensity of that segment (0 = blocked) ---
+            // --- red laser light drawn as a travelling transverse wave ---
+            // The wave amplitude tracks the field amplitude (sqrt of intensity), so the
+            // wave shrinks after each filter and flattens to nothing when the light is
+            // fully blocked. A shared global x keeps the wave continuous across segments.
             function beam(x0, x1, intensity) {
                 var I = Math.max(0, Math.min(1, intensity));
                 if (I <= 0.001) return;                         // fully extinguished: draw nothing
-                ctx.strokeStyle = 'rgba(255,40,40,' + (0.25 * I) + ')'; // outer glow
-                ctx.lineWidth = 16;
-                ctx.beginPath(); ctx.moveTo(x0, midY); ctx.lineTo(x1, midY); ctx.stroke();
-                ctx.strokeStyle = 'rgba(255,70,70,' + (0.85 * I) + ')'; // core
-                ctx.lineWidth = 5;
-                ctx.beginPath(); ctx.moveTo(x0, midY); ctx.lineTo(x1, midY); ctx.stroke();
-                ctx.strokeStyle = 'rgba(255,205,205,' + I + ')';       // hot centre
-                ctx.lineWidth = 1.5;
-                ctx.beginPath(); ctx.moveTo(x0, midY); ctx.lineTo(x1, midY); ctx.stroke();
+                var amp = 16 * Math.sqrt(I);                    // E-field amplitude (px)
+                var k = 2 * Math.PI / 30;                       // spatial frequency (px per cycle)
+                function wave(width, style) {
+                    ctx.strokeStyle = style;
+                    ctx.lineWidth = width;
+                    ctx.beginPath();
+                    for (var x = x0; x <= x1; x += 2) {
+                        var y = midY + amp * Math.sin(k * x - animPhase);
+                        if (x === x0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+                    }
+                    ctx.stroke();
+                }
+                wave(6, 'rgba(255,45,45,' + (0.30 * I) + ')');  // soft glow
+                wave(2.2, 'rgba(255,120,120,' + I + ')');       // bright core
             }
 
             var xAperture = xSource + 66;
@@ -194,11 +203,15 @@
 
         window.drawPolarization = drawPolarization;
 
-        ['polA', 'polB', 'polC', 'polMiddleOn'].forEach(function (id) {
-            var elx = document.getElementById(id);
-            if (elx) elx.addEventListener('input', drawPolarization);
-            if (elx) elx.addEventListener('change', drawPolarization);
-        });
-        document.addEventListener('DOMContentLoaded', drawPolarization);
+        // Animation loop: advance the wave phase and redraw each frame, but only while
+        // the panel is actually visible (offsetParent is null when it's display:none),
+        // so a hidden experiment costs nothing. Controls are read live inside the draw.
+        function animate(ts) {
+            animPhase = ts / 110;                               // travelling-wave speed
+            var canvas = document.getElementById('polCanvas');
+            if (canvas && canvas.offsetParent !== null) drawPolarization();
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
     })();
 </script>
