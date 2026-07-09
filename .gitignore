@@ -13,8 +13,9 @@ env/
 *.pem
 data_storage/*.pem
 
-# Generated datasets (regenerate with qml_bp.generate)
-data_bp/
+# Datasets: the CSVs are committed for full reproducibility. Ignore only the
+# transient generator log and any large binary/parquet dumps.
+data_bp/*.log
 *.parquet
 
 # OS / editor
