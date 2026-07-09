@@ -4,63 +4,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Qbit Programming</title>
+    <title>Quantum Lab - Eshyana</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/1.0.1/chartjs-plugin-zoom.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+    <style>
+        body { background: #f4f6f9; }
+        .lab-wrap { max-width: 1300px; margin: 24px auto; padding: 0 16px; }
+        .challenge-list { max-height: 78vh; overflow-y: auto; }
+        .challenge-item { cursor: pointer; border-left: 3px solid transparent; }
+        .challenge-item.active { border-left-color: #6f42c1; background: #f0eaff; }
+        .badge-Beginner { background: #28a745; }
+        .badge-Intermediate { background: #fd7e14; }
+        .badge-Advanced { background: #dc3545; }
+        .CodeMirror { height: 340px; border-radius: 6px; font-size: 14px; }
+        .output-box { background: #1e1e2e; color: #e0e0e0; border-radius: 6px;
+            padding: 12px; font-family: Consolas, monospace; font-size: 13px;
+            white-space: pre-wrap; min-height: 90px; }
+        .prob-row { display: flex; align-items: center; margin-bottom: 6px; }
+        .prob-label { width: 70px; font-family: monospace; }
+        .prob-bar { height: 18px; background: #6f42c1; border-radius: 3px; }
+        .prob-val { margin-left: 8px; font-size: 12px; color: #555; }
+        .result-banner { border-radius: 6px; padding: 12px 16px; font-weight: 600; }
+        .result-pass { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .result-fail { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .hint-list li { margin-bottom: 4px; }
+        .cheatsheet code { background: #eee; padding: 1px 5px; border-radius: 3px; }
+    </style>
 </head>
 
 <body>
     {% include 'includes/nav_header.html' %}
-    <div class="container mt-5">
+
+    <div class="lab-wrap">
+        <h2>Quantum Lab <small class="text-muted">- write quantum code, solve challenges</small></h2>
+        <p class="text-muted">
+            Write Python using the built-in <code>QuantumCircuit</code> API. Your code runs in a
+            secure sandbox. Build your circuit in a variable named <code>qc</code>, then
+            <b>Run</b> to see the state or <b>Check</b> to grade your solution.
+        </p>
+
         <div class="row">
-            <div class="col-md-6">
-                <div class="box" style="height: 60vh; border: 1px solid #ccc;">
-                    <textarea id="python-code" style="height: 90%; width: 100%;"
-                        placeholder="Enter your Python code here"></textarea>
-                    <br>
-                    <button onclick="runPythonCode()">Run Code</button>
+            <!-- Challenge list -->
+            <div class="col-lg-3">
+                <div class="card">
+                    <div class="card-header font-weight-bold">Challenges</div>
+                    <div class="list-group list-group-flush challenge-list" id="challenge-list">
+                        <div class="p-3 text-muted">Loading...</div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="box" style="height: 60vh; border: 1px solid #ccc;">
-                    <h2>Output</h2>
-                    <iframe id="output-frame" style="height: 60%; width: 100%;"></iframe>
+
+            <!-- Editor -->
+            <div class="col-lg-5">
+                <div class="card mb-3">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span id="challenge-title" class="font-weight-bold">Playground</span>
+                        <span id="challenge-badge"></span>
+                    </div>
+                    <div class="card-body py-2">
+                        <p id="challenge-task" class="mb-2 text-muted small">
+                            Free play - write any quantum code and Run it.
+                        </p>
+                        <textarea id="code"></textarea>
+                        <div class="mt-2">
+                            <button class="btn btn-primary btn-sm" id="run-btn">&#9654; Run</button>
+                            <button class="btn btn-success btn-sm" id="check-btn" disabled>&#10003; Check Solution</button>
+                            <button class="btn btn-outline-secondary btn-sm" id="reset-btn">Reset</button>
+                            <button class="btn btn-link btn-sm" id="hint-btn" disabled>Show hints</button>
+                        </div>
+                        <ul id="hints" class="hint-list small mt-2 text-muted" style="display:none;"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output -->
+            <div class="col-lg-4">
+                <div id="result-banner"></div>
+                <div class="card mt-2">
+                    <div class="card-header font-weight-bold">Output</div>
+                    <div class="card-body">
+                        <div class="output-box" id="output">Run your code to see output here.</div>
+                    </div>
+                </div>
+                <div class="card mt-2">
+                    <div class="card-header font-weight-bold">Measurement probabilities</div>
+                    <div class="card-body" id="prob-chart">
+                        <span class="text-muted small">No circuit simulated yet.</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="row ">
-            <div class="col-md-12">
-                <div class="description" style="height: 40vh; border: 1px solid #ccc; padding: 10px;">
-                    <p>This is the description below the boxes.</p>
-                </div>
+        <div class="card mt-3 cheatsheet">
+            <div class="card-header font-weight-bold">Gate cheat sheet</div>
+            <div class="card-body small">
+                <code>qc = QuantumCircuit(n)</code> &middot;
+                <code>qc.h(q)</code> Hadamard &middot;
+                <code>qc.x/y/z(q)</code> Pauli &middot;
+                <code>qc.s(q)</code>/<code>qc.t(q)</code> phase &middot;
+                <code>qc.rx/ry/rz(theta, q)</code> rotations &middot;
+                <code>qc.cx(c, t)</code> CNOT &middot;
+                <code>qc.cz(c, t)</code> &middot;
+                <code>qc.swap(a, b)</code> &middot;
+                <code>qc.ccx(c1, c2, t)</code> Toffoli &middot;
+                <code>print(qc.draw())</code>
+                <br><span class="text-muted">Qubit 0 is the left-most bit: |q0 q1 ...&gt;.</span>
             </div>
         </div>
     </div>
 
     <script>
-        function runPythonCode() {
-            var pythonCode = document.getElementById('python-code').value;
-            fetch('/run_python_code', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ code: pythonCode })
-            })
-                .then(response => response.text())
-                .then(data => {
-                    document.getElementById('output-frame').srcdoc = data;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+        var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
+            mode: 'python', theme: 'dracula', lineNumbers: true, indentUnit: 4,
+        });
+
+        var challenges = [];
+        var current = null;  // current challenge object, or null for playground
+
+        var PLAYGROUND_CODE =
+            "qc = QuantumCircuit(2)\n" +
+            "qc.h(0)\n" +
+            "qc.cx(0, 1)\n" +
+            "print(qc.draw())\n";
+
+        function el(id) { return document.getElementById(id); }
+
+        function renderChallengeList() {
+            var box = el('challenge-list');
+            box.innerHTML = '';
+            var play = document.createElement('a');
+            play.className = 'list-group-item list-group-item-action challenge-item';
+            play.innerHTML = '<b>Playground</b><br><small class="text-muted">Free experimentation</small>';
+            play.onclick = function () { selectPlayground(); };
+            box.appendChild(play);
+
+            challenges.forEach(function (c) {
+                var a = document.createElement('a');
+                a.className = 'list-group-item list-group-item-action challenge-item';
+                a.dataset.id = c.id;
+                a.innerHTML = '<div class="d-flex justify-content-between">' +
+                    '<span>' + c.title + '</span>' +
+                    '<span class="badge badge-' + c.difficulty + ' text-white">' + c.difficulty + '</span>' +
+                    '</div>';
+                a.onclick = function () { selectChallenge(c.id); };
+                box.appendChild(a);
+            });
         }
+
+        function highlight(id) {
+            document.querySelectorAll('.challenge-item').forEach(function (n) {
+                n.classList.toggle('active', n.dataset.id === id);
+            });
+        }
+
+        function selectPlayground() {
+            current = null;
+            highlight(undefined);
+            el('challenge-title').textContent = 'Playground';
+            el('challenge-badge').innerHTML = '';
+            el('challenge-task').textContent = 'Free play - write any quantum code and Run it.';
+            el('check-btn').disabled = true;
+            el('hint-btn').disabled = true;
+            el('hints').style.display = 'none';
+            editor.setValue(PLAYGROUND_CODE);
+            clearResults();
+        }
+
+        function selectChallenge(id) {
+            current = challenges.find(function (c) { return c.id === id; });
+            if (!current) return;
+            highlight(id);
+            el('challenge-title').textContent = current.title;
+            el('challenge-badge').innerHTML =
+                '<span class="badge badge-' + current.difficulty + ' text-white">' + current.difficulty + '</span>';
+            el('challenge-task').textContent = current.task;
+            el('check-btn').disabled = false;
+            el('hint-btn').disabled = false;
+            var hints = el('hints');
+            hints.innerHTML = '';
+            current.hints.forEach(function (h) {
+                var li = document.createElement('li');
+                li.textContent = h;
+                hints.appendChild(li);
+            });
+            hints.style.display = 'none';
+            editor.setValue(current.starter_code);
+            clearResults();
+        }
+
+        function clearResults() {
+            el('output').textContent = 'Run your code to see output here.';
+            el('prob-chart').innerHTML = '<span class="text-muted small">No circuit simulated yet.</span>';
+            el('result-banner').innerHTML = '';
+        }
+
+        function renderProbabilities(probs) {
+            var box = el('prob-chart');
+            box.innerHTML = '';
+            var keys = Object.keys(probs);
+            if (!keys.length) {
+                box.innerHTML = '<span class="text-muted small">No measurable outcomes.</span>';
+                return;
+            }
+            keys.sort();
+            keys.forEach(function (k) {
+                var p = probs[k];
+                var row = document.createElement('div');
+                row.className = 'prob-row';
+                row.innerHTML =
+                    '<span class="prob-label">|' + k + '&gt;</span>' +
+                    '<div class="prob-bar" style="width:' + Math.max(2, p * 200) + 'px"></div>' +
+                    '<span class="prob-val">' + (p * 100).toFixed(1) + '%</span>';
+                box.appendChild(row);
+            });
+        }
+
+        function renderResult(data) {
+            var out = el('output');
+            var banner = el('result-banner');
+            banner.innerHTML = '';
+
+            if (!data.ok) {
+                out.textContent = 'Error (' + (data.stage || 'error') + '):\n' + data.error +
+                    (data.stdout ? '\n\n--- output ---\n' + data.stdout : '');
+                el('prob-chart').innerHTML = '<span class="text-muted small">No circuit simulated.</span>';
+                return;
+            }
+
+            var text = data.stdout || '(no printed output)';
+            if (data.sim_error) text += '\nSimulation note: ' + data.sim_error;
+            out.textContent = text;
+
+            if (data.probabilities) renderProbabilities(data.probabilities);
+            else el('prob-chart').innerHTML =
+                '<span class="text-muted small">Define a QuantumCircuit named <code>qc</code> to see probabilities.</span>';
+
+            if (data.grade) {
+                banner.innerHTML = '<div class="result-banner ' +
+                    (data.grade.passed ? 'result-pass' : 'result-fail') + '">' +
+                    (data.grade.passed ? '&#10003; ' : '&#10007; ') + data.grade.message + '</div>';
+            }
+        }
+
+        function post(url, body, btn) {
+            var label = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = 'Running...';
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            })
+                .then(function (r) { return r.json(); })
+                .then(renderResult)
+                .catch(function (e) {
+                    el('output').textContent = 'Network error: ' + e;
+                })
+                .finally(function () { btn.disabled = false; btn.innerHTML = label; });
+        }
+
+        el('run-btn').onclick = function () {
+            post('/api/quantum/run', { code: editor.getValue() }, this);
+        };
+        el('check-btn').onclick = function () {
+            if (!current) return;
+            post('/api/quantum/check', { challenge_id: current.id, code: editor.getValue() }, this);
+        };
+        el('reset-btn').onclick = function () {
+            if (current) editor.setValue(current.starter_code);
+            else editor.setValue(PLAYGROUND_CODE);
+            clearResults();
+        };
+        el('hint-btn').onclick = function () {
+            var h = el('hints');
+            h.style.display = h.style.display === 'none' ? 'block' : 'none';
+        };
+
+        fetch('/api/quantum/challenges')
+            .then(function (r) { return r.json(); })
+            .then(function (list) {
+                challenges = list;
+                renderChallengeList();
+                selectPlayground();
+            })
+            .catch(function () {
+                el('challenge-list').innerHTML = '<div class="p-3 text-danger">Failed to load challenges.</div>';
+                selectPlayground();
+            });
     </script>
 </body>
 

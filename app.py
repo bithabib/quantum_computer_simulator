@@ -9,8 +9,9 @@ from views.public import book
 from views.public import quantum_programming
 from views.public import quantum_gate_simulator
 from views.public import quantum_historical_experiment_simulator
-# import api 
-from views.public.api import interpreter
+# import api
+from views.public.api import interpreter  # legacy route, now disabled
+from views.public.api import quantum_lab
 
 # import private views
 from views import login_required_function

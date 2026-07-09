@@ -1,17 +1,28 @@
-from app import app
-from flask import Flask, request, render_template_string
-import sys
-import io
-@app.route('/run_python_code', methods=['POST'])
-def run_python_code():
-    print(request.json['code'])
-    code = request.json['code']
-    sys.stdout = io.StringIO()  # Redirect stdout to capture output
-    try:
-        exec(code)
-        output = sys.stdout.getvalue()
-    except Exception as e:
-        output = str(e)
-    sys.stdout = sys.__stdout__  # Reset stdout
-    return output
+"""Deprecated & disabled: the old arbitrary-code-execution endpoint.
 
+The previous implementation ran ``exec()`` on unsanitised POST input, a remote
+code execution hole. It has been replaced by the sandboxed Quantum Lab API in
+:mod:`views.public.api.quantum_lab` (``/api/quantum/run`` and
+``/api/quantum/check``).
+
+The legacy route is kept only so old clients get a clear error instead of a
+silent 404, and it no longer executes anything.
+"""
+
+from flask import jsonify
+
+from app import app
+
+
+@app.route("/run_python_code", methods=["POST"])
+def run_python_code():
+    return (
+        jsonify(
+            {
+                "ok": False,
+                "error": "This endpoint has been removed for security. "
+                "Use /api/quantum/run or /api/quantum/check instead.",
+            }
+        ),
+        410,  # Gone
+    )
