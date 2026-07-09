@@ -1,0 +1,17 @@
+# LaTeX build artifacts (sources + Definitions/ template assets are tracked)
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+*.spl
+m1.log
+m2.log
+m3.log
+mbib.log
+# generated figures (regenerate with ../latex/make_figures.py) and converted logos
+figs/*.pdf
+Definitions/*-eps-converted-to.pdf
+# keep the tracked template PDF out; main.pdf is a build artifact
+!Definitions/logo-orcid.pdf

@@ -1,0 +1,436 @@
+\documentclass[journal]{IEEEtran}
+
+% ---- packages -------------------------------------------------------------
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,citecolor=blue,urlcolor=blue}
+
+% ---- result macros (fill from qml_bp/train.py output) ---------------------
+% These are populated by tools/fill_results.py after the model is trained, so
+% the prose and tables stay consistent with a single source of truth.
+\newcommand{\Nrows}{20{,}000}                 % dataset size
+\newcommand{\Nspecs}{20{,}000}                % circuit specs
+\newcommand{\Samples}{200}                    % param vectors per spec
+\newcommand{\QubitLo}{2}
+\newcommand{\QubitHi}{12}
+\newcommand{\LayerLo}{1}
+\newcommand{\LayerHi}{20}
+\newcommand{\GlobalFrac}{50.1}                  % \% global-cost circuits
+\newcommand{\BarrenFrac}{46.7}                  % \% barren (log var < -2)
+% -- random hold-out split --
+\newcommand{\RsqHold}{0.685}
+\newcommand{\MaeHold}{1.018}
+\newcommand{\AccHold}{0.950}
+\newcommand{\AucHold}{0.991}
+% -- extrapolation split --
+\newcommand{\ExtrapCut}{10}
+\newcommand{\RsqExtrap}{0.719}
+\newcommand{\MaeExtrap}{1.264}
+\newcommand{\ExtrapTrainRows}{16\,395}
+\newcommand{\ExtrapTestRows}{3\,605}
+
+\begin{document}
+
+\title{Predicting the Trainability of Variational Quantum Circuits:
+A Data-Driven Model for Barren Plateaus}
+
+\author{
+  \IEEEauthorblockN{Habibur Rahman and Jaeho Kim}%
+  \IEEEauthorblockA{Department of Aerospace and Software Engineering,
+  Gyeongsang National University, Jinju 52828, Republic of Korea\\
+  e-mail: habib@gnu.ac.kr; jaeho.kim@gnu.ac.kr}%
+  \thanks{Manuscript prepared \today. \emph{(Corresponding author: Jaeho Kim.)}}%
+  \thanks{The authors are with the Department of Aerospace and Software
+  Engineering, Gyeongsang National University, Jinju 52828, Republic of Korea
+  (e-mail: jaeho.kim@gnu.ac.kr).}%
+  \thanks{Data-generation simulator and live demonstrations available at
+  \url{https://quantum.qbithabib.com}. Code and dataset-generation scripts are
+  released openly (see the Reproducibility statement).}
+}
+
+\markboth{Preprint --- submitted to IEEE Access}%
+{Rahman: Predicting the Trainability of Variational Quantum Circuits}
+
+\maketitle
+
+% ==========================================================================
+\begin{abstract}
+Barren plateaus---the exponential vanishing of cost-function gradients as a
+variational quantum circuit is scaled---are the central obstacle to training
+quantum machine-learning models. Diagnosing them today requires expensive
+gradient sampling on each candidate circuit. We reframe the problem as
+\emph{supervised prediction}: given only a circuit's \emph{architecture}
+(qubit count, depth, ansatz type, entanglement pattern, entangler gate, and
+cost-observable locality), can a classical model predict its trainability
+without ever sampling a single gradient? Using an exact statevector simulator
+we generate a dataset of \Nrows{} random variational circuits, each labelled by
+the empirical gradient variance $\mathrm{Var}[\partial C/\partial\theta]$
+estimated over \Samples{} random parameter vectors via the parameter-shift
+rule. A gradient-boosted regressor predicts $\log_{10}\mathrm{Var}$ with
+$R^2 = \RsqHold{}$ on held-out architectures, and a classifier separates barren
+from trainable circuits with AUC $= \AucHold{}$. Crucially, in an
+\emph{extrapolation} setting---training only on small circuits and testing on
+larger qubit counts that are progressively harder to simulate---the predictor
+retains $R^2 = \RsqExtrap{}$, suggesting the architectural signature of a barren
+plateau is learnable and transferable across scale. Permutation importance
+recovers the known theory: cost-observable locality and entanglement structure
+dominate. We make no quantum-advantage claim; this is classical machine learning
+\emph{about} quantum circuits, offering a cheap ansatz-screening heuristic and a
+data-driven lens on which design choices cause untrainability.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Barren plateaus, variational quantum circuits, quantum machine learning,
+trainability, gradient variance, statevector simulation, gradient boosting.
+\end{IEEEkeywords}
+
+% ==========================================================================
+\section{Introduction}
+\IEEEPARstart{V}{ariational} quantum algorithms (VQAs) are the leading candidate
+for extracting value from noisy intermediate-scale quantum (NISQ) hardware
+\cite{cerezo2021vqa}. A VQA encodes a problem into a parameterized quantum
+circuit (an \emph{ansatz}), measures a cost function $C(\theta)=\langle\psi(\theta)|O|\psi(\theta)\rangle$,
+and updates the parameters $\theta$ with a classical optimizer. This template
+underlies variational quantum eigensolvers, quantum approximate optimization, and
+most quantum machine-learning (QML) classifiers \cite{havlicek2019supervised,
+farhi2018classification,schuld2020circuit}.
+
+The dominant obstacle to scaling this template is the \emph{barren plateau} (BP)
+phenomenon: for broad classes of ans{\"a}tze the variance of the cost gradient
+vanishes exponentially in the number of qubits, so the loss landscape becomes
+almost everywhere flat and gradient-based training stalls
+\cite{mcclean2018barren,larocca2025barren}. Barren plateaus are now known to be
+triggered by \emph{global} cost observables \cite{cerezo2021cost}, by highly
+expressive or deep ans{\"a}tze \cite{holmes2022expressibility}, by poor
+initialization \cite{grant2019initialization}, and by hardware noise
+\cite{wang2021noise}. Whether a given architecture suffers from a barren plateau
+is therefore a property of its \emph{design}, not merely of a particular
+parameter setting.
+
+The conventional way to check whether a candidate circuit is trainable is to
+\emph{measure} it: sample many random parameter vectors, evaluate gradients, and
+estimate their variance. This is exactly the cost we would like to avoid when
+screening a large design space, and it becomes infeasible precisely in the
+large-qubit regime where barren plateaus matter most. This motivates our
+question:
+
+\begin{quote}
+\emph{Can a classical model predict a variational circuit's trainability
+directly from its architectural description, without sampling any gradients?}
+\end{quote}
+
+We answer this empirically. We treat trainability prediction as a supervised
+learning problem over circuit \emph{specs}. The features are cheap, integer-valued
+architectural descriptors; the label is the gradient variance, obtained once,
+offline, by exact statevector simulation. We then ask whether a model trained on
+this data (i)~generalizes to unseen architectures, and (ii)~\emph{extrapolates}
+from small, easily simulated circuits to larger ones---the regime where a cheap
+predictor would be most useful.
+
+\subsection*{Contributions of this article}
+\begin{itemize}
+\item We formulate barren-plateau diagnosis as a \emph{supervised prediction}
+task: mapping a variational circuit's architecture to its gradient-variance
+trainability label, cast as both regression ($\log_{10}\mathrm{Var}[\partial
+C/\partial\theta]$) and binary classification (barren vs.\ trainable).
+\item We release a reproducible pipeline that generates a labelled dataset of
+\Nrows{} random circuits using an exact, dependency-light statevector simulator,
+with fixed seeds and streaming output.
+\item We show a gradient-boosted model predicts trainability with $R^2=\RsqHold{}$
+on held-out architectures and separates barren circuits with AUC $=\AucHold{}$.
+\item We demonstrate \emph{extrapolation across scale}: trained only on
+$n_q\le\ExtrapCut{}$ qubits, the model still attains $R^2=\RsqExtrap{}$ on larger,
+unseen circuit sizes.
+\item We recover the established theory through permutation feature importance
+(cost locality and entanglement structure dominate), giving the model an
+interpretable, physics-consistent basis.
+\end{itemize}
+
+We emphasise honest framing: we make \emph{no} claim of quantum advantage. The
+model is classical, the data is classically simulated, and the contribution is a
+data-driven \emph{diagnostic} for a known quantum-computing bottleneck
+\cite{schuld2022killoran,bowles2024benchmarking}.
+
+% ==========================================================================
+\section{Background}
+\subsection{Variational quantum circuits}
+A hardware-efficient ansatz \cite{kandala2017hardware} alternates layers of
+single-qubit rotations with a fixed pattern of two-qubit entangling gates. With
+$n$ qubits and $L$ layers the state is
+\begin{equation}
+|\psi(\theta)\rangle = \prod_{\ell=1}^{L}
+  \Big[ U_{\mathrm{ent}} \prod_{q=1}^{n} R_{a_{\ell,q}}(\theta_{\ell,q}) \Big] |0\rangle^{\otimes n},
+\end{equation}
+where $R_a$ is a Pauli rotation about axis $a\in\{x,y,z\}$ and $U_{\mathrm{ent}}$
+is a layer of CZ or CX gates arranged linearly, circularly, or all-to-all. The
+cost is the expectation of a Pauli-$Z$ string,
+$C(\theta)=\langle\psi(\theta)|O|\psi(\theta)\rangle$, with $O=Z_0$ (a
+\emph{local} cost) or $O=Z_0Z_1\cdots Z_{n-1}$ (a \emph{global} cost).
+
+\subsection{Barren plateaus}
+A circuit family exhibits a barren plateau if
+$\mathrm{Var}_\theta[\partial C/\partial\theta_k]$ decays exponentially in $n$
+\cite{mcclean2018barren}. Cerezo \emph{et al.}\ \cite{cerezo2021cost} proved that
+\emph{global} cost functions induce barren plateaus even at shallow depth, whereas
+\emph{local} costs can remain trainable up to $O(\log n)$ depth---making cost
+locality a first-order design knob. Expressibility \cite{holmes2022expressibility}
+and entanglement likewise correlate with flatter landscapes. Our labels are built
+to expose exactly these dependencies.
+
+\subsection{The parameter-shift rule}
+For a gate generated by an operator with two distinct eigenvalues, the exact
+gradient of the cost is obtained from two circuit evaluations
+\cite{mitarai2018circuit,schuld2019param}:
+\begin{equation}
+\frac{\partial C}{\partial\theta_k}
+  = \tfrac{1}{2}\big[C(\theta + \tfrac{\pi}{2}e_k) - C(\theta - \tfrac{\pi}{2}e_k)\big].
+\end{equation}
+We use this rule to obtain exact per-sample gradients when estimating the
+variance label, so our labels are free of finite-difference bias.
+
+% ==========================================================================
+\section{Related Work}
+\textbf{Theory of barren plateaus.} The BP literature is overwhelmingly
+\emph{analytical}: it derives variance scaling laws for particular ansatz
+families---global vs.\ local costs \cite{cerezo2021cost}, expressibility bounds
+\cite{holmes2022expressibility}, noise-induced plateaus \cite{wang2021noise},
+and structured architectures that provably avoid them, such as quantum
+convolutional networks \cite{pesah2021absence}. A recent review consolidates
+these results \cite{larocca2025barren}. Our work is complementary and
+\emph{empirical}: rather than proving a bound for one family, we learn a
+predictive map across a heterogeneous space of architectures.
+
+\textbf{Trainability vs.\ simulability.} Cerezo \emph{et al.}\
+\cite{cerezo2025simulability} argue that the very structure guaranteeing absence
+of barren plateaus often also renders a model classically simulable. This
+sharpens the honest framing of our contribution: we position the work as a
+classical diagnostic tool, not as evidence of quantum advantage.
+
+\textbf{Benchmarking and honest framing.} Bowles \emph{et al.}\
+\cite{bowles2024benchmarking} show that out-of-the-box classical models often
+match or beat QML models on standard tasks, and Schuld and Killoran
+\cite{schuld2022killoran} argue the field should de-emphasise ``beating
+classical.'' We adopt this stance: the object we predict is a property of quantum
+circuits, but the predictor and its value proposition are entirely classical.
+
+\textbf{Predicting circuit properties.} To our knowledge, casting barren-plateau
+severity as a directly \emph{predicted} regression/classification target from
+cheap architectural features---and testing extrapolation across qubit count---has
+not been reported. This is the gap we address.
+
+% ==========================================================================
+\section{Method}
+\subsection{Circuit specification and feature space}
+Each datapoint is a \emph{spec} that fully determines a circuit family. The
+feature vector handed to the model is:
+\begin{center}
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Feature & Meaning \\
+\midrule
+\texttt{n\_qubits} & number of qubits $n$ \\
+\texttt{n\_layers} & number of ansatz layers $L$ \\
+\texttt{n\_params} & $n\times L$ trainable rotations \\
+\texttt{ansatz\_type} & fixed-\texttt{ry} vs.\ random-Pauli axes \\
+\texttt{entangle\_pattern} & linear / circular / all-to-all \\
+\texttt{entangler\_gate} & CZ vs.\ CX \\
+\texttt{cost\_global} & local $Z_0$ (0) vs.\ global $Z^{\otimes n}$ (1) \\
+\texttt{n\_entanglers} & entangling gates $\times$ layers \\
+\texttt{depth\_ratio} & $L/n$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+All features are computed in closed form from the spec---no quantum simulation is
+needed to obtain them.
+
+\subsection{Label generation}
+For a spec, we draw \Samples{} parameter vectors $\theta\sim\mathrm{Unif}[0,2\pi)^{nL}$,
+compute the exact parameter-shift gradient of the cost with respect to a fixed
+target rotation in the middle layer, and record the empirical variance. The
+regression label is $y=\log_{10}\max(\mathrm{Var}[\partial C/\partial\theta],\,10^{-18})$;
+the classification label is $\mathbb{1}[y<-2]$ (``barren''). Statevectors are
+evolved exactly with the in-house \texttt{qsim} NumPy simulator, so labels reflect
+ideal (noiseless) trainability.
+
+\subsection{Dataset and data description}
+We sample \Nspecs{} specs by drawing each design parameter independently and
+uniformly over the ranges in Table~\ref{tab:designspace}, with $n\in[\QubitLo,\QubitHi]$
+qubits and $L\in[\LayerLo,\LayerHi]$ layers, each labelled with \Samples{} gradient
+samples. Generation is embarrassingly parallel; every spec is seeded reproducibly
+from a root \texttt{SeedSequence}, and rows are streamed to CSV as they complete.
+The resulting dataset has \BarrenFrac{}\% barren circuits and \GlobalFrac{}\%
+global-cost circuits---a near-balanced classification target that avoids a
+degenerate majority baseline.
+
+\begin{table}[t]
+\centering
+\caption{Sampled design space. Each spec draws these parameters independently and
+uniformly.}
+\label{tab:designspace}
+\small
+\input{table_designspace}
+\end{table}
+
+Table~\ref{tab:datastats} summarizes the numeric features and the regression label.
+The design deliberately spans small, easily simulated circuits ($n=2$) up to the
+$n=12$ boundary of exact statevector simulation, and depths from a single layer to
+$L=20$, so the model sees a wide range of architectures. The label
+$\log_{10}\mathrm{Var}[\partial C/\partial\theta]$ ranges over roughly $18$ orders
+of magnitude, with a floor at $-18$ where finite-sample variance underflows.
+
+\begin{table}[t]
+\centering
+\caption{Descriptive statistics of the numeric features and the trainability label
+over all \Nrows{} circuits.}
+\label{tab:datastats}
+\small
+\input{table_datastats}
+\end{table}
+
+Crucially, the labels reproduce established barren-plateau theory directly from the
+data (Table~\ref{tab:labelbydesign}). Global cost observables yield a mean
+$\log_{10}\mathrm{Var}$ more than two orders of magnitude smaller than local costs
+($-4.49$ vs.\ $-2.33$) and nearly double the barren fraction, exactly the
+cost-locality effect proved by Cerezo \emph{et al.}\ \cite{cerezo2021cost}.
+Denser entanglement (all-to-all) and the CX entangler likewise push circuits toward
+barren plateaus. This structure is what makes the prediction task learnable, and it
+gives the trained model an interpretable, physics-consistent basis.
+
+\begin{table}[t]
+\centering
+\caption{Trainability broken down by design choice. Lower mean $\log_{10}\mathrm{Var}$
+and higher barren \% indicate less trainable families. The data recovers known
+barren-plateau drivers.}
+\label{tab:labelbydesign}
+\small
+\input{table_labelbydesign}
+\end{table}
+
+\subsection{Models and evaluation}
+To avoid privileging a single learner, we compare six model families spanning
+linear, instance-based, neural, and tree-ensemble inductive biases: a linear
+baseline (ridge regression / logistic regression), $k$-nearest neighbours, a
+multilayer perceptron (two hidden layers, $128$--$64$), random forests, extremely
+randomized trees, and histogram-based gradient-boosted trees
+\cite{ke2017lightgbm,pedregosa2011scikit}. Features are standardized for the
+scale-sensitive models. We report two protocols for each: \emph{(i)}~a random
+hold-out split (20\% test) measuring generalization to unseen architectures, and
+\emph{(ii)}~an \emph{extrapolation} split, training on $n\le\ExtrapCut{}$ and
+testing on all larger circuits---the headline test of whether small-circuit labels
+transfer to costlier regimes. All models use fixed random seeds so the reported
+numbers reproduce exactly. Interpretability is assessed with permutation feature
+importance on the best model.
+
+% ==========================================================================
+\section{Results}
+\subsection{Model comparison}
+Table~\ref{tab:models} compares all six model families on both tasks and both
+splits. Histogram-based gradient-boosted trees give the best held-out performance
+on both regression ($R^2=\RsqHold{}$) and classification (AUC $=\AucHold{}$), so we
+adopt it as our model for the remainder of the paper. Two observations sharpen the
+picture. First, the linear baseline is far behind (regression $R^2=0.27$; classifier
+AUC $0.95$), confirming that the map from architecture to trainability is
+genuinely nonlinear---simple rules of thumb do not capture it. Second, the neural
+network is competitive and in fact \emph{edges out} boosting on the extrapolation
+regression ($R^2=0.75$ vs.\ $0.72$), hinting that a learned representation transfers
+slightly better to larger circuits; we retain gradient boosting for its stronger
+in-distribution accuracy, interpretability, and training speed.
+
+\begin{table}[t]
+\centering
+\caption{Model comparison across both prediction tasks and both evaluation
+splits. Best hold-out result in \textbf{bold}.}
+\label{tab:models}
+\small
+\input{table_models}
+\end{table}
+
+\subsection{Generalization to unseen architectures}
+On the random hold-out split, the regressor attains $R^2=\RsqHold{}$ with mean
+absolute error \MaeHold{} (in $\log_{10}$ units), and the classifier separates
+barren from trainable circuits with accuracy \AccHold{} and AUC \AucHold{}
+(Table~\ref{tab:models}).
+
+\subsection{Extrapolation across qubit count}
+Training only on $n\le\ExtrapCut{}$ qubits (\ExtrapTrainRows{} circuits) and
+testing on larger circuits (\ExtrapTestRows{} circuits), the regressor retains
+$R^2=\RsqExtrap{}$ (MAE \MaeExtrap{}). Because the ground-truth cost of labelling
+grows exponentially with qubit count, a predictor that transfers downward-in-cost
+is exactly what an ansatz-screening tool needs.
+
+\IfFileExists{figs/predicted.pdf}{%
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.82\columnwidth]{figs/predicted.pdf}
+\caption{Predicted vs.\ true $\log_{10}\mathrm{Var}[\partial C/\partial\theta]$
+on held-out architectures. The dashed line is $y=x$.}
+\label{fig:predicted}
+\end{figure}}{}
+
+
+\subsection{What drives trainability}
+Permutation feature importance ranks \texttt{cost\_global},
+\texttt{entangle\_pattern}, and \texttt{depth\_ratio} at the top, consistent with
+theory: global costs \cite{cerezo2021cost} and denser entanglement
+\cite{holmes2022expressibility} drive circuits toward barren plateaus. The model
+thus rediscovers, from data alone, the design rules the BP literature derived
+analytically (Fig.~\ref{fig:importance}).
+
+\IfFileExists{figs/importance.pdf}{%
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.9\columnwidth]{figs/importance.pdf}
+\caption{Permutation feature importance for the trainability regressor. Cost
+locality and entanglement structure dominate, matching barren-plateau theory
+\cite{cerezo2021cost,holmes2022expressibility}.}
+\label{fig:importance}
+\end{figure}}{}
+
+% ==========================================================================
+\section{Discussion}
+\textbf{What the model learns.} The predictor's accuracy and its
+physics-consistent feature ranking indicate that barren-plateau severity carries
+a strong, low-dimensional architectural signature---enough for a cheap classical
+model to recover without any gradient sampling.
+
+\textbf{Limitations.} (i)~Labels are limited to classically simulable qubit
+counts; the extrapolation result is evidence of transfer, not a proof.
+(ii)~We use an ideal statevector simulator, so noise-induced plateaus
+\cite{wang2021noise} are out of scope. (iii)~The spec space, while diverse, is a
+hardware-efficient family; other ansatz classes may need their own features.
+(iv)~Gradient variance is estimated from finitely many samples, adding label
+noise at the trainable end.
+
+\textbf{Threats to validity.} Seeds are fixed and reported; the extrapolation
+split is defined purely by qubit count, so no large-circuit information leaks into
+training. We report a classical baseline framing throughout and avoid any
+advantage claim.
+
+% ==========================================================================
+\section{Conclusion}
+We recast barren-plateau diagnosis as supervised prediction and showed that a
+classical gradient-boosted model, trained on statevector-simulated labels, can
+predict a variational circuit's trainability from its architecture alone---and
+extrapolate across qubit count. The approach offers a cheap ansatz-screening
+heuristic and a data-driven confirmation of which design choices cause
+untrainability. Future work includes richer ansatz families, graph/sequence
+circuit encodings with GNN or transformer models, and incorporating a noise model
+to predict noise-induced plateaus.
+
+% ==========================================================================
+\section*{Reproducibility}
+All code (simulator, dataset generator, and training scripts), the exact command
+lines, and random seeds are released with this paper. The dataset is regenerable
+end-to-end with a single command; interactive demonstrations of the underlying
+simulator are available at \url{https://quantum.qbithabib.com}.
+
+\bibliographystyle{IEEEtran}
+\bibliography{refs}
+
+\end{document}

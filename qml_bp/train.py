@@ -74,12 +74,14 @@ def main():
     tr, te = perm[:cut], perm[cut:]
 
     print("\n=== Random hold-out split ===")
-    reg = HistGradientBoostingRegressor(max_iter=400, learning_rate=0.08)
+    reg = HistGradientBoostingRegressor(max_iter=400, learning_rate=0.08,
+                                        random_state=args.seed)
     reg.fit(X[tr], y_reg[tr])
     _report_regression("regression", y_reg[te], reg.predict(X[te]))
 
     if len(np.unique(y_cls[tr])) > 1:
-        clf = HistGradientBoostingClassifier(max_iter=400, learning_rate=0.08)
+        clf = HistGradientBoostingClassifier(max_iter=400, learning_rate=0.08,
+                                             random_state=args.seed)
         clf.fit(X[tr], y_cls[tr])
         prob = clf.predict_proba(X[te])[:, 1]
         _report_classification("classification", y_cls[te], clf.predict(X[te]), prob)
@@ -93,7 +95,8 @@ def main():
     te2 = np.where(df.n_qubits.to_numpy() > kcut)[0]
     print("\n=== Extrapolation split (train n<=%d, test n>%d) ===" % (kcut, kcut))
     if len(tr2) and len(te2):
-        reg2 = HistGradientBoostingRegressor(max_iter=400, learning_rate=0.08)
+        reg2 = HistGradientBoostingRegressor(max_iter=400, learning_rate=0.08,
+                                             random_state=args.seed)
         reg2.fit(X[tr2], y_reg[tr2])
         _report_regression("regression", y_reg[te2], reg2.predict(X[te2]))
         print("  (train rows %d, test rows %d)" % (len(tr2), len(te2)))
