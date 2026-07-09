@@ -1,1 +1,175 @@
-<iframe src="https://www.geogebra.org/material/iframe/id/8047/width/1050/height/550/border/888888/rc/false/ai/false/sdz/false/smb/false/stb/false/stbh/true/ld/false/sri/true/at/auto" target="_blank" title="Double Slit Experiment" width="100%" height="400px" scrolling="no" allowfullscreen></iframe>
+<div class="row" style="padding: 16px;">
+    <div class="col-md-12">
+        <h4>Three Polarizing Filters &mdash; interactive (Malus's law)</h4>
+        <p class="text-muted" style="margin-bottom: 8px;">
+            Unpolarized light hits three polarizers in a row. With filter&nbsp;A vertical (0&deg;) and
+            filter&nbsp;C horizontal (90&deg;), <b>no light</b> gets through. Insert filter&nbsp;B at
+            45&deg; <i>between</i> them and light reappears &mdash; because a polarizer doesn't just block,
+            it <b>re-projects</b> the polarization. Each stage follows Malus's law
+            <b>I&nbsp;=&nbsp;I&#8320;&nbsp;cos&sup2;(&Delta;&theta;)</b>.
+        </p>
+        <canvas id="polCanvas" width="820" height="300"
+            style="width:100%; max-width:820px; background:#07070f; border-radius:6px;"></canvas>
+    </div>
+
+    <div class="col-md-12 mt-3">
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input" id="polMiddleOn" checked>
+            <label class="custom-control-label" for="polMiddleOn">Insert the middle filter&nbsp;B</label>
+        </div>
+    </div>
+
+    <div class="col-md-4 mt-2">
+        <input type="range" min="0" max="180" value="0" id="polA" style="width: 100%;">
+        <label for="polA">Filter A angle = <b><span id="polAVal">0</span>&deg;</b></label>
+    </div>
+    <div class="col-md-4 mt-2">
+        <input type="range" min="0" max="180" value="45" id="polB" style="width: 100%;">
+        <label for="polB">Filter B angle = <b><span id="polBVal">45</span>&deg;</b></label>
+    </div>
+    <div class="col-md-4 mt-2">
+        <input type="range" min="0" max="180" value="90" id="polC" style="width: 100%;">
+        <label for="polC">Filter C angle = <b><span id="polCVal">90</span>&deg;</b></label>
+    </div>
+
+    <div class="col-md-12 mt-2">
+        <p style="font-size: 1.05rem; margin-bottom: 4px;">
+            Meter reading: <b><span id="polMeter">12.5</span>% of the source</b>
+            &nbsp;(<span id="polMeterAfterA">25.0</span>% of the light that passed filter A)
+        </p>
+        <p class="text-muted" id="polNote" style="font-size: 0.9rem;"></p>
+    </div>
+</div>
+
+<script>
+    (function () {
+        function deg2rad(d) { return d * Math.PI / 180; }
+        function malus(dThetaDeg) { return Math.pow(Math.cos(deg2rad(dThetaDeg)), 2); }
+
+        // Exposed globally so the page can (re)draw when the panel becomes visible.
+        function drawPolarization() {
+            var canvas = document.getElementById('polCanvas');
+            if (!canvas || !canvas.getContext) return;
+            var ctx = canvas.getContext('2d');
+            var W = canvas.width, H = canvas.height, midY = H / 2;
+
+            var a = Number(document.getElementById('polA').value);
+            var b = Number(document.getElementById('polB').value);
+            var c = Number(document.getElementById('polC').value);
+            var middleOn = document.getElementById('polMiddleOn').checked;
+
+            document.getElementById('polAVal').textContent = a;
+            document.getElementById('polBVal').textContent = b;
+            document.getElementById('polCVal').textContent = c;
+            document.getElementById('polB').disabled = !middleOn;
+
+            // --- Malus's law chain (intensity as a fraction of the source) ---
+            var Ia = 0.5;                                   // unpolarized -> first polarizer halves it
+            var Ib, Ic;
+            if (middleOn) {
+                Ib = Ia * malus(b - a);
+                Ic = Ib * malus(c - b);
+            } else {
+                Ib = null;
+                Ic = Ia * malus(c - a);
+            }
+
+            document.getElementById('polMeter').textContent = (Ic * 100).toFixed(1);
+            document.getElementById('polMeterAfterA').textContent = (Ic / Ia * 100).toFixed(1);
+
+            var note = document.getElementById('polNote');
+            if (!middleOn && Math.abs(((c - a) % 180 + 180) % 180 - 90) < 0.5) {
+                note.textContent = 'Crossed polarizers (A ⟂ C), no middle filter: complete extinction — 0% gets through.';
+            } else if (middleOn && Math.abs(b - a - 45) < 0.5 && Math.abs(c - a - 90) < 0.5) {
+                note.textContent = 'The classic result: A at 0°, B at 45°, C at 90° → 12.5% of the source (¼ of the light after A) reappears.';
+            } else {
+                note.textContent = '';
+            }
+
+            // --- drawing ---
+            ctx.clearRect(0, 0, W, H);
+            ctx.font = '13px sans-serif';
+
+            var xSource = 20, xA = 200, xB = 400, xC = 600, xMeter = 760;
+
+            // beam segments: brightness ∝ intensity of that segment
+            function beam(x0, x1, intensity, unpolarized) {
+                var alpha = unpolarized ? 0.5 : Math.max(0, intensity);
+                var grad = ctx.createLinearGradient(x0, 0, x1, 0);
+                var col = unpolarized ? '200,200,215' : '255,238,150';
+                grad.addColorStop(0, 'rgba(' + col + ',' + alpha + ')');
+                grad.addColorStop(1, 'rgba(' + col + ',' + alpha + ')');
+                ctx.strokeStyle = grad;
+                ctx.lineWidth = 10;
+                ctx.beginPath();
+                ctx.moveTo(x0, midY);
+                ctx.lineTo(x1, midY);
+                ctx.stroke();
+            }
+
+            beam(xSource, xA, 1, true);                         // source -> A (unpolarized)
+            if (middleOn) {
+                beam(xA, xB, Ia, false);                        // A -> B
+                beam(xB, xC, Ib, false);                        // B -> C
+            } else {
+                beam(xA, xC, Ia, false);                        // A -> C (B removed)
+            }
+            beam(xC, xMeter, Ic, false);                        // C -> meter
+
+            // filter plates with their transmission axis
+            function filter(x, angleDeg, label, active) {
+                ctx.save();
+                ctx.globalAlpha = active ? 1 : 0.25;
+                // plate
+                ctx.fillStyle = 'rgba(80,110,170,0.35)';
+                ctx.strokeStyle = '#9db4e6';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.rect(x - 8, midY - 70, 16, 140);
+                ctx.fill();
+                ctx.stroke();
+                // transmission axis (0° = vertical)
+                var r = deg2rad(angleDeg);
+                var dx = Math.sin(r) * 60, dy = -Math.cos(r) * 60;
+                ctx.strokeStyle = '#ffd34d';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(x - dx, midY - dy);
+                ctx.lineTo(x + dx, midY + dy);
+                ctx.stroke();
+                ctx.fillStyle = '#cdd6f4';
+                ctx.fillText(label + ' ' + angleDeg + '°', x - 20, midY - 80);
+                ctx.restore();
+            }
+
+            filter(xA, a, 'A', true);
+            filter(xB, b, 'B', middleOn);
+            filter(xC, c, 'C', true);
+
+            // light meter
+            ctx.fillStyle = '#cdd6f4';
+            ctx.fillText('meter', xMeter - 4, midY - 80);
+            ctx.strokeStyle = '#445';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(xMeter, midY - 60, 34, 120);
+            var fillH = 120 * Math.max(0, Ic);
+            ctx.fillStyle = 'rgba(255,214,77,0.9)';
+            ctx.fillRect(xMeter, midY + 60 - fillH, 34, fillH);
+            ctx.fillStyle = '#fff';
+            ctx.fillText((Ic * 100).toFixed(0) + '%', xMeter + 2, midY + 78);
+
+            // source label
+            ctx.fillStyle = '#8a8aa0';
+            ctx.fillText('source', xSource - 2, midY - 20);
+        }
+
+        window.drawPolarization = drawPolarization;
+
+        ['polA', 'polB', 'polC', 'polMiddleOn'].forEach(function (id) {
+            var elx = document.getElementById(id);
+            if (elx) elx.addEventListener('input', drawPolarization);
+            if (elx) elx.addEventListener('change', drawPolarization);
+        });
+        document.addEventListener('DOMContentLoaded', drawPolarization);
+    })();
+</script>
