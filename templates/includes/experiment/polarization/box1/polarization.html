@@ -2,7 +2,7 @@
     <div class="col-md-12">
         <h4>Three Polarizing Filters &mdash; interactive (Malus's law)</h4>
         <p class="text-muted" style="margin-bottom: 8px;">
-            Unpolarized light hits three polarizers in a row. With filter&nbsp;A vertical (0&deg;) and
+            A laser sends light through three polarizers in a row. With filter&nbsp;A vertical (0&deg;) and
             filter&nbsp;C horizontal (90&deg;), <b>no light</b> gets through. Insert filter&nbsp;B at
             45&deg; <i>between</i> them and light reappears &mdash; because a polarizer doesn't just block,
             it <b>re-projects</b> the polarization. Each stage follows Malus's law
@@ -92,29 +92,61 @@
 
             var xSource = 20, xA = 200, xB = 400, xC = 600, xMeter = 760;
 
-            // beam segments: brightness ∝ intensity of that segment
-            function beam(x0, x1, intensity, unpolarized) {
-                var alpha = unpolarized ? 0.5 : Math.max(0, intensity);
-                var grad = ctx.createLinearGradient(x0, 0, x1, 0);
-                var col = unpolarized ? '200,200,215' : '255,238,150';
-                grad.addColorStop(0, 'rgba(' + col + ',' + alpha + ')');
-                grad.addColorStop(1, 'rgba(' + col + ',' + alpha + ')');
-                ctx.strokeStyle = grad;
-                ctx.lineWidth = 10;
+            // --- laser emitter at the far left ---
+            function drawLaser(x, y) {
+                ctx.fillStyle = '#2b2f3a';                       // housing
+                ctx.strokeStyle = '#7f8aa3';
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.moveTo(x0, midY);
-                ctx.lineTo(x1, midY);
+                ctx.rect(x, y - 20, 54, 40);
+                ctx.fill();
                 ctx.stroke();
+                ctx.strokeStyle = '#59617a';                     // cooling fins
+                ctx.lineWidth = 1;
+                for (var f = 0; f < 4; f++) {
+                    ctx.beginPath();
+                    ctx.moveTo(x + 8 + f * 10, y - 20);
+                    ctx.lineTo(x + 8 + f * 10, y + 20);
+                    ctx.stroke();
+                }
+                ctx.fillStyle = '#3a3f4d';                       // emitter nozzle
+                ctx.fillRect(x + 54, y - 6, 12, 12);
+                var glow = ctx.createRadialGradient(x + 66, y, 0, x + 66, y, 11); // hot aperture
+                glow.addColorStop(0, 'rgba(255,140,140,0.95)');
+                glow.addColorStop(1, 'rgba(255,40,40,0)');
+                ctx.fillStyle = glow;
+                ctx.beginPath();
+                ctx.arc(x + 66, y, 11, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.fillStyle = '#8a8aa0';
+                ctx.fillText('laser', x + 12, y - 26);
             }
 
-            beam(xSource, xA, 1, true);                         // source -> A (unpolarized)
-            if (middleOn) {
-                beam(xA, xB, Ia, false);                        // A -> B
-                beam(xB, xC, Ib, false);                        // B -> C
-            } else {
-                beam(xA, xC, Ia, false);                        // A -> C (B removed)
+            // --- red laser beam; brightness ∝ intensity of that segment (0 = blocked) ---
+            function beam(x0, x1, intensity) {
+                var I = Math.max(0, Math.min(1, intensity));
+                if (I <= 0.001) return;                         // fully extinguished: draw nothing
+                ctx.strokeStyle = 'rgba(255,40,40,' + (0.25 * I) + ')'; // outer glow
+                ctx.lineWidth = 16;
+                ctx.beginPath(); ctx.moveTo(x0, midY); ctx.lineTo(x1, midY); ctx.stroke();
+                ctx.strokeStyle = 'rgba(255,70,70,' + (0.85 * I) + ')'; // core
+                ctx.lineWidth = 5;
+                ctx.beginPath(); ctx.moveTo(x0, midY); ctx.lineTo(x1, midY); ctx.stroke();
+                ctx.strokeStyle = 'rgba(255,205,205,' + I + ')';       // hot centre
+                ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.moveTo(x0, midY); ctx.lineTo(x1, midY); ctx.stroke();
             }
-            beam(xC, xMeter, Ic, false);                        // C -> meter
+
+            var xAperture = xSource + 66;
+            drawLaser(xSource, midY);
+            beam(xAperture, xA, 1);                              // laser -> A
+            if (middleOn) {
+                beam(xA, xB, Ia);                               // A -> B
+                beam(xB, xC, Ib);                               // B -> C
+            } else {
+                beam(xA, xC, Ia);                               // A -> C (B removed)
+            }
+            beam(xC, xMeter, Ic);                               // C -> meter
 
             // filter plates with their transmission axis
             function filter(x, angleDeg, label, active) {
@@ -157,10 +189,7 @@
             ctx.fillRect(xMeter, midY + 60 - fillH, 34, fillH);
             ctx.fillStyle = '#fff';
             ctx.fillText((Ic * 100).toFixed(0) + '%', xMeter + 2, midY + 78);
-
-            // source label
-            ctx.fillStyle = '#8a8aa0';
-            ctx.fillText('source', xSource - 2, midY - 20);
+            // (the laser emitter and its label are drawn in the beam section above)
         }
 
         window.drawPolarization = drawPolarization;
