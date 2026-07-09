@@ -141,7 +141,7 @@
 
     <div class="col-md-12 mt-2"
         style="height: 10%; width: 100%; background-color: black;display: flex; align-items: center; ">
-        <div id="slitContainer" style="height: 100%; width: 100%; display: flex; justify-content: center;">
+        <div id="slitContainerBottom" style="height: 100%; width: 100%; display: flex; justify-content: center;">
             <div id="slit_1" style="height: 100%; width: 2px; background-color: red; margin-right: 2px;"></div>
             <div id="slit_2" style="height: 100%; width: 2px; background-color: red; margin-left: 2px;"></div>
         </div>
@@ -153,7 +153,7 @@
             <label for="distance_bitween_two_slits">Distance between slits (micrometers)</label>
         </div>
         <div class="col-md-12">
-            <input type="range" min="5" max="20" value="2" id="slit_width">
+            <input type="range" min="5" max="20" value="8" id="slit_width">
             <label for="slit_width">Slit width (micrometers)</label>
         </div>
 
@@ -197,55 +197,56 @@
             // get canvas width and height
 
 
-            // Function to calculate intensity at a given point (x) on the screen
-            function intensity(x, wavelength, slitSeparation, screenDistance) {
-                const k = 2 * Math.PI / wavelength;
-                const d = slitSeparation;
-                const D = screenDistance;
-                const r1 = Math.sqrt(x * x + D * D);
-                const r2 = Math.sqrt((x - d) * (x - d) + D * D);
-                const phi = k * r1 - k * r2;
-                return Math.pow(Math.cos(phi), 2);
+            // Fraunhofer two-slit intensity as a function of the diffraction angle theta.
+            //   alpha = pi * d * sin(theta) / lambda   -> interference between the two slits
+            //   beta  = pi * a * sin(theta) / lambda   -> single-slit diffraction envelope
+            //   I(theta) = [sin(beta)/beta]^2 * cos^2(alpha),  normalised to 1 at the centre.
+            // (The old code double-counted by adding a shifted copy of the pattern to itself
+            //  and ignored the slit width; this is the standard, physically correct formula.)
+            function twoSlitIntensity(theta, wavelength, slitSeparation, slitWidth) {
+                const s = Math.sin(theta);
+                const alpha = Math.PI * slitSeparation * s / wavelength;
+                const beta = Math.PI * slitWidth * s / wavelength;
+                const envelope = (beta === 0) ? 1 : Math.pow(Math.sin(beta) / beta, 2);
+                return envelope * Math.pow(Math.cos(alpha), 2);
             }
 
-            // Function to calculate combined intensity at a given point (x) on the screen
-            function combinedIntensity(x, wavelength, slitSeparation, screenDistance) {
-                return intensity(x, wavelength, slitSeparation, screenDistance) + intensity(x - slitSeparation, wavelength, slitSeparation, screenDistance);
-            }
             function slitDistanceWidthHandler(widthEventHandler, distanceEventHandler, screenDistanceEventHandler) {
-                var width = widthEventHandler.value; // Get the value of the slider
-                var distanceSplit = distanceEventHandler.value; // Get the value of the slider
-                var sDistance = screenDistanceEventHandler.value; // Get the value of the slider
-                slit1.style.width = width + "px"; // Set width for slit_1
-                slit2.style.width = width + "px"; // Set width for slit_2
-                const canvasWidth = 800;
-                const canvasHeight = 400;
-                const scale = 100; // Scale for drawing
-                const wavelength = 0.02 + (width / 1000); // Wavelength of the waves
-                const slitSeparation = 0.2 + (distanceSplit / 100); // Distance between the slits
-                const screenDistance = 1 + (sDistance / 10); // Distance from the slits to the screen
+                var width = Number(widthEventHandler.value);            // slit width (micrometres)
+                var distanceSplit = Number(distanceEventHandler.value); // slit separation (micrometres)
+                var sDistance = Number(screenDistanceEventHandler.value); // screen distance (metres)
+                slit1.style.width = width + "px";
+                slit2.style.width = width + "px";
+
+                const wavelength = 0.5;                                 // green light, ~0.5 um (fixed)
+                const slitWidth = width;                                // a (um)
+                const slitSeparation = Math.max(distanceSplit, width);  // d >= a to stay physical (um)
+                const screenDistance = sDistance;                       // D (m): scales fringe spacing
+                const thetaMax = 0.25;                                  // half-angle of the view window (rad)
+                const N = 800;
+
                 var labels = [];
                 var intensityData = [];
-                for (let x = 0; x < canvasWidth; x++) {
-                    const intensityValue = combinedIntensity((x - canvasWidth / 2) / scale, wavelength, slitSeparation, screenDistance);
-                    const y = canvasHeight / 2 - intensityValue * scale;
-                    labels.push(x);
-                    intensityData.push(y);
+                for (let i = 0; i < N; i++) {
+                    const theta = -thetaMax + (2 * thetaMax) * i / (N - 1);
+                    const I = twoSlitIntensity(theta, wavelength, slitSeparation, slitWidth);
+                    // position on the screen; a larger screen distance spreads the fringes out
+                    const xScreen = screenDistance * Math.tan(theta);
+                    labels.push(xScreen.toFixed(2));
+                    intensityData.push(I);
                 }
-                // line chart 
-                var downGradeBy = canvasWidth / 15;
-                var downsampledlabels = _.chunk(labels, downGradeBy).map(chunk => _.mean(chunk));
-                var downsampledintensityData = _.chunk(intensityData, downGradeBy).map(chunk => _.mean(chunk));
-                // find max intensity
-                var maxIntensity = Math.max(...downsampledintensityData);
-                for (var i = 1; i <= 15; i++) {
-                    var constructive1 = document.getElementById("constructive_" + i + "1");
-                    var constructive2 = document.getElementById("constructive_" + i + "2");
-                    var increaseIntensity = 255 - maxIntensity;
-                    var intensity = downsampledintensityData[i - 1] + increaseIntensity;
 
-                    constructive1.style.background = "linear-gradient(to left, rgba(" + intensity + ", 0, 0, 1) 20%, rgba(" + intensity + ", 0, 0, 0) 100%)";
-                    constructive2.style.background = "linear-gradient(to right, rgba(" + intensity + ", 0, 0, 1) 20%, rgba(" + intensity + ", 0, 0, 0) 100%)";
+                // Light up the 15 bars above the screen from the central band of the pattern.
+                var downGradeBy = Math.floor(N / 15);
+                var downsampled = _.chunk(intensityData, downGradeBy)
+                    .map(function (chunk) { return _.mean(chunk); }).slice(0, 15);
+                for (var b = 1; b <= 15; b++) {
+                    var bar1 = document.getElementById("constructive_" + b + "1");
+                    var bar2 = document.getElementById("constructive_" + b + "2");
+                    if (!bar1 || !bar2) continue;
+                    var level = Math.round(255 * (downsampled[b - 1] || 0)); // intensity 0..1 -> 0..255
+                    bar1.style.background = "linear-gradient(to left, rgba(" + level + ", 0, 0, 1) 20%, rgba(" + level + ", 0, 0, 0) 100%)";
+                    bar2.style.background = "linear-gradient(to right, rgba(" + level + ", 0, 0, 1) 20%, rgba(" + level + ", 0, 0, 0) 100%)";
                 }
                 createChart(labels, intensityData);
             }
@@ -257,24 +258,26 @@
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: 'Eshyana: Double-slit Experiment',
-                                data: intensityData,// End data 
-                                borderColor: 'rgba(255,0,0,0.7)',
-                                fill: false,
-                                tension: 0.01,
+                                label: 'Eshyana: Double-slit intensity pattern',
+                                data: intensityData,
+                                borderColor: 'rgba(255,0,0,0.85)',
+                                backgroundColor: 'rgba(255,0,0,0.08)',
+                                fill: true,
+                                tension: 0.1,
                                 pointRadius: 0,
-                            }]// End datasets 
-                        },// End data
+                            }]
+                        },
                         options: {
-                            Plugins: {
+                            animation: false,
+                            scales: {
+                                x: { title: { display: true, text: 'position on screen' }, ticks: { maxTicksLimit: 11 } },
+                                y: { min: 0, max: 1.05, title: { display: true, text: 'relative intensity' } }
+                            },
+                            plugins: {
                                 zoom: {
                                     zoom: {
-                                        wheel: {
-                                            enabled: true,
-                                        },
-                                        pinch: {
-                                            enabled: true,
-                                        },
+                                        wheel: { enabled: true },
+                                        pinch: { enabled: true },
                                         mode: 'x',
                                     }
                                 }

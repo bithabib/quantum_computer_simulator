@@ -1,0 +1,110 @@
+<div class="row" style="min-height: 60vh; border: 1px solid #ccc; padding: 16px;">
+    <div class="col-md-12">
+        <h4>Ramsey Interferometer &mdash; separated oscillatory fields</h4>
+        <p class="text-muted" style="margin-bottom: 8px;">
+            A two-level atom starts in the ground state. Two &pi;/2 pulses, separated by a free-evolution time
+            <b>T</b>, drive it. During T the atomic phase advances at the detuning &delta; (= drive frequency
+            &minus; atomic frequency). The chance of finding the atom <b>excited</b> oscillates as
+            <b>P<sub>e</sub>(&delta;) = cos&sup2;(&delta;T/2)</b> &mdash; the <b>Ramsey fringes</b> below.
+            Longer T makes the fringes finer, which is exactly why Ramsey's method underpins atomic clocks.
+        </p>
+        <canvas id="ramseyCanvas" width="820" height="340"
+            style="width:100%; max-width:820px;"></canvas>
+    </div>
+
+    <div class="col-md-6 mt-3">
+        <input type="range" min="1" max="40" value="10" id="ramseyT" style="width: 70%;">
+        <label for="ramseyT" style="margin-left: 10px;">Free-evolution time T =
+            <b><span id="ramseyTVal">10</span></b> (a.u.)</label>
+    </div>
+    <div class="col-md-6 mt-3">
+        <input type="range" min="-30" max="30" value="0" id="ramseyDetune" style="width: 70%;">
+        <label for="ramseyDetune" style="margin-left: 10px;">Detuning &delta; =
+            <b><span id="ramseyDetuneVal">0</span></b> (a.u.)</label>
+    </div>
+    <div class="col-md-12">
+        <p style="font-size: 1.1rem;">At &delta; = <span id="ramseyDcur">0</span>:
+            P(excited) = <b><span id="ramseyPe">1.000</span></b></p>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var chart = null;
+
+        function ramseyPe(delta, T) {
+            // Two ideal pi/2 pulses separated by time T; probability of excitation.
+            return Math.pow(Math.cos(delta * T / 2), 2);
+        }
+
+        function drawRamsey() {
+            var canvas = document.getElementById('ramseyCanvas');
+            if (!canvas || typeof Chart === 'undefined') return;
+
+            var T = Number(document.getElementById('ramseyT').value);
+            var dCur = Number(document.getElementById('ramseyDetune').value);
+            document.getElementById('ramseyTVal').textContent = T;
+            document.getElementById('ramseyDetuneVal').textContent = dCur;
+            document.getElementById('ramseyDcur').textContent = dCur;
+            document.getElementById('ramseyPe').textContent = ramseyPe(dCur, T).toFixed(3);
+
+            var labels = [], data = [], marker = [];
+            var dMax = 30;
+            for (var i = 0; i <= 300; i++) {
+                var delta = -dMax + (2 * dMax) * i / 300;
+                labels.push(delta.toFixed(2));
+                data.push(ramseyPe(delta, T));
+                // a single point highlighting the currently selected detuning
+                marker.push(Math.abs(delta - dCur) < (dMax / 300) ? ramseyPe(delta, T) : null);
+            }
+
+            if (!chart) {
+                chart = new Chart(canvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'P(excited)  vs  detuning δ',
+                                data: data,
+                                borderColor: 'rgba(111,66,193,0.9)',
+                                backgroundColor: 'rgba(111,66,193,0.12)',
+                                fill: true,
+                                pointRadius: 0,
+                                tension: 0.1,
+                            },
+                            {
+                                label: 'selected δ',
+                                data: marker,
+                                borderColor: 'rgba(220,53,69,1)',
+                                backgroundColor: 'rgba(220,53,69,1)',
+                                pointRadius: 5,
+                                showLine: false,
+                            },
+                        ],
+                    },
+                    options: {
+                        animation: false,
+                        scales: {
+                            x: { title: { display: true, text: 'detuning δ (a.u.)' }, ticks: { maxTicksLimit: 11 } },
+                            y: { min: 0, max: 1, title: { display: true, text: 'P(excited)' } },
+                        },
+                    },
+                });
+            } else {
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = data;
+                chart.data.datasets[1].data = marker;
+                chart.update();
+            }
+        }
+
+        window.drawRamsey = drawRamsey;
+
+        var t = document.getElementById('ramseyT');
+        var d = document.getElementById('ramseyDetune');
+        if (t) t.addEventListener('input', drawRamsey);
+        if (d) d.addEventListener('input', drawRamsey);
+        document.addEventListener('DOMContentLoaded', drawRamsey);
+    })();
+</script>

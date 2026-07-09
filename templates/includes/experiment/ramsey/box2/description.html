@@ -1,0 +1,34 @@
+<div>
+    <h1>The Ramsey Interferometer</h1>
+    <p>Norman Ramsey's <em>method of separated oscillatory fields</em> (1949, Nobel Prize 1989) is the
+        technique at the heart of every atomic clock. Instead of driving a two-level atom with one long pulse,
+        it uses <strong>two short \( \pi/2 \) pulses</strong> separated by a period of free evolution of
+        duration \( T \). It is a quantum interferometer in which the two &ldquo;paths&rdquo; are the ground and
+        excited states of the atom.</p>
+
+    <h3>How it works</h3>
+    <ol>
+        <li>The atom begins in the ground state \( |g\rangle \).</li>
+        <li>The <strong>first \( \pi/2 \) pulse</strong> places it in an equal superposition
+            \( \tfrac{1}{\sqrt{2}}(|g\rangle + |e\rangle) \) &mdash; on the Bloch sphere the state now lies on
+            the equator.</li>
+        <li>During the free time \( T \), the superposition precesses. If the drive is <strong>detuned</strong>
+            from the atomic frequency by \( \delta \), the two components accumulate a relative phase
+            \( \phi = \delta T \).</li>
+        <li>The <strong>second \( \pi/2 \) pulse</strong> converts that accumulated phase into a population
+            difference that a detector can read out.</li>
+    </ol>
+
+    <p>The probability of finding the atom in the excited state is:</p>
+    <p>\( P_e(\delta) = \cos^2\!\left(\dfrac{\delta T}{2}\right) = \tfrac{1}{2}\big(1 + \cos(\delta T)\big) \)</p>
+
+    <p>Plotting \( P_e \) against the detuning \( \delta \) gives the <strong>Ramsey fringes</strong> shown in
+        the simulator. Their spacing is \( \Delta\delta = 2\pi / T \): the <strong>longer the free-evolution
+        time T, the narrower the central fringe</strong>, and the more precisely the drive frequency can be
+        locked to the atomic transition. This is why a longer interrogation time means a more accurate clock.</p>
+
+    <p>Compared with driving a single long pulse (a Rabi measurement), Ramsey's separated-pulse scheme is far
+        less sensitive to fluctuations in the pulse amplitude and to the field's uniformity, because the atom
+        spends most of its time evolving <em>freely</em> rather than being driven &mdash; which is what makes it
+        so precise.</p>
+</div>

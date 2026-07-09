@@ -41,14 +41,16 @@
                     </div>
                     <div class="col">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="experiment3">
+                            <input type="checkbox" class="custom-control-input" id="experiment3"
+                                onchange="toggleExperiment('experiment3')">
                             <label class="custom-control-label" for="experiment3">Stern-Gerlach Experiment</label>
                         </div>
                     </div>
 
                     <div class="col">
                         <div class="custom-control custom-checkbox">
-                            <input type="checkbox" class="custom-control-input" id="experiment4">
+                            <input type="checkbox" class="custom-control-input" id="experiment4"
+                                onchange="toggleExperiment('experiment4')">
                             <label class="custom-control-label" for="experiment4">Ramsey Interferometer</label>
                         </div>
                     </div>
@@ -92,29 +94,72 @@
                 </div>
 
             </div>
+
+            <div class="col-md-12 m-2 mt-4" id="stern-gerlach" style="display: none;">
+                <div class="row" style="width: 100%; height: 100%;">
+                    <div class="col-md-6">
+                        {% include 'includes/experiment/stern_gerlach_experiment/box1/stern_gerlach_experiment.html' %}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="box row" style="height: 80vh; border: 1px solid #ccc; overflow: auto; padding: 12px;">
+                            {% include 'includes/experiment/stern_gerlach_experiment/box2/description.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 m-2 mt-4" id="ramsey" style="display: none;">
+                <div class="row" style="width: 100%; height: 100%;">
+                    <div class="col-md-6">
+                        {% include 'includes/experiment/ramsey/box1/ramsey.html' %}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="box row" style="height: 80vh; border: 1px solid #ccc; overflow: auto; padding: 12px;">
+                            {% include 'includes/experiment/ramsey/box2/description.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <script>
-            // Function to toggle experiment description based on checkbox selection
+            // Map each experiment checkbox to the id of the panel it shows, plus an
+            // optional draw hook to run when that panel becomes visible (canvases and
+            // charts render blank if drawn while their container is display:none).
+            var EXPERIMENTS = {
+                experiment1: { panel: 'double-slit', draw: null },
+                experiment2: { panel: 'polarization', draw: null },
+                experiment3: { panel: 'stern-gerlach', draw: function () { if (window.drawSternGerlach) window.drawSternGerlach(); } },
+                experiment4: { panel: 'ramsey', draw: function () { if (window.drawRamsey) window.drawRamsey(); } }
+            };
+
+            // Radio-style selection: the chosen experiment is shown, all others hidden.
             function toggleExperiment(checkboxId) {
-                var doubleSlitDiv = document.getElementById('double-slit');
-                var polarizationDiv = document.getElementById('polarization');
-                var isChecked = document.getElementById(checkboxId).checked;
+                var shownPanel = null;
+                Object.keys(EXPERIMENTS).forEach(function (id) {
+                    var checkbox = document.getElementById(id);
+                    var panel = document.getElementById(EXPERIMENTS[id].panel);
+                    var selected = (id === checkboxId);
+                    if (checkbox) checkbox.checked = selected; // enforce exactly one selected
+                    if (panel) panel.style.display = selected ? 'block' : 'none';
+                    if (selected) shownPanel = panel;
+                });
 
-                if (isChecked) {
-                    if (checkboxId === 'experiment1') {
-                        doubleSlitDiv.style.display = 'block';
-                        polarizationDiv.style.display = 'none';
-                        document.getElementById('experiment2').checked = false;
-                    } else if (checkboxId === 'experiment2') {
-                        polarizationDiv.style.display = 'block';
-                        doubleSlitDiv.style.display = 'none';
-                        document.getElementById('experiment1').checked = false;
-
+                // Now that the panel is visible, let any Chart.js charts inside it resize
+                // to their real dimensions (charts built while display:none render at 0),
+                // then run the experiment's own draw hook.
+                setTimeout(function () {
+                    if (shownPanel && window.Chart && Chart.getChart) {
+                        shownPanel.querySelectorAll('canvas').forEach(function (cv) {
+                            var ch = Chart.getChart(cv);
+                            if (ch) ch.resize();
+                        });
                     }
-                }
+                    var draw = EXPERIMENTS[checkboxId] && EXPERIMENTS[checkboxId].draw;
+                    if (draw) draw();
+                }, 0);
             }
-            // Call toggleExperiment function with the ID of the double slit experiment checkbox
+
             window.onload = function () {
                 toggleExperiment('experiment1');
             };

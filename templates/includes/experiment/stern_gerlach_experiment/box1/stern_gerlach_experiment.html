@@ -1,0 +1,149 @@
+<div class="row" style="min-height: 60vh; border: 1px solid #ccc; padding: 16px;">
+    <div class="col-md-12">
+        <h4>Sequential Stern&ndash;Gerlach</h4>
+        <p class="text-muted" style="margin-bottom: 8px;">
+            A beam of spin-&frac12; atoms is first prepared <b>spin-up along Z</b> by the left magnet.
+            A second Stern&ndash;Gerlach magnet is rotated by an angle &theta; relative to the first.
+            Classically you would expect a continuous smear; quantum mechanics predicts the beam splits
+            into exactly <b>two</b> discrete spots, with probabilities
+            <b>cos&sup2;(&theta;/2)</b> (up) and <b>sin&sup2;(&theta;/2)</b> (down).
+        </p>
+        <canvas id="sgCanvas" width="820" height="300"
+            style="width:100%; max-width:820px; background:#0b0b1a; border-radius:6px;"></canvas>
+    </div>
+
+    <div class="col-md-12 mt-3">
+        <input type="range" min="0" max="360" value="45" id="sgAngle" style="width: 60%;">
+        <label for="sgAngle" style="margin-left: 10px;">Analyzer angle &theta; =
+            <b><span id="sgAngleVal">45</span>&deg;</b></label>
+    </div>
+    <div class="col-md-12">
+        <p style="font-size: 1.1rem;">
+            <span style="color:#37b6ff;">&#9650; P(up) = <b><span id="sgUp">0.85</span></b></span>
+            &nbsp;&nbsp;&nbsp;
+            <span style="color:#ff6b6b;">&#9660; P(down) = <b><span id="sgDown">0.15</span></b></span>
+        </p>
+        <p class="text-muted" id="sgNote" style="font-size: 0.9rem;"></p>
+    </div>
+</div>
+
+<script>
+    (function () {
+        // Draw the sequential Stern-Gerlach visualisation. Exposed globally so the
+        // page can (re)draw it when the panel becomes visible (a canvas sized while
+        // display:none has zero dimensions and would render blank).
+        function drawSternGerlach() {
+            var canvas = document.getElementById('sgCanvas');
+            if (!canvas || !canvas.getContext) return;
+            var ctx = canvas.getContext('2d');
+            var W = canvas.width, H = canvas.height, midY = H / 2;
+
+            var deg = Number(document.getElementById('sgAngle').value);
+            var theta = deg * Math.PI / 180;
+            var pUp = Math.pow(Math.cos(theta / 2), 2);
+            var pDown = Math.pow(Math.sin(theta / 2), 2);
+
+            document.getElementById('sgAngleVal').textContent = deg;
+            document.getElementById('sgUp').textContent = pUp.toFixed(3);
+            document.getElementById('sgDown').textContent = pDown.toFixed(3);
+            var note = document.getElementById('sgNote');
+            if (deg % 360 === 0) note.textContent = 'Aligned analyzers (θ = 0): every atom is still spin-up — the beam is not split.';
+            else if (deg === 180) note.textContent = 'Anti-aligned (θ = 180°): every atom flips to spin-down.';
+            else if (deg === 90 || deg === 270) note.textContent = 'θ = 90°: a Z-up atom is an equal superposition along this axis — 50/50.';
+            else note.textContent = '';
+
+            ctx.clearRect(0, 0, W, H);
+
+            // --- source + first (Z) magnet: prepares a single spin-up beam ---
+            ctx.fillStyle = '#8aa';
+            ctx.font = '13px sans-serif';
+            ctx.fillText('source', 8, midY - 18);
+            ctx.fillText('SG (Z)', 92, midY - 42);
+
+            ctx.strokeStyle = '#37b6ff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(10, midY);
+            ctx.lineTo(150, midY);
+            ctx.stroke();
+
+            // first magnet box
+            ctx.strokeStyle = '#556';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(90, midY - 35, 60, 70);
+
+            // --- second (rotated) magnet ---
+            var mx = 340;
+            ctx.save();
+            ctx.translate(mx, midY);
+            ctx.rotate(-theta); // visualise the analyzer orientation
+            ctx.strokeStyle = '#c9a227';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(-30, -45, 60, 90);
+            ctx.fillStyle = '#c9a227';
+            ctx.fillText('N', -6, -32);
+            ctx.fillText('S', -6, 42);
+            ctx.restore();
+            ctx.fillStyle = '#8aa';
+            ctx.fillText('SG (θ)', mx - 20, midY - 60);
+
+            // beam from first to second magnet
+            ctx.strokeStyle = '#37b6ff';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(150, midY);
+            ctx.lineTo(mx - 30, midY);
+            ctx.stroke();
+
+            // --- two output beams, thickness/opacity proportional to probability ---
+            var screenX = W - 40;
+            var upY = 70, downY = H - 70;
+
+            ctx.strokeStyle = 'rgba(55,182,255,' + Math.max(0.08, pUp) + ')';
+            ctx.lineWidth = 1 + 10 * pUp;
+            ctx.beginPath();
+            ctx.moveTo(mx + 30, midY);
+            ctx.lineTo(screenX, upY);
+            ctx.stroke();
+
+            ctx.strokeStyle = 'rgba(255,107,107,' + Math.max(0.08, pDown) + ')';
+            ctx.lineWidth = 1 + 10 * pDown;
+            ctx.beginPath();
+            ctx.moveTo(mx + 30, midY);
+            ctx.lineTo(screenX, downY);
+            ctx.stroke();
+
+            // --- detector screen with two spots ---
+            ctx.strokeStyle = '#445';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(screenX, 20);
+            ctx.lineTo(screenX, H - 20);
+            ctx.stroke();
+
+            function spot(y, p, color) {
+                var r = 4 + 22 * p;
+                var g = ctx.createRadialGradient(screenX, y, 0, screenX, y, r);
+                g.addColorStop(0, color + Math.max(0.15, p) + ')');
+                g.addColorStop(1, color + '0)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(screenX, y, r, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            spot(upY, pUp, 'rgba(55,182,255,');
+            spot(downY, pDown, 'rgba(255,107,107,');
+
+            ctx.fillStyle = '#37b6ff';
+            ctx.fillText('▲ up', screenX - 60, upY - 26);
+            ctx.fillStyle = '#ff6b6b';
+            ctx.fillText('▼ down', screenX - 60, downY + 34);
+        }
+
+        window.drawSternGerlach = drawSternGerlach;
+
+        var slider = document.getElementById('sgAngle');
+        if (slider) slider.addEventListener('input', drawSternGerlach);
+        document.addEventListener('DOMContentLoaded', drawSternGerlach);
+    })();
+</script>
