@@ -5,6 +5,9 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{booktabs}
+\usepackage[hidelinks]{hyperref}
+% ORCID icon linking to the author's profile (class does not define this).
+\newcommand{\orcidicon}[1]{\,\href{https://orcid.org/#1}{\raisebox{-0.1em}{\includegraphics[height=0.9em]{logo-orcid.pdf}}}}
 
 % ---- result macros (filled by ../latex/fill_results.py) -------------------
 \newcommand{\Nrows}{20{,}000}
@@ -33,11 +36,12 @@
 \title{Predicting the Trainability of Variational Quantum Circuits:
 A Data-Driven Model for Barren Plateaus}
 
-\author{\uppercase{Habibur Rahman}\authorrefmark{1},
-\uppercase{and Jaeho Kim}\authorrefmark{1}}
-\address[1]{Department of Aerospace and Software Engineering, Gyeongsang National
-University, Jinju 52828, Republic of Korea (e-mail: habib@gnu.ac.kr;
-jaeho.kim@gnu.ac.kr)}
+\author{\uppercase{Md Habibur Rahman}\authorrefmark{1}\orcidicon{0000-0001-8862-1300},
+\uppercase{and Jaeho Kim}\authorrefmark{2}\orcidicon{0000-0002-5268-0074}}
+\address[1]{Department of AI Convergence Engineering, Gyeongsang National
+University, Jinju, South Korea (e-mail: habib@gnu.ac.kr)}
+\address[2]{Department of AI Convergence Engineering, Gyeongsang National
+University, Jinju, South Korea (e-mail: jaeho.kim@gnu.ac.kr)}
 
 \tfootnote{Data-generation simulator and interactive demonstrations are available
 at https://quantum.qbithabib.com. Code, dataset-generation scripts, and random
