@@ -1,0 +1,95 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,top=0.7in,bottom=0.7in,left=0.9in,right=0.9in]{geometry}
+\usepackage{parskip}
+\usepackage{times}
+\usepackage[hidelinks]{hyperref}
+\usepackage{microtype}
+\usepackage{enumitem}
+\pagestyle{empty}
+\setlength{\parskip}{3pt plus 1pt}
+\setlength{\emergencystretch}{2em}
+
+\begin{document}
+
+{\raggedleft\small
+Md Habibur Rahman \\
+Jaeho Kim (corresponding author) \\
+Department of AI Convergence Engineering, Gyeongsang National University \\
+Jinju, South Korea \quad\textbullet\quad \href{mailto:jaeho.kim@gnu.ac.kr}{jaeho.kim@gnu.ac.kr} \\[0.4em]
+\par}
+
+\noindent The Editorial Office, \textit{Quantum Reports} (MDPI)
+
+\vspace{0.5em}
+
+\noindent\textbf{Re: Submission of ``Predicting the Trainability of Variational
+Quantum Circuits: A Data-Driven Model for Barren Plateaus''}
+
+\vspace{0.3em}
+
+\noindent Dear Editors,
+
+We are pleased to submit our manuscript, \textit{``Predicting the Trainability of
+Variational Quantum Circuits: A Data-Driven Model for Barren Plateaus,''} for
+consideration as an original research article in \textit{Quantum Reports}.
+
+\textbf{Significance.} Barren plateaus---the exponential vanishing of
+cost-function gradients as a variational quantum circuit is scaled---are widely
+regarded as the central obstacle to training quantum machine-learning models.
+Diagnosing them today requires expensive gradient sampling on each candidate
+circuit, infeasible precisely in the large-qubit regime where the problem matters
+most. Our manuscript reframes this diagnosis as a \emph{supervised prediction}
+problem: can a purely classical model predict a circuit's trainability from its
+architecture alone---qubit count, depth, ansatz type, entanglement pattern,
+entangler gate, and cost-observable locality---without evaluating a single
+gradient? Using an exact statevector simulator we generate a labeled dataset of
+20{,}000 random circuits and show that a gradient-boosted model predicts the
+gradient-variance trainability with high accuracy (AUC 0.99 for the
+barren/trainable decision) and, most notably, \emph{extrapolates} from small
+circuits to the largest sizes we can still simulate---yielding a cheap
+ansatz-screening heuristic and an interpretable account of which design choices
+drive untrainability.
+
+\textbf{Context and relationship to existing work.} The barren-plateau literature
+is overwhelmingly analytical, deriving variance scaling laws for particular ansatz
+families (e.g., McClean et al.\ 2018; Cerezo et al.\ 2021; Larocca et al.\ 2025).
+Our contribution is complementary and empirical: we learn a predictive map across a
+heterogeneous design space and show that it recovers the established theory from
+data. Consistent with recent skeptical benchmarking (Bowles et al.\ 2024;
+Schuld \& Killoran 2022), we make \textbf{no} claim of quantum advantage---the
+object we predict is a property \emph{of} quantum circuits, while the predictor is
+a classical diagnostic tool.
+
+\textbf{Fit to the scope of Quantum Reports.} The manuscript sits squarely within
+the journal's remit of quantum computing, quantum information, and quantum machine
+learning, and is a natural fit for the Special Issue \textit{``The Integration of
+Quantum Computing with Artificial Intelligence.''}
+
+\textbf{Reproducibility.} In keeping with the journal's open-science standards, all
+code, fixed random seeds, and the full dataset are openly available at
+\url{https://github.com/bithabib/quantum_computer_simulator}, and the underlying
+simulator runs interactively in the browser at
+\url{https://quantum.qbithabib.com}; every reported number regenerates from a
+single command.
+
+\textbf{Required statements.}
+\begin{itemize}[nosep,leftmargin=1.4em,itemsep=1.5pt]
+\item We confirm that neither the manuscript nor any parts of its content are
+currently under consideration for publication with or published in another journal.
+\item All authors have approved the manuscript and agree with its submission to
+\textit{Quantum Reports}.
+\item This manuscript has not been previously submitted to any MDPI journal.
+\item The authors declare no conflicts of interest.
+\end{itemize}
+
+We believe this work will interest the readership of \textit{Quantum Reports} and
+look forward to the reviewers' feedback.
+
+\vspace{0.3em}
+\noindent Sincerely, \\[0.6em]
+Jaeho Kim (on behalf of all authors) \\
+Corresponding author --- \href{mailto:jaeho.kim@gnu.ac.kr}{jaeho.kim@gnu.ac.kr} \\
+Department of AI Convergence Engineering, Gyeongsang National University, Jinju,
+South Korea
+
+\end{document}
