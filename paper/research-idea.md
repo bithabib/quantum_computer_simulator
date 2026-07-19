@@ -3,7 +3,7 @@
 **Title (working):** *Predicting the Trainability of Variational Quantum Circuits:
 A Data-Driven Model for Barren Plateaus*
 
-**Target:** IEEE Access (open access). Template: IEEEtran journal class.
+**Target:** MDPI Quantum Reports (open access). Template: MDPI `quantumrep` class.
 
 > The browser/simulator is just the data-generation tool, NOT the contribution.
 > The contribution is the **prediction task**: a classical ML model that predicts

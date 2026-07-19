@@ -2,7 +2,7 @@
 
 > Review of `paper/mdpi/main.tex` (MDPI/Entropy build) and shared tables/refs.
 > Work through these on the lab machine, then rebuild with `./build.sh`.
-> Most items apply equally to `paper/ieee-access/` since it shares text/tables.
+> Applies to the MDPI Quantum Reports manuscript in `paper/mdpi/`.
 >
 > **Overall verdict:** scientifically sound, honestly framed, numbers verified
 > consistent across macros/tables/prose. Submittable after the fixes below.
@@ -13,7 +13,7 @@
 ## 0. Figures (you said you'll do these on the lab machine)
 - [ ] Figures don't render: `main.tex` includes `figs/*.pdf` (guarded by
       `\IfFileExists`, so they silently vanish). No `figs/` dir; `build.sh` doesn't
-      make one; `make_figures.py` (in `paper/latex/`) writes to `paper/latex/figs/`
+      make one; `make_figures.py` (now in `paper/mdpi/`) writes to `paper/mdpi/figs/`
       and only makes 3 of 4 (no `pipeline.pdf`); `figs/*.pdf` is git-ignored.
 - [ ] Two are fully guarded, so their `\ref` breaks to "??": `fig:predicted`
       (main.tex ~L373) and `fig:importance` (~L407).
@@ -82,7 +82,7 @@
   (venues/years/DOIs spot-checked).
 
 ## Process note
-- You have 3 builds: `paper/latex/`, `paper/ieee-access/`, `paper/mdpi/`. Pick ONE
+- Single build: `paper/mdpi/` (MDPI Quantum Reports). Earlier IEEE variants removed.
   target venue; keep the others only if you'll maintain them (tables/text drift).
   Header says MDPI **Entropy**, a good fit.
 - Repo hygiene (not paper, but noticed): stray `template.tex` / `template.pdf` and
