@@ -1,10 +1,10 @@
 """Generate the paper's figures from the trainability dataset.
 
-Produces two vector PDFs in paper/latex/figs/:
+Produces two vector PDFs in paper/mdpi/figs/:
   * importance.pdf     -- permutation feature importance (regression)
   * predicted.pdf      -- predicted vs. true log10 gradient variance (hold-out)
 
-    python paper/latex/make_figures.py --data data_bp/bp_dataset.csv
+    python paper/mdpi/make_figures.py --data data_bp/bp_dataset.csv
 """
 
 import argparse

@@ -4,7 +4,7 @@ Runs the trainer on a dataset, parses its stdout, and rewrites the
 `\newcommand{...}{TBD}`-style result macros in main.tex so the paper prose and
 tables stay in sync with the actual model numbers.
 
-    python paper/latex/fill_results.py --data data_bp/bp_dataset.csv
+    python paper/mdpi/fill_results.py --data data_bp/bp_dataset.csv
 
 Idempotent: re-run any time the dataset or model changes.
 """
@@ -17,12 +17,10 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.abspath(os.path.join(HERE, "..", ".."))
-# Both the IEEE and MDPI papers share the same result-macro definitions, so we
+# The manuscript defines its result macros once, so we
 # patch whichever of them exist.
 MAIN_TEX_FILES = [
     os.path.join(HERE, "main.tex"),
-    os.path.join(ROOT, "paper", "mdpi", "main.tex"),
-    os.path.join(ROOT, "paper", "ieee-access", "main.tex"),
 ]
 
 
