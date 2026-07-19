@@ -3,7 +3,7 @@
 % MDPI template. Journal = quantumrep (Quantum Reports). Swap the first
 % \documentclass option to target a different MDPI journal, e.g. entropy, applsci.
 %=================================================================
-\documentclass[quantumrep,article,submit,pdftex,moreauthors]{Definitions/mdpi}
+\documentclass[quantumrep,article,submit,pdftex,oneauthor]{Definitions/mdpi}
 
 %------------------------------------------------------------------
 % Result macros (populated by ../latex/fill_results.py; kept identical to the
@@ -48,18 +48,16 @@
 A Data-Driven Model for Barren Plateaus}
 
 \newcommand{\orcidauthorA}{0000-0001-8862-1300}
-\newcommand{\orcidauthorB}{0000-0002-5268-0074}
 
-\Author{Md Habibur Rahman $^{1}$\orcidA{} and Jaeho Kim $^{1,}$*\orcidB{}}
+\Author{Md Habibur Rahman $^{1}$\orcidA{}}
 
-\AuthorNames{Md Habibur Rahman and Jaeho Kim}
+\AuthorNames{Md Habibur Rahman}
 
 \address{%
 $^{1}$ \quad Department of AI Convergence Engineering, Gyeongsang National
-University (GNU), Jinju, South Korea;
-habib@gnu.ac.kr (M.H.R.); jaeho.kim@gnu.ac.kr (J.K.)}
+University (GNU), Jinju, South Korea; habib@gnu.ac.kr}
 
-\corres{Correspondence: jaeho.kim@gnu.ac.kr; Tel.: +82-55-772-1373}
+\corres{Correspondence: habib@gnu.ac.kr}
 
 \abstract{Barren plateaus are the main obstacle to training quantum
 machine-learning models. On a barren plateau, the cost-function gradient shrinks
@@ -479,12 +477,17 @@ also cover noise-induced plateaus.
 %=================================================================
 \vspace{6pt}
 
-\authorcontributions{Conceptualization, methodology, software, formal analysis,
-data curation, visualization, and writing---original draft, M.H.R.; supervision,
-project administration, and writing---review and editing, J.K. Both authors have
-read and agreed to the published version of the manuscript.}
+\authorcontributions{The author confirms sole responsibility for the following:
+study conception and design, software, data generation and curation, analysis and
+interpretation of results, visualization, and manuscript preparation. The author
+has read and agreed to the published version of the manuscript.}
 
 \funding{This research received no external funding.}
+
+\acknowledgments{During the preparation of this manuscript, the author used
+Claude (Anthropic) for the purposes of language editing and grammar correction.
+The author has reviewed and edited the output and takes full responsibility for
+the content of this publication.}
 
 \institutionalreview{Not applicable.}
 
@@ -497,7 +500,7 @@ The dataset is regenerable end-to-end with a single command. Interactive
 demonstrations of the underlying simulator are available at
 \url{https://quantum.qbithabib.com}.}
 
-\conflictsofinterest{The authors declare no conflicts of interest.}
+\conflictsofinterest{The author declares no conflicts of interest.}
 
 \abbreviations{Abbreviations}{%
 The following abbreviations are used in this manuscript:\\
