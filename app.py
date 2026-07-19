@@ -1,6 +1,15 @@
+import os
+import secrets
+
 from flask import Flask, request, redirect
+
 app = Flask(__name__)
-app.secret_key = "super secret key"
+
+# Session signing key. Set QUANTUM_SECRET_KEY in the environment in production;
+# otherwise a random key is generated at start-up (sessions then reset on every
+# restart, which is safe but not persistent). Never hard-code a key here - a
+# committed key lets anyone forge session cookies.
+app.secret_key = os.environ.get("QUANTUM_SECRET_KEY") or secrets.token_hex(32)
 
 # Import the views public and private
 # import public views

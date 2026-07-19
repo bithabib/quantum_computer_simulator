@@ -22,3 +22,6 @@ data_bp/*.log
 .DS_Store
 .vscode/
 .idea/
+
+# Local admin credentials - never commit (copy admin_user.example.csv)
+data_storage/admin_user.csv
