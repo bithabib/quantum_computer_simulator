@@ -27,7 +27,7 @@ I am pleased to submit my manuscript, *"Predicting the Trainability of Variation
 - I confirm that neither the manuscript nor any parts of its content are currently under consideration for publication with or published in another journal.
 - I am the sole author of this manuscript and approve its submission to *Quantum Reports*.
 - This manuscript has not been previously submitted to any MDPI journal.
-- Generative AI (Claude, Anthropic) was used for language editing and grammar correction only; this is disclosed in the Acknowledgments of the manuscript.
+- Generative AI tools (ChatGPT, OpenAI; and Claude, Anthropic) were used for language editing and grammar correction only; this is disclosed in the Acknowledgments of the manuscript.
 - The author declares no conflicts of interest.
 
 I believe this work will be of interest to the readership of *Quantum Reports* and thank you for considering it. I look forward to the reviewers' feedback.
