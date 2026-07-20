@@ -14,7 +14,26 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-
+    <style>
+        /* End-of-chapter navigation */
+        .chapter-nav {
+            margin: 2.5rem 0 3rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid #e3e6ef;
+        }
+        .chapter-nav a {
+            display: inline-block;
+            padding: .55rem 1.1rem;
+            background: #1a237e;
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .chapter-nav a:hover { background: #3949ab; color: #fff; text-decoration: none; }
+        .chapter-nav--end a { background: #5c6bc0; }
+        .chapter-nav--end p { font-weight: 600; color: #444; }
+    </style>
 </head>
 
 <body>
@@ -47,18 +66,36 @@
             </div>
         </div>
 
-        <div class="col-md-10" style="height: 100vh; overflow: scroll;">
+        <div class="col-md-10" id="chapterPane" style="height: 100vh; overflow: scroll;">
             <div class="chapter" id="chapter_01" style="display: block;">
                 {% include 'includes/book_chapter/chapter_01.html' %}
+                <div class="chapter-nav">
+                    <a href="#" onclick="showChapter('chapter_022'); return false;">
+                        Next: 2. Derivatives and Integrals &rarr;</a>
+                </div>
             </div>
             <div class="chapter" id="chapter_022" style="display: none;">
                 {% include 'includes/book_chapter/chapter_022.html' %}
+                <div class="chapter-nav">
+                    <a href="#" onclick="showChapter('chapter_02'); return false;">
+                        Next: 3. Complex Number &rarr;</a>
+                </div>
             </div>
             <div class="chapter" id="chapter_02" style="display: none;">
                 {% include 'includes/book_chapter/chapter_02.html' %}
+                <div class="chapter-nav">
+                    <a href="#" onclick="showChapter('chapter_03'); return false;">
+                        Next: 4. Probability Amplitude &rarr;</a>
+                </div>
             </div>
             <div class="chapter" id="chapter_03" style="display: none;">
                 {% include 'includes/book_chapter/chapter_03.html' %}
+                <div class="chapter-nav chapter-nav--end">
+                    <p class="mb-2">That is the end of the book.</p>
+                    <a href="#" onclick="showChapter('chapter_01'); return false;">
+                        &larr; Back to 1. Why linear algebra?</a>
+                    <a href="/programming" class="ml-3">Try the Quantum Lab &rarr;</a>
+                </div>
             </div>
         </div>
 
@@ -66,13 +103,22 @@
     <script>
         function showChapter(chapterId) {
             // Hide all chapters
-            console.log(chapterId);
             var chapters = document.getElementsByClassName('chapter');
             for (var i = 0; i < chapters.length; i++) {
                 chapters[i].style.display = 'none';
             }
             // Show the selected chapter
             document.getElementById(chapterId).style.display = 'block';
+            // Scroll back to the top of the reading pane. Without this, following a
+            // "Next chapter" link from the bottom of a chapter leaves the reader
+            // part-way down the new one.
+            var pane = document.getElementById('chapterPane');
+            if (pane) pane.scrollTop = 0;
+            // Re-typeset any math in the newly shown chapter (MathJax skips hidden
+            // elements on first load in some browsers).
+            if (window.MathJax && MathJax.typesetPromise) {
+                MathJax.typesetPromise([document.getElementById(chapterId)]);
+            }
         }
     </script>
 </body>
