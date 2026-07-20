@@ -1,0 +1,10 @@
+# LaTeX build artifacts
+*.aux
+*.log
+*.out
+*.blg
+*.bbl
+*.pdf
+# generated submission package
+arxiv_pkg/
+arxiv-submission.tar.gz
