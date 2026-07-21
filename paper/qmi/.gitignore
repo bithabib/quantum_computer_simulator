@@ -5,3 +5,5 @@
 *.blg
 *.bbl
 *.pdf
+# generated submission package
+qmi-submission.zip
