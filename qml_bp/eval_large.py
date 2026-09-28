@@ -90,7 +90,7 @@ def main():
         a.plot([lo, hi], [lo, hi], "k--", lw=0.8)
         a.set_title("%s: $R^2=%.2f$" % ("HGB" if name.startswith("Hist") else name, R["models"][name]["r2"]), fontsize=9)
         a.set_xlabel("true label, $n\\in\\{13,14\\}$", fontsize=8); a.tick_params(labelsize=8)
-    ax[0].set_ylabel("predicted (trained on $n\\le12$)", fontsize=8)
+    ax[0].set_ylabel("predicted (trained on $n \\leq 12$)", fontsize=8)
     plt.tight_layout(); plt.savefig(os.path.join(args.figdir, "large.pdf")); plt.close()
     print("wrote large.json, table_large.tex, figs/large.pdf")
 

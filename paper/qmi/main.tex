@@ -226,49 +226,49 @@
 \newcommand{\LCMLPSixteenThousand}{0.978}
 \newcommand{\LCRowsNinety}{2\,000}
 \newcommand{\LCRowsSaturate}{4\,000}
-\newcommand{\LargeN}{??}
-\newcommand{\LargeRsqHGB}{??}
-\newcommand{\LargeRsqHGBLo}{??}
-\newcommand{\LargeRsqHGBHi}{??}
-\newcommand{\LargeRsqHGBThirteen}{??}
-\newcommand{\LargeRsqHGBFourteen}{??}
-\newcommand{\LargeRsqMLP}{??}
-\newcommand{\LargeRsqMLPLo}{??}
-\newcommand{\LargeRsqMLPHi}{??}
-\newcommand{\LargeRsqMLPThirteen}{??}
-\newcommand{\LargeRsqMLPFourteen}{??}
-\newcommand{\LargeRsqPhys}{??}
-\newcommand{\LargeRsqPhysLo}{??}
-\newcommand{\LargeRsqPhysHi}{??}
-\newcommand{\LargeRsqPhysThirteen}{??}
-\newcommand{\LargeRsqPhysFourteen}{??}
-\newcommand{\LargeMaeHGB}{??}
-\newcommand{\LargeMaeMLP}{??}
-\newcommand{\LargeMaePhys}{??}
+\newcommand{\LargeN}{1\,991}
+\newcommand{\LargeRsqHGB}{0.906}
+\newcommand{\LargeMaeHGB}{0.318}
+\newcommand{\LargeRsqHGBLo}{0.898}
+\newcommand{\LargeRsqHGBHi}{0.913}
+\newcommand{\LargeRsqHGBThirteen}{0.937}
+\newcommand{\LargeRsqHGBFourteen}{0.879}
+\newcommand{\LargeRsqMLP}{0.964}
+\newcommand{\LargeMaeMLP}{0.159}
+\newcommand{\LargeRsqMLPLo}{0.959}
+\newcommand{\LargeRsqMLPHi}{0.968}
+\newcommand{\LargeRsqMLPThirteen}{0.966}
+\newcommand{\LargeRsqMLPFourteen}{0.962}
+\newcommand{\LargeRsqPhys}{0.350}
+\newcommand{\LargeMaePhys}{0.815}
+\newcommand{\LargeRsqPhysLo}{0.326}
+\newcommand{\LargeRsqPhysHi}{0.375}
+\newcommand{\LargeRsqPhysThirteen}{0.354}
+\newcommand{\LargeRsqPhysFourteen}{0.345}
+\newcommand{\TOSpGdExact}{0.13}
+\newcommand{\TOStGdExact}{0.14}
+\newcommand{\TOdCBGdExact}{0.93}
+\newcommand{\TOdCTGdExact}{1.00}
+\newcommand{\TOFrBGdExact}{97}
+\newcommand{\TOFrTGdExact}{99}
+\newcommand{\TOSpGdHundred}{0.17}
+\newcommand{\TOStGdHundred}{0.19}
+\newcommand{\TOdCBGdHundred}{0.93}
+\newcommand{\TOdCTGdHundred}{1.02}
+\newcommand{\TOFrBGdHundred}{97}
+\newcommand{\TOFrTGdHundred}{96}
 \newcommand{\TOSpAdamThousand}{0.08}
 \newcommand{\TOStAdamThousand}{0.09}
 \newcommand{\TOdCBAdamThousand}{0.96}
 \newcommand{\TOdCTAdamThousand}{1.00}
 \newcommand{\TOFrBAdamThousand}{98}
 \newcommand{\TOFrTAdamThousand}{97}
-\newcommand{\TOSpGdExact}{??}
-\newcommand{\TOStGdExact}{??}
-\newcommand{\TOdCBGdExact}{??}
-\newcommand{\TOdCTGdExact}{??}
-\newcommand{\TOFrBGdExact}{??}
-\newcommand{\TOFrTGdExact}{??}
-\newcommand{\TOSpGdHundred}{??}
-\newcommand{\TOStGdHundred}{??}
-\newcommand{\TOdCBGdHundred}{??}
-\newcommand{\TOdCTGdHundred}{??}
-\newcommand{\TOFrBGdHundred}{??}
-\newcommand{\TOFrTGdHundred}{??}
-\newcommand{\TOSpAdamHundred}{??}
-\newcommand{\TOStAdamHundred}{??}
-\newcommand{\TOdCBAdamHundred}{??}
-\newcommand{\TOdCTAdamHundred}{??}
-\newcommand{\TOFrBAdamHundred}{??}
-\newcommand{\TOFrTAdamHundred}{??}
+\newcommand{\TOSpAdamHundred}{0.17}
+\newcommand{\TOStAdamHundred}{0.19}
+\newcommand{\TOdCBAdamHundred}{0.93}
+\newcommand{\TOdCTAdamHundred}{1.02}
+\newcommand{\TOFrBAdamHundred}{94}
+\newcommand{\TOFrTAdamHundred}{96}
 \newcommand{\TON}{299}
 \newcommand{\TOSteps}{200}
 \newcommand{\TORestarts}{3}
@@ -349,7 +349,10 @@ noise ceiling of $R^2\approx\RsqCeiling$. A classifier separates circuits
 below a variance cutoff with an area under the ROC curve of \AucCV. Trained on
 circuits with at most \ExtrapCut{} qubits, the regressor reaches
 $R^2=\RsqExtrap$ on unseen 11- and 12-qubit circuits (\RsqExtrapMLP{} for a
-neural network), with error broken down by qubit count and cost locality.
+neural network), with error broken down by qubit count and cost locality;
+trained on all circuits with at most 12 qubits, the neural network reaches
+$R^2=\LargeRsqMLP$ on a separate set of \LargeN{} circuits with 13 and 14
+qubits.
 Replacing the categorical entanglement pattern by descriptors of the
 entangling graph allows partial transfer to patterns absent from training,
 which we quantify with a leave-one-pattern-out experiment over five
@@ -1080,7 +1083,20 @@ the main dataset), predicted by models trained on all $n\le12$ circuits.
 95\% bootstrap confidence intervals over test rows.}
 \label{tab:large}
 %%BEGIN-TABLE:large
-% (pending)
+\begin{tabular}{lcccccc}
+\toprule
+Model & $R^2$ [95\% CI] & MAE & $R^2$, $n=13$ & $R^2$, $n=14$ & $R^2$, local & $R^2$, global \\
+\midrule
+Hist Gradient Boosting & 0.906 [0.898, 0.913] & 0.318 & 0.937 & 0.879 & 0.940 & 0.758 \\
+MLP & 0.964 [0.959, 0.968] & 0.159 & 0.966 & 0.962 & 0.963 & 0.937 \\
+Random Forest & 0.906 [0.899, 0.914] & 0.310 & 0.942 & 0.875 & 0.938 & 0.761 \\
+k-NN & 0.898 [0.889, 0.906] & 0.329 & 0.929 & 0.870 & 0.935 & 0.734 \\
+Linear baseline & 0.322 [0.294, 0.347] & 0.871 & 0.323 & 0.319 & 0.258 & -0.103 \\
+\midrule
+Physics-informed linear & 0.350 [0.326, 0.375] & 0.815 & 0.354 & 0.345 & 0.187 & 0.157 \\
+Cost-locality subgroup mean & -0.889 [-1.024, -0.776] & 1.549 & -0.902 & -0.884 & -0.442 & -3.400 \\
+\botrule
+\end{tabular}
 %%END-TABLE:large
 \end{table}
 
@@ -1392,7 +1408,8 @@ predicts $\log_{10}$ of the mean gradient variance with $R^2=\RsqCV$ on
 unseen architectures, against \RsqPhys{} for a physics-informed linear
 model, and transfers to 11- and 12-qubit circuits with $R^2=\RsqExtrap$
 (\RsqExtrapMLP{} for a neural network, which extrapolates the decay in $n$
-where trees cannot). Cost locality and entanglement structure carry most of
+where trees cannot, and \LargeRsqMLP{} on 13- and 14-qubit circuits when
+trained on everything up to 12). Cost locality and entanglement structure carry most of
 the signal, and transfer to an entanglement pattern never seen in training
 is possible but lossy. The model is a
 cheap screening tool for one circuit family; extending it to other families,
