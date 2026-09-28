@@ -1,0 +1,22 @@
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Design choice} & \textbf{Count} & \textbf{Mean} $\boldsymbol{\log_{10}\overline{\mathrm{Var}}}$ & \textbf{Barren \%} & \textbf{Structural-zero \%}\\
+\midrule
+\multicolumn{5}{l}{\emph{Cost-observable locality}}\\
+\quad local $Z_0$ & 9859 & $-1.68$ & 33.4 & 29.5\\
+\quad global $Z^{\otimes n}$ & 9999 & $-2.08$ & 51.7 & 14.9\\
+\midrule
+\multicolumn{5}{l}{\emph{Entanglement pattern}}\\
+\quad linear & 6608 & $-1.76$ & 35.7 & 26.7\\
+\quad circular & 6709 & $-2.01$ & 48.9 & 16.8\\
+\quad all-to-all & 6541 & $-1.86$ & 43.3 & 23.0\\
+\midrule
+\multicolumn{5}{l}{\emph{Entangler gate}}\\
+\quad CZ & 10021 & $-1.84$ & 39.2 & 20.7\\
+\quad CX & 9837 & $-1.92$ & 46.2 & 23.6\\
+\midrule
+\multicolumn{5}{l}{\emph{Single-qubit rotation scheme}}\\
+\quad fixed-\texttt{ry} & 9878 & $-1.77$ & 39.5 & 15.8\\
+\quad random-Pauli & 9980 & $-1.99$ & 45.8 & 28.4\\
+\botrule
+\end{tabular}

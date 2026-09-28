@@ -1,0 +1,1117 @@
+Predicting the Trainability of Hardware-Eﬀicient
+ Variational Quantum Circuits: A Data-Driven
+           Model for Barren Plateaus
+
+                         Md Habibur Rahman1*
+1*
+     Department of AI Convergence Engineering, Gyeongsang National
+                 University, Jinju, Republic of Korea.
+
+
+         Corresponding author(s). E-mail(s): habib@gnu.ac.kr;
+
+
+                                   Abstract
+Barren plateaus are a central obstacle to training variational quantum circuits.
+On a barren plateau the variance of the cost gradient shrinks exponentially with
+the number of qubits, and gradient-based training stalls. The standard diagnostic
+is to sample many gradients for every candidate circuit, which is exactly the cost
+one would like to avoid when screening a large design space. We ask whether
+a classical model can predict the empirical gradient variance of a hardware-
+eﬀicient circuit from its architecture alone: qubit count, depth, rotation scheme,
+entanglement pattern, entangler gate, and cost-observable locality. We build a
+dataset of 20 000 random circuits with an exact statevector simulator. For each
+circuit we compute the exact gradient of the cost with respect to every rotation
+angle for 200 random parameter vectors, and we use the mean gradient variance
+over all parameters as the label. Parameters whose gradient vanishes identically
+for structural reasons are detected and excluded, so the label measures small but
+non-zero gradients rather than exact symmetries. Because the sampled design
+space contains only 5 168 distinct architectures, we evaluate with architecture-
+grouped cross-validation, in which no architecture appears in both training and
+test folds. Under this protocol a gradient-boosted regressor predicts log10 of the
+label with R2 = 0.977 (mean over folds), against R2 = 0.682 for a physics-
+informed linear model in qubit count, depth, and cost locality, and a within-
+architecture noise ceiling of R2 ≈ 0.989. A classifier separates circuits below a
+variance cutoff with an area under the ROC curve of 0.998. Trained on circuits
+with at most 10 qubits, the regressor reaches R2 = 0.866 on unseen 11- and 12-
+qubit circuits (0.950 for a neural network), with error broken down by qubit count
+and cost locality. Replacing the categorical entanglement pattern by descriptors
+of the entangling graph allows partial transfer to patterns absent from training,
+
+
+
+                                        1
+     which we quantify with a leave-one-pattern-out experiment over five patterns.
+     A feature-ablation study confirms that cost locality and entanglement structure
+     carry most of the signal, in qualitative agreement with barren-plateau theory.
+     The contribution is an inexpensive, classical screening tool for one circuit family,
+     not a claim of quantum advantage and not a proof of barren-plateau scaling.
+
+     Keywords: Barren plateaus, Variational quantum circuits, Quantum machine
+     learning, Trainability, Gradient variance, Statevector simulation, Gradient boosting
+
+
+
+
+1 Introduction
+Variational quantum algorithms (VQAs) are the leading way to use noisy
+intermediate-scale quantum (NISQ) hardware [1]. A VQA works in three steps.
+It encodes a problem into a parameterized quantum circuit, called an ansatz. It
+then measures a cost function C(θ) = ⟨ψ(θ)|O|ψ(θ)⟩. Finally, a classical optimizer
+updates the parameters θ. This loop underlies variational quantum eigensolvers,
+quantum approximate optimization, and most quantum machine-learning (QML)
+classifiers [2–4].
+     One problem stops this loop from scaling: the barren plateau (BP) [5, 6]. On
+a barren plateau the variance of the cost gradient, taken over random parameter
+settings, vanishes exponentially in the number of qubits. The loss landscape becomes
+almost flat almost everywhere, and gradient-based training stalls. Several causes are
+known. Global cost observables trigger barren plateaus [7]. So do highly expressive or
+deep ansätze [8], poor initialization [9], and hardware noise [10]. Recent theory unifies
+many of these results through the dynamical Lie algebra of the circuit [11, 12]. The
+common thread is that a barren plateau is largely a property of the circuit design
+rather than of one particular parameter setting.
+     The usual way to check a circuit is to measure it. One samples many random
+parameter vectors, evaluates the gradients, and estimates their variance. This is
+exactly the cost one wants to avoid when screening a large design space, and it is hard-
+est for many qubits, where barren plateaus matter most. This motivates our question.
+Can a classical model predict the empirical gradient variance of a variational circuit
+from its architecture alone, without sampling any gradients?
+     We answer this question empirically for one widely used circuit family, the
+hardware-eﬀicient ansatz [13]. We treat trainability prediction as a supervised learning
+problem over circuit specifications. The features are cheap architectural descriptors:
+small integers and categories. The label is the gradient variance, computed once,
+offline, by exact statevector simulation. Throughout, we use two standard machine-
+learning scores. The coeﬀicient of determination R2 is the fraction of label variance
+a regressor explains; R2 = 1 is perfect and R2 = 0 is no better than predicting the
+mean. The area under the receiver operating characteristic curve (AUC) is the prob-
+ability that a classifier ranks a randomly chosen positive example above a randomly
+chosen negative one; 0.5 is chance and 1 is perfect. We also report the mean absolute
+error (MAE) of the regressor, in log10 units.
+
+
+                                                2
+    This article is a revised version of an earlier preprint. Two referee reports identified
+two weaknesses in the original evidence, and the revision addresses both. First, the
+original label was the variance of the gradient with respect to a single, fixed parameter.
+Such a gradient can vanish identically for structural reasons, for example when the
+rotation commutes with everything between it and the observable, and a structural
+zero is not a barren plateau. The label is now the mean gradient variance over all
+parameters, with structural zeros detected and excluded. Second, the original “held-
+out” evaluation used a row-wise random split. Because the sampled design space
+contains far fewer distinct architectures than rows, the same architecture routinely
+appeared on both sides of that split. All headline numbers now come from architecture-
+grouped cross-validation, and every learner is compared against simple controls that
+encode what barren-plateau theory already predicts.
+    The contributions of this article are as follows.
+• We formulate barren-plateau screening as a supervised prediction task over one
+  hardware-eﬀicient circuit family. The input is an architecture and the output is the
+  log10 mean gradient variance over all parameters (regression), or a binary “barren”
+  flag obtained by thresholding it (classification).
+• We release a reproducible pipeline that generates a labeled dataset of 20 000 random
+  circuits with an exact, dependency-light statevector simulator, using reverse-mode
+  (adjoint) differentiation to obtain the exact gradient of every parameter, and that
+  separates structural zeros from small non-zero gradients.
+• We evaluate with architecture-grouped cross-validation and report row-wise random
+  splitting only as a contrast. A gradient-boosted model reaches R2 = 0.977 under
+  the grouped protocol, versus R2 = 0.682 for a physics-informed linear model and
+  an estimated noise ceiling of R2 ≈ 0.989.
+• We test transfer across scale. Trained only on n ≤ 10 qubits, the model attains
+  R2 = 0.866 on unseen 11- and 12-qubit circuits. We break this down by qubit count
+  and cost locality and report bootstrap confidence intervals, so the reader can see
+  where the transfer holds and where it does not.
+• We test transfer to entanglement patterns the model has never seen. Replacing the
+  categorical pattern index with closed-form descriptors of the entangling graph makes
+  such transfer possible, and a leave-one-pattern-out experiment over five patterns
+  measures how much is lost.
+• We replace permutation importance with a feature-ablation study under grouped
+  cross-validation, which is robust to the strong dependence between the primitive
+  and derived features. Cost locality and entanglement structure carry most of the
+  predictive signal, in qualitative agreement with theory.
+    We also want to be clear about scope. We make no claim of quantum advantage.
+The model is classical and the data is classically simulated. The predicted quan-
+tity is an empirical, finite-size proxy for trainability within one circuit family, not a
+proof of exponential scaling. The contribution is a data-driven diagnostic for a known
+quantum-computing bottleneck [14, 15].
+
+
+
+
+                                             3
+2 Background and related work
+2.1 Variational quantum circuits
+We use a hardware-eﬀicient ansatz [13]. Each layer applies one single-qubit rotation
+to every qubit, then a fixed pattern of two-qubit entangling gates. With n qubits and
+L layers the state is
+
+                                   L [
+                                   ∏            ∏
+                                                n                  ]
+                        |ψ(θ)⟩ =         Uent         Raℓ,q (θℓ,q ) |0⟩⊗n ,          (1)
+                                   ℓ=1          q=1
+
+
+where Ra (θ) = exp(−iθσa /2) is a Pauli rotation about axis a ∈ {x, y, z} and Uent
+is a layer of CZ or CX gates arranged linearly, circularly, or all-to-all (Section 3.1
+defines these patterns precisely). The cost is the expectation of a Pauli-Z string,
+C(θ) = ⟨ψ(θ)|O|ψ(θ)⟩, with either a local observable O = Z0 or a global one O =
+Z0 Z1 · · · Zn−1 .
+
+2.2 Barren plateaus
+A circuit family has a barren plateau if Varθ [∂C/∂θk ] decays exponentially in n [5].
+This is a statement about a family of circuits of growing size, not about any single
+circuit. Cerezo et al. [7] proved that global cost functions cause barren plateaus even
+at shallow depth, whereas local costs can stay trainable up to O(log n) depth. Cost
+locality is therefore a first-order design knob. Expressibility [8] and entanglement also
+correlate with flatter landscapes. Some structured architectures avoid the problem;
+quantum convolutional networks are a proven example [16]. The dimension of the
+dynamical Lie algebra generated by the circuit gives a unified, exact characterization
+for many families [11, 12], and a recent review consolidates these results [6].
+    Most of this work is analytical. It derives variance scaling laws for one ansatz
+family at a time. Our work is empirical and complementary. We do not prove a
+bound. Instead, we learn a predictive map across a heterogeneous but finite space of
+architectures, at circuit sizes where the ground truth can be simulated exactly.
+
+2.3 Exact gradients
+For gates generated by an operator with two eigenvalues, the parameter-shift rule
+gives the exact gradient from two circuit evaluations [17, 18]:
+
+                         ∂C      [                             ]
+                             = 12 C(θ + π2 ek ) − C(θ − π2 ek ) .                    (2)
+                         ∂θk
+
+Evaluating Eq. (2) for all nL parameters costs 2nL simulations per parameter vector.
+On a classical simulator the same exact gradient vector is available from a single
+backward pass. Reverse-mode (adjoint) differentiation walks the circuit backwards
+once, maintaining the state and the adjoint state, and yields every ∂C/∂θk for roughly
+the cost of three forward simulations. We use adjoint differentiation for the dataset
+
+
+                                                4
+and verify it against Eq. (2) (Section 3.3). Each individual gradient is therefore exact
+to floating-point precision. The label, a variance over finitely many random parameter
+vectors, is nonetheless an estimator with its own sampling uncertainty, which we
+quantify in Section 3.2.
+
+2.4 Related data-driven approaches
+Several lines of work use classical computation to rank or choose circuits before train-
+ing. Quantum architecture search (QAS) optimizes the circuit structure itself, by
+differentiable relaxation [19], by sampling from a supernet [20], or with training-free
+proxies that score candidate circuits without optimizing them [21]. Expressibility and
+entangling capability are classical descriptors that are estimated by sampling and
+used to compare ansätze [22]. Lie-algebraic theory provides an exact, closed-form
+trainability criterion for circuits whose generators are known [11, 12].
+    Our work differs in three ways. The target is the empirical gradient variance itself,
+not downstream task accuracy and not a proxy for it. The input is a handful of
+architectural integers and categories, not a sampled statistic such as expressibility, so
+a prediction costs microseconds. And the predictor is learned across a heterogeneous
+design space and tested on architectures it has never seen, including larger qubit
+counts. We are not aware of prior work that casts barren-plateau severity as a directly
+predicted regression or classification target from cheap architectural features and that
+also tests extrapolation across qubit count. We regard the QAS proxies and the Lie-
+algebraic criteria as complementary: a learned predictor of the kind studied here could
+serve as a zero-cost filter inside a QAS loop.
+
+2.5 Trainability, simulability, and honest framing
+Recent work urges caution about advantage claims. Cerezo et al. [23] argue that
+the structure which removes barren plateaus often also makes a model classically
+simulable. Bowles et al. [15] show that out-of-the-box classical models often match or
+beat QML models on standard tasks. Schuld and Killoran [14] argue that the field
+should de-emphasize “beating classical”. We adopt this stance. The object we predict
+is a property of quantum circuits; the predictor and its value are entirely classical.
+
+3 Methods
+Figure 1 summarizes the pipeline from a sampled circuit specification to a predicted
+trainability value.
+
+3.1 Circuit specification and feature space
+Each datapoint is a specification, or spec. A spec fixes one circuit family through
+six design parameters: the qubit count n, the layer count L, the rotation scheme,
+the entanglement pattern, the entangler gate, and the cost observable. Table 1 lists
+the nine-element feature vector we hand to the model. Six entries are the design
+parameters themselves, which we call the primitive features. Three are derived from
+
+
+
+                                           5
+ Sample circuit spec                                                                   Label y
+                           Build & simulate            Adjoint gradient
+     n, L, ansatz,                                                             log10 meank Var[∂C/∂θk ]
+                           NumPy statevector       all nL angles, ×200 θ
+  entanglement, cost                                                          (structural zeros excluded)
+
+
+
+
+                              Features X              Gradient-boosted     Predict trainability
+                              closed form                  model           regression + barren?
+
+
+Fig. 1 Method pipeline. A random circuit specification is built and simulated exactly with our
+NumPy statevector simulator. The exact gradient with respect to every rotation angle is obtained by
+adjoint differentiation for 200 random parameter vectors. The label y is log10 of the mean gradient
+variance over all parameters that are not structural zeros. Closed-form architectural features X are
+read directly from the specification, and a gradient-boosted model is trained on (X, y).
+
+
+             Table 1 Architectural features used to predict trainability. The first six
+             are the sampled design parameters; the last three are deterministic
+             functions of them.
+
+             Feature              Meaning                                        Type
+             n_qubits             number of qubits n                             primitive
+             n_layers             number of ansatz layers L                      primitive
+             ansatz_type          fixed-ry (0) versus random-Pauli axes (1)      primitive
+             entangle_pattern     linear (0), circular (1), all-to-all (2)       primitive
+             entangler_gate       CZ (0) versus CX (1)                           primitive
+             cost_global          local Z0 (0) versus global Z ⊗n (1)            primitive
+             n_params             nL trainable rotations                         derived
+             n_entanglers         entangling gates per layer ×L                  derived
+             depth_ratio          L/n                                            derived
+
+
+
+
+them in closed form and are included only for the convenience of the learner. No
+quantum simulation is needed to obtain any feature.
+
+Rotation scheme.
+With the fixed-ry scheme every rotation in Eq. (1) is Ry . With the random-Pauli
+scheme the axis aℓ,q of each of the nL rotations is drawn independently and uniformly
+from {x, y, z} once, when the spec is created, from the spec’s own random seed.
+The axis pattern is then fixed for that spec: it does not change between the random
+parameter vectors used to label the circuit. Two random-Pauli specs with the same
+feature vector can therefore have different axis patterns. The feature vector does not
+encode the pattern, so this variation acts as label noise from the model’s point of
+view. We quantify its effect in Section 3.4.
+
+Entanglement pattern.
+Each layer applies the entangler gate to a fixed list of ordered qubit pairs (a, b), in
+list order, after the rotation layer. The linear pattern uses the n − 1 nearest-neighbor
+pairs (0, 1), (1, 2), . . . , (n − 2, n − 1). The circular pattern adds the wrap-around pair
+(n − 1, 0), giving n gates per layer. The all-to-all pattern uses every pair (a, b) with
+
+
+                                                  6
+a < b, giving n(n − 1)/2 gates per layer. For CX the first qubit of each pair is the
+control and the second is the target; CZ is symmetric. The same list is used in every
+layer.
+
+Cost observable.
+The local cost measures Z on qubit 0 only. The global cost measures the parity
+operator Z ⊗n .
+
+3.2 Label generation
+We label each spec in four steps. First, we draw 200 parameter vectors θ ∼
+Unif[0, 2π)nL . Second, for each θ we compute the exact gradient vector ∇θ C by adjoint
+differentiation. Third, for every parameter k we compute the population variance vk
+of ∂C/∂θk over the 200 samples. Fourth, we detect structural zeros and average the
+remaining variances.
+
+Structural zeros.
+Some rotations have a gradient that is identically zero for every θ. This happens when
+the rotation commutes with everything between it and the observable: for example
+an Rz applied immediately before a Z measurement on the same qubit, a rotation on
+a qubit outside the light cone of a local observable in a shallow circuit, or a rotation
+on the control qubit of CX gates that lead only to the observable’s support. Such a
+parameter is untrainable, but the reason is an exact symmetry, not a barren plateau.
+We flag parameter k as a structural zero when maxθ |∂C/∂θk | < 10−10 over all 200
+samples. Section 3.3 verifies that flagged parameters remain exactly zero on fresh
+samples, so the flag is a property of the circuit and not of the sample. At n ≤ 12 no
+genuine barren-plateau variance in our data comes within eight orders of magnitude
+of this tolerance, so the two populations do not overlap.
+
+Regression and classification labels.
+Let K be the set of parameters that are not structural zeros. The label is
+
+                                                         1 ∑
+                          y = log10 Var,        Var =        vk .                      (3)
+                                                        |K|
+                                                           k∈K
+
+
+No floor or clipping is applied; Var is strictly positive by construction, and the smallest
+value in the dataset is 10−4.89 . Specs with K = ∅ (every parameter a structural zero)
+cannot be labeled and are excluded; there are 142 such rows. The classification label
+is ⊮[y < −2], which we call “barren” for brevity. The cutoff is a modeling choice:
+Var < 10−2 means the typical gradient component has magnitude below 0.1, which
+for a Haar-random circuit corresponds to roughly seven qubits. The regression target
+is threshold-free, and Section 4.4 reports the effect of moving the cutoff.
+
+
+
+
+                                            7
+Sampling uncertainty of the label.
+Each vk is an estimate from 200 samples. To measure the resulting label noise directly,
+we relabeled 200 randomly chosen specs with an independent set of 200 parameter
+vectors. The mean absolute difference between the two labels was 0.021 in log10 units,
+and the largest difference was 0.20. This is small compared with the label’s spread
+across architectures (standard deviation 0.94) and with the model errors reported
+below.
+
+Comparison with the single-parameter label.
+The original version of this work used the variance of a single parameter, the rotation
+on qubit 0 in layer ⌊L/2⌋, estimated by parameter shift. We keep that quantity as a
+secondary column. Because the new dataset was generated from the same root seed,
+it contains the same 20 000 specs and the same parameter samples as the original,
+and the secondary column reproduces the original labels to within 4 × 10−15 on every
+one of the 5 168 architectures; the only thing that changed is the label definition.
+In 9.6% of specs it is a structural zero, and every such case in the original dataset
+was clipped to a floor and labeled barren. Figure 3 compares the two labels. Where
+the single-parameter gradient is not a structural zero, the two labels agree closely
+(correlation 0.963, mean absolute difference 0.16). Where it is a structural zero, 69%
+of the circuits are in fact trainable by the all-parameter label. The single-parameter
+label therefore mixed two different phenomena, exactly as one referee anticipated, and
+the all-parameter label removes the mixture.
+
+3.3 Simulator and validation
+Statevectors are evolved exactly with a small in-house NumPy simulator (qsim in the
+released code), which applies each gate as a tensor contraction on the 2n -amplitude
+state. We validate it in three ways, reproducible with one command in the repository.
+(i) On 200 random circuits with up to seven qubits, the statevector agrees with an
+independent dense-matrix simulation that builds the full 2n × 2n unitary of every
+gate, to a maximum amplitude difference of 3.1e-16. (ii) On 200 random circuits, the
+adjoint gradient agrees with the parameter-shift rule of Eq. (2) for every one of 4 792
+parameters, to a maximum difference of 1.0e-15. (iii) Every parameter flagged as a
+structural zero from 50 samples remained below 10−10 on 200 fresh samples, in all
+1153 flagged cases.
+
+3.4 Dataset and data description
+We sample 20 000 specs. Each design parameter is drawn independently and uniformly
+over the ranges in Table 2: n uniformly on {2, . . . , 12}, L uniformly on {1, . . . , 20},
+and each categorical choice uniformly over its options. Every spec is labeled with 200
+gradient samples. Generation is embarrassingly parallel; every spec is seeded repro-
+ducibly from a root seed, and completed rows are appended to a comma-separated
+text file (CSV) as they finish, so a long run can be resumed.
+
+
+
+
+                                            8
+              Table 2 Sampled design space. Each spec draws these parameters
+              independently and uniformly. The six parameters admit
+              11 × 20 × 2 × 3 × 2 × 2 = 5 280 distinct combinations.
+
+               Design parameter      Type              Sampled values
+               n_qubits              integer           2–12
+               n_layers              integer           1–20
+               ansatz_type           categorical (2)   fixed-ry, random-Pauli
+               entangle_pattern      categorical (3)   linear, circular, all-to-all
+               entangler_gate        categorical (2)   CZ, CX
+               cost_global           binary            local Z0 , global Z ⊗n
+
+
+
+
+Architectures versus rows.
+The design space has only 5 280 distinct feature vectors, and the 20 000 rows cover
+5 168 of them, with a median of 4 and a maximum of 13 rows per architecture. Rows
+sharing an architecture differ only in their random-Pauli axis pattern (if applicable)
+and in the parameter samples used to label them. Two consequences follow. A row-
+wise random split places 95.0% of test rows next to a training row with the identical
+feature vector, so it measures interpolation within known architectures rather than
+generalization to new ones; we therefore evaluate with architecture-grouped splits
+(Section 3.5). And the within-architecture spread of the label is irreducible for any
+model that sees only the feature vector. The mean within-architecture variance of
+y is 0.010 against a total variance of 0.885, which caps the achievable R2 at about
+0.989 overall: 1.000 for fixed-ry circuits, whose only within-architecture variation is
+sampling noise, and 0.979 for random-Pauli circuits, whose hidden axis pattern adds
+real variation.
+
+Descriptive statistics.
+Table 3 summarizes the numeric features and the label over the 19 858 labeled rows.
+The label spans from -4.89 to -0.23 with mean -1.88 and standard deviation 0.94.
+Structural zeros are common: 17.0% of all parameters are structural zeros, and 87.0%
+of circuits contain at least one. Figure 2 shows that they concentrate in shallow circuits
+and in local-cost circuits, as the light-cone picture predicts; at L = 1 a local observable
+on qubit 0 sees only a handful of rotations. Table 4 breaks the label and the structural-
+zero rate down by each design choice. Note that this table describes the dataset; it
+involves no trained model. Global cost observables lower the mean label by 0.40 orders
+of magnitude relative to local costs, which is the cost-locality effect proved by Cerezo
+et al. [7]. Denser entanglement and the CX entangler lower it further. This structure
+is what makes the prediction task learnable.
+
+3.5 Models and evaluation
+We compare six learner families spanning linear, instance-based, neural, and tree-
+ensemble inductive biases: a linear baseline (ridge regression or logistic regression),
+k-nearest neighbors, a multilayer perceptron with two hidden layers, random forests,
+
+
+                                             9
+     Table 3 Descriptive statistics of the numeric features and the regression label over
+     the 19 858 labeled circuits.
+
+       Variable                    Mean       Std      Min    25%     Median        Max
+       n_qubits                      7.02     3.16    2.00    4.00        7.00      12.00
+       n_layers                     10.55     5.77    1.00    6.00       11.00      20.00
+       n_params                     74.02    55.48    2.00   28.00       60.00     240.00
+       n_entanglers                136.63   198.79    1.00   28.00       70.00    1320.00
+       depth_ratio                   2.01     1.83    0.08    0.80        1.50      10.00
+       structural-zero fraction      0.22     0.25    0.00    0.05        0.12       0.99
+       log10 Var (label)           −1.88      0.94   −4.89   −2.62       −1.78     −0.23
+
+
+
+
+     Table 4 Dataset statistics broken down by design choice. Lower mean log10 Var and
+     higher barren fraction indicate less trainable families; the last column is the mean
+     fraction of parameters that are structural zeros. These are properties of the labeled
+     data, not model outputs.
+
+      Design choice       Count      Mean log10 Var     Barren %      Structural-zero %
+      Cost-observable locality
+       local Z0             9859               −1.68           33.4                   29.5
+       global Z ⊗n          9999               −2.08           51.7                   14.9
+      Entanglement pattern
+       linear             6608                 −1.76           35.7                   26.7
+       circular           6709                 −2.01           48.9                   16.8
+       all-to-all         6541                 −1.86           43.3                   23.0
+      Entangler gate
+       CZ                  10021               −1.84           39.2                   20.7
+       CX                   9837               −1.92           46.2                   23.6
+      Single-qubit rotation scheme
+        fixed-ry            9878               −1.77           39.5                   15.8
+        random-Pauli        9980               −1.99           45.8                   28.4
+
+
+
+
+extremely randomized trees, and histogram-based gradient-boosted trees (HGB). All
+are scikit-learn implementations [24]; the histogram booster follows the design of
+LightGBM [25]. Table 5 lists the hyperparameters. They were fixed a priori and not
+tuned on the test folds.
+
+Controls.
+Because barren-plateau theory already predicts the direction of the main effects, a
+learner should be judged against what those known rules achieve on their own. We
+include three controls. The training mean predicts the mean label of the training fold.
+The cost-locality subgroup mean predicts the training-fold mean label separately for
+local and global costs. The physics-informed linear model fits
+
+                       ŷ = β0 + β1 n + β2 L + β3 ⊮global + β4 n ⊮global ,                   (4)
+
+
+                                               10
+                                                       80
+                                                                                            local Z0
+
+
+
+
+                      structural-zero parameters (%)
+                                                                                            global Z n
+                                                       60
+
+                                                       40
+
+                                                       20
+
+
+                                                                5        10            15            20
+                                                                    number of layers L
+
+Fig. 2 Mean percentage of parameters that are structural zeros, as a function of the number of layers
+L, for local and global cost observables. Shallow, local-cost circuits have many rotations outside the
+light cone of the observable.
+
+
+
+                                                        0
+
+
+
+
+                      single-parameter label
+                                                        2
+
+
+                                                        4
+
+
+                                                        6                       non-zero legacy gradient
+                                                                                legacy structural zero
+                                                            5    4       3         2        1         0
+                                                                all-parameter label log10 Var
+
+Fig. 3 All-parameter label (this version) versus the single-parameter label used in the original
+preprint, for the same circuits and parameter samples. Circles: the single parameter has a non-zero
+gradient and the two labels agree. Triangles (drawn at −6.5 for visibility): the single parameter is a
+structural zero; the original label clipped these to a floor and called them barren, whereas most have
+trainable all-parameter labels.
+
+
+which encodes a linear-in-n decay of log10 Var whose slope depends on cost local-
+ity, by ordinary least squares (or logistic regression on the same four features for
+classification).
+
+
+
+
+                                                                         11
+           Table 5 Model hyperparameters. Everything not listed is the
+           scikit-learn 1.6.1 default. Features are standardized (zero mean, unit
+           variance on the training fold) for the linear, k-NN, and MLP models only.
+
+            Model             Settings
+            Linear baseline   ridge, α = 1 / logistic regression, C = 1
+            k-NN              k = 10, uniform weights
+            MLP               hidden layers (128, 64), ReLU, Adam, 800 iterations
+            Random forest     400 trees
+            Extra trees       400 trees
+            HGB               400 iterations, learning rate 0.08, 31 leaves
+
+
+
+
+Architecture-grouped cross-validation.
+Our primary protocol is K-fold cross-validation with K = 5 in which the folds are
+formed from whole architectures. Every row is assigned to one fold according to its
+feature vector, so no architecture appears in both the training and the test fold. Each
+model is trained on K − 1 folds and scored on the remaining fold, and every row is
+scored exactly once. We repeat the whole procedure 2 times with a different random
+assignment of architectures to folds, giving 10 scores per model, and report their mean
+and standard deviation. The standard deviation measures split-to-split variability.
+
+Row-wise random split (for contrast only).
+We also report the protocol of the original preprint, a single random split of rows
+with 20% held out. As explained above, this split leaks architectures and its scores
+are upper bounds on generalization.
+
+Extrapolation across qubit count.
+We train on all circuits with n ≤ 10 and test on all circuits with n ∈ {11, 12}. This
+split is defined purely by qubit count, so no large-circuit information enters training.
+We report scores for the whole test set and separately for n = 11, n = 12, local cost,
+and global cost, with 95% bootstrap confidence intervals from 1000 resamples of the
+test rows, and the spread over five random seeds of the HGB model. The controls of
+Eq. (4) are fitted on the same training set; the physics-informed model can extrapolate
+in n by construction, so it is the natural yardstick here.
+
+Feature ablation.
+To ask which architectural properties carry the signal, we retrain HGB under the
+grouped protocol with a group of features removed and report the drop in R2 . This
+avoids the known failure of permutation importance when features are strongly depen-
+dent, as ours are: nL, L/n, and the entangler count are deterministic functions of the
+primitive features.
+
+Transfer to unseen entanglement patterns.
+A categorical pattern index cannot be evaluated on a pattern the model has never
+seen, because the index carries no information about what the new pattern is. To
+
+
+                                              12
+ask whether the predictor transfers beyond the three sampled patterns, we replace
+the index by four closed-form descriptors of the entangling graph, which are defined
+for any pattern: the mean number of entangling gates per layer, the edge density of
+the union graph over layers (edges divided by n(n − 1)/2), its maximum degree, and
+its diameter (n if disconnected). We then generate ?? additional circuits with two
+further patterns that are structurally different from the first three. Brickwork applies
+the even nearest-neighbor pairs (0, 1), (2, 3), . . . on even-numbered layers and the odd
+pairs (1, 2), (3, 4), . . . on odd-numbered layers, so each layer has about n/2 gates and
+the union graph is the chain. Star applies (0, q) for q = 1, . . . , n − 1 in every layer, so
+qubit 0 has degree n−1 and the diameter is 2. Everything else is sampled as in Table 2.
+For each of the five patterns we train HGB on the descriptor features using the other
+four patterns only and test on the held-out one (leave-one-pattern-out, LOPO). We
+compare with the same model and features when the pattern is included in training
+(architecture-grouped cross-validation on the pooled data, scored on that pattern’s
+rows) and with the physics-informed linear control.
+    All models use fixed random seeds, so the reported numbers reproduce exactly. All
+code, command lines, seeds, and software versions are released; see the data availability
+statement.
+
+4 Results
+4.1 Generalization to unseen architectures
+Table 6 reports architecture-grouped cross-validation for all six learners and the three
+controls. HGB gives R2 = 0.977 ± 0.003 and MAE 0.076 ± 0.004 on regression, and
+AUC 0.998 ± 0.000 with accuracy 0.980 ± 0.003 on classification. The four non-linear
+learners with enough capacity (HGB, the MLP, random forests, and extra trees) are
+statistically indistinguishable on this protocol, with R2 between 0.974 and 0.978; k-
+NN is close behind and the linear baseline is far behind (R2 = 0.701). We keep HGB
+as the reference model because it is deterministic, fast to train, and needs no feature
+scaling. Figure 4 shows its out-of-fold predictions.
+    Three comparisons put these numbers in context. First, the controls. The physics-
+informed linear model of Eq. (4) reaches R2 = 0.682 and the cost-locality subgroup
+mean reaches R2 = 0.043. The learned model therefore explains 0.29 more of the label
+variance than the known scaling rules alone, which is the part of the signal that this
+work adds. Second, the ceiling. The within-architecture noise estimate of Section 3.4
+caps R2 near 0.989, so HGB recovers roughly 99% of the explainable variance. Third,
+the old protocol. The same HGB model scored on the row-wise random split of the
+original preprint reaches R2 = 0.979 and AUC 0.999, essentially the same as under
+the grouped protocol. This is not because the leakage was harmless in the original
+work; it is because the corrected label is close to a deterministic function of the feature
+vector (noise ceiling 0.989), so seeing a duplicate of an architecture adds little beyond
+seeing its neighbors. With the original single-parameter label, whose structural zeros
+were unpredictable from the features, the leakage did matter. One caveat applies to
+the grouped protocol itself. The design space is a dense grid (5 168 of 5 280 cells are
+populated), so a held-out architecture always has close neighbors in training, differing
+
+
+                                             13
+Table 6 Architecture-grouped cross-validation (mean ± standard deviation over 10 folds).
+Regression predicts log10 Var; classification predicts y < −2. The three controls encode what
+barren-plateau theory already predicts. The selected model is shown in bold.
+
+                                                                     Regression                            Classification
+                                                                 2
+ Model                                                       R                    MAE                 AUC            Accuracy
+ Hist Gradient Boosting                                 0.977 ± 0.003         0.076 ± 0.004       0.998 ± 0.000    0.980 ± 0.003
+ MLP                                                    0.978 ± 0.003         0.074 ± 0.004       0.999 ± 0.000    0.979 ± 0.004
+ Random Forest                                          0.974 ± 0.003         0.074 ± 0.003       0.997 ± 0.001    0.973 ± 0.003
+ Extra Trees                                            0.978 ± 0.003         0.065 ± 0.003       0.998 ± 0.000    0.978 ± 0.003
+ k-NN                                                   0.967 ± 0.003         0.100 ± 0.004       0.995 ± 0.002    0.970 ± 0.005
+ Linear baseline                                        0.701 ± 0.011         0.376 ± 0.006       0.952 ± 0.003    0.880 ± 0.006
+ Physics-informed linear                                 0.682 ± 0.016        0.392 ± 0.008       0.927 ± 0.004    0.847 ± 0.006
+ Cost-locality subgroup mean                             0.043 ± 0.011        0.771 ± 0.011       0.593 ± 0.012    0.591 ± 0.012
+ Training mean                                          −0.002 ± 0.002        0.794 ± 0.011       0.500 ± 0.000    0.574 ± 0.021
+
+
+
+
+                                                        architecture-grouped CV R 2 = 0.98
+                                                0
+
+                                                1
+
+
+
+                      predicted (out-of-fold)
+                                                2
+
+                                                3
+
+                                                4
+
+                                                5
+                                                    5         4           3        2          1        0
+                                                                       true log10 Var
+
+Fig. 4 Out-of-fold predicted versus true log10 Var for the HGB regressor under architecture-grouped
+cross-validation (first repeat). Every point is predicted by a model that never saw its architecture.
+The dashed line is y = x.
+
+
+by one qubit or one layer. The grouped score therefore measures interpolation across
+a dense design space, not extrapolation; Sections 4.2 and 4.6 probe beyond it.
+
+4.2 Extrapolation across qubit count
+Table 7 reports the qubit-count split, with 16 278 training circuits at n ≤ 10 and 3 580
+test circuits at n ∈ {11, 12}. HGB attains R2 = 0.866 (95% CI [0.857, 0.874]; seed
+spread ±0.002) and MAE 0.313 (95% CI [0.306, 0.320]). The physics-informed linear
+model, which can extrapolate in n by construction, reaches only R2 = 0.326 and MAE
+0.665: a single linear-in-n slope per cost type, fitted on n ≤ 10, does not describe the
+
+
+                                                                         14
+                Table 7 Extrapolation split: trained on n ≤ 10 (16 278 circuits),
+                tested on n ∈ {11, 12} (3 580 circuits). Single split; see Table 8 for
+                confidence intervals.
+
+                 Model                               R2      MAE      AUC      Accuracy
+                 Hist Gradient Boosting            0.866     0.313    0.991      0.972
+                 MLP                               0.950     0.154    0.997      0.977
+                 Random Forest                     0.862     0.310    0.996      0.977
+                 Extra Trees                       0.865     0.306    0.993      0.976
+                 k-NN                              0.858     0.321    0.979      0.968
+                 Linear baseline                   0.338     0.680    0.842      0.810
+                 Physics-informed linear            0.326    0.665    0.814      0.752
+                 Cost-locality subgroup mean       -1.027    1.326    0.699      0.248
+                 Training mean                     -1.125    1.359    0.500      0.248
+
+
+
+
+Table 8 Extrapolation error by subset of the n ∈ {11, 12} test set. MAE in log10 units, with 95% bootstrap
+confidence intervals for HGB. The physics-informed linear model and the cost-locality subgroup mean are fitted on
+the same n ≤ 10 training set.
+
+ Subset            Rows     Label mean (std)      HGB MAE [95% CI]         Physics-linear MAE   Subgroup-mean MAE
+ n =11 local         836         −2.31 (1.04)     0.183 [0.173, 0.192]             0.805              1.106
+ n =11 global        904         −3.11 (0.72)     0.273 [0.265, 0.282]             0.438              1.399
+ n =12 local         930         −2.40 (1.13)     0.297 [0.281, 0.313]             0.907              1.191
+ n =12 global        910         −3.29 (0.86)     0.488 [0.474, 0.500]             0.516              1.592
+ all                3580         −2.78 (1.04)     0.313 [0.306, 0.320]             0.665              1.326
+
+
+
+
+n = 11, 12 circuits well. The most notable entry in Table 7 is the MLP, which reaches
+R2 = 0.950 (95% CI [??, ??]), well above every tree ensemble. This is the expected
+behavior of the two model classes: a tree ensemble’s prediction is constant outside the
+training range of a feature, so it cannot continue the decay in n past n = 10, whereas
+a neural network with continuous inputs can. In-family the two are indistinguishable;
+out of range the inductive bias decides.
+    Table 8 breaks the result down by qubit count and cost locality. Error grows from
+n = 11 to n = 12 for both models, and global-cost circuits at n = 12 are the hardest
+subset (HGB R2 = 0.624, MLP ??), as expected, since they are furthest from training
+in both n and label value. Every subset is predicted far better than the subgroup-mean
+and physics-informed controls. The result should still be read narrowly: small-circuit
+labels transfer usefully to the largest sizes we can simulate exactly, two qubits beyond
+training. This is not evidence of unbounded extrapolation, and Section 5 lists it as a
+limitation.
+
+
+
+
+                                                   15
+                                                                         local Z0
+                                       1                                 global Z n
+
+
+
+
+                      mean log10 Var
+                                       2
+
+                                       3
+
+                                       4
+                                           2     4       6        8      10      12
+                                                      number of qubits n
+
+Fig. 5 Mean log10 Var versus qubit count for local and global cost observables. Shaded: ±1 standard
+deviation across circuits at each n (spread of the population, not uncertainty of the mean).
+
+
+                     Table 9 Classification with alternative barren cutoffs
+                     y < c. AUC is the mean ± standard deviation over 5
+                     architecture-grouped folds.
+
+                      Cutoff y < c             Barren fraction   AUC (grouped CV)
+                      c = −1.5                       59.7%          0.996 ± 0.001
+                      c = −2.0                       42.6%          0.998 ± 0.000
+                      c = −2.5                       27.0%          0.999 ± 0.000
+                      c = −3.0                       15.0%          0.998 ± 0.001
+
+
+
+
+4.3 Trainability versus qubit count
+Figure 5 shows the mean label as a function of qubit count, split by cost locality.
+Global-cost circuits show a steep, monotone decay of the mean gradient variance with
+qubit number; local-cost circuits decay far more slowly. The shaded bands are one
+standard deviation of the label across the heterogeneous circuits at each n, not the
+uncertainty of the mean, which is much smaller. The dataset therefore contains the
+qubit-scaling behavior that the predictor must learn, within the finite range n ≤ 12
+where it can be measured exactly.
+
+4.4 Sensitivity to the barren cutoff
+Table 9 moves the classification cutoff from −1.5 to −3, which changes the barren
+fraction from 60% to 15%. The AUC stays at or above 0.996 for every cutoff, so the
+ranking the classifier produces is not tied to the particular threshold. The regression
+target is unaffected by this choice.
+
+
+
+
+                                                         16
+         Table 10 Feature ablation under architecture-grouped cross-validation. Each
+         row removes one feature group and retrains HGB; ∆R2 is the paired drop
+         relative to the full model (mean ± standard deviation over 10 folds).
+
+          Features removed                            R2 (grouped CV)       ∆R2
+          none (all 9 features)                        0.977 ± 0.003          –
+          derived features (keep 6 primitives)         0.980 ± 0.003    −0.002 ± 0.001
+          size (n, L, nL, L/n)                         0.704 ± 0.017    0.274 ± 0.015
+          qubit count n                                0.976 ± 0.003    0.001 ± 0.001
+          layers L                                     0.977 ± 0.003    0.000 ± 0.000
+          entanglement (pattern, gate, count)          0.716 ± 0.014    0.261 ± 0.014
+          entangle pattern                             0.927 ± 0.015    0.051 ± 0.015
+          entangler gate                               0.794 ± 0.022    0.183 ± 0.024
+          cost locality                                0.635 ± 0.039    0.342 ± 0.038
+          rotation scheme                              0.931 ± 0.003    0.046 ± 0.002
+
+
+
+
+4.5 What drives trainability
+Table 10 and Figure 6 report the feature ablation. Removing the three derived features
+(keeping only the six design parameters) changes R2 by -0.002, so the derived fea-
+tures add essentially nothing that the trees cannot reconstruct. Among the primitive
+groups, removing cost locality costs the most (∆R2 = 0.342), followed by entangler
+gate (∆R2 = 0.183) and then entangle pattern (∆R2 = 0.051). Removing all size
+information at once (n, L, nL, L/n) costs 0.274, whereas removing n or L alone costs
+nothing, because the derived features encode them; this is exactly the redundancy
+that makes single-feature permutation importance unreliable here, and it is why we
+report groups. This ordering is consistent with the qualitative predictions of barren-
+plateau theory: global costs [7] and denser entanglement [8] drive circuits toward flat
+landscapes. We stress the limits of this claim. The ablation shows that the model
+relies on the same design variables that theory identifies, which is a consistency check
+on the model, not an independent rediscovery of the theory; the theory was, after all,
+used to choose the feature set.
+
+4.6 Transfer to unseen entanglement patterns
+Table ?? and Figure 7 report the leave-one-pattern-out experiment. With the graph
+descriptors in place of the pattern index, the pooled five-pattern model loses nothing
+in-family (grouped-CV R2 =?? with descriptors versus ?? with the index). When a
+pattern is held out entirely, the model reaches R2 =?? on brickwork, ?? on star, ??
+on linear, ?? on circular, and ?? on all-to-all, against ??, ??, ??, ??, and ?? when the
+same pattern is seen in training. Two readings follow. First, transfer is possible in
+principle: a pattern whose descriptors lie inside the range spanned by the training
+patterns is predicted far better than the physics-informed control. Second, transfer is
+not free: every held-out pattern is predicted worse than a seen one, and a pattern at
+the edge of the descriptor space suffers most. A user who needs predictions for a new
+gate pattern should therefore add a modest number of labeled circuits of that pattern
+
+
+
+                                                 17
+                                                                   cost locality
+                                                             size (n, L, nL, L/n)
+                                          entanglement (pattern, gate, count)
+                                                                entangler gate
+                                                             entangle pattern
+                                                              rotation scheme
+                                                                 qubit count n
+                                                                        layers L
+
+                                                                                  0.0           0.2
+                                                                                R 2 when feature group is removed
+
+Fig. 6 Drop in grouped-CV R2 when each feature group is removed from the HGB regressor. Bars
+are means over 10 folds; error bars are the standard deviation of the paired drop across folds.
+
+
+
+
+                                          1.0
+
+                                          0.8
+
+
+
+
+                R 2 on held-out pattern
+                                          0.6
+
+                                          0.4
+
+                                          0.2         pattern seen (grouped CV)
+                                                      pattern unseen (LOPO)
+                                                      physics-informed linear
+                                          0.0
+                                                    linear        circular          all-to-all brickwork   star
+Fig. 7 R2 on each entanglement pattern when it is seen in training (grouped CV), when it is held
+out entirely (LOPO), and for the physics-informed linear control.
+
+
+to the training set, which the released pipeline does from one command, rather than
+rely on zero-shot transfer.
+
+5 Discussion
+Our results support one main claim, stated within its scope. For the hardware-eﬀicient
+family studied here, the mean gradient variance carries an architectural signature that
+a cheap classical model can recover without any gradient sampling, and that signature
+
+
+                                                                              18
+goes beyond what the known cost-locality and qubit-count rules explain on their own.
+The learned model captures about 99% of the explainable variance under a protocol
+in which it never sees the test architectures.
+    This suggests a practical workflow. First, screen a large space of candidate ansätze
+with the learned model, at microseconds per candidate. Then reserve expensive
+gradient-variance estimation for the shortlist it flags as trainable. Within a QAS loop,
+the predictor could act as a zero-cost filter ahead of any training-free proxy or actual
+training.
+    Several limitations scope these claims. (i) One circuit family. The design space is
+one hardware-eﬀicient ansatz with five fixed entanglement patterns. Section 4.6 shows
+that graph descriptors allow partial transfer to a pattern the model has never seen, but
+with a measurable loss, so predictions for a new gate pattern should be supported by
+some labeled circuits of that pattern. The pipeline generates them from one command.
+Predictions outside the hardware-eﬀicient family (for example, problem-inspired or
+Hamiltonian-variational ansätze) are unsupported. (ii) Finite size. Labels exist only
+at n ≤ 12. A barren plateau is a statement about scaling as n → ∞; our label
+is a finite-size proxy, and the extrapolation result covers two additional qubits, not
+an asymptotic regime. Tree ensembles in particular cannot continue a trend in n
+beyond the training range, so a user who needs predictions at larger n should prefer
+the MLP or a model with an explicit scaling term. (iii) Ideal simulation. We use a
+noiseless statevector simulator, so noise-induced plateaus [10] are out of scope. (iv) The
+label is an estimator. Each variance is estimated from 200 samples. We measured
+the resulting label noise directly (mean absolute relabeling difference 0.021 in log10
+units) and it is small relative to the model error, but it is not zero. (v) Hidden
+axis patterns. For random-Pauli circuits the drawn axis pattern is part of the circuit
+but not of the feature vector. It contributes irreducible label variation, which we
+quantified as a noise ceiling rather than hiding it. (vi) The cutoff. The barren cutoff
+y < −2 is a modeling choice. The regression target is threshold-free, and Table 9
+shows the classifier’s behavior at other cutoffs. (vii) Averaging over parameters. The
+mean over parameters of the gradient variance is one summary of a circuit’s landscape.
+Other summaries, such as the minimum over parameters or the distribution across
+layers, may matter for particular optimizers. We release all per-circuit statistics (mean,
+median, minimum, maximum, and the structural-zero count) so these can be studied.
+    Two design choices protect the results. Seeds are fixed and reported, and the
+extrapolation split is defined purely by qubit count, so no large-circuit information
+leaks into training.
+
+6 Conclusion
+We recast barren-plateau screening for hardware-eﬀicient circuits as supervised pre-
+diction from architecture. Relative to the original preprint, this revision changes the
+label to the mean gradient variance over all parameters with structural zeros removed,
+evaluates only on architectures the model has never seen, and measures the learned
+model against controls that encode the known theory. The corrected numbers are,
+
+
+
+
+                                           19
+perhaps surprisingly, higher than those first reported: the structural zeros of the orig-
+inal label were the main source of unexplained variance, and once they are separated
+from genuine small gradients the architecture determines the label almost completely.
+These are the numbers we stand behind. A gradient-boosted model predicts log10 of
+the mean gradient variance with R2 = 0.977 on unseen architectures, against 0.682
+for a physics-informed linear model, and transfers to 11- and 12-qubit circuits with
+R2 = 0.866 (0.950 for a neural network, which extrapolates the decay in n where
+trees cannot). Cost locality and entanglement structure carry most of the signal, and
+transfer to an entanglement pattern never seen in training is possible but lossy. The
+model is a cheap screening tool for one circuit family; extending it to other families,
+to noisy simulation, and to larger qubit counts via tensor-network labels are natural
+next steps.
+Acknowledgements. During the preparation of this manuscript, the author used
+ChatGPT (OpenAI) and Claude (Anthropic) for language editing, grammar cor-
+rection, and refinement of the written text, and for assistance in developing the
+accompanying open-source research code. The author reviewed and edited all content
+and takes full responsibility for the content of the publication.
+
+Declarations
+• Funding. This research received no external funding.
+• Conflict of interest. The author declares no competing interests.
+• Ethics approval and consent to participate. Not applicable.
+• Consent for publication. Not applicable.
+• Data availability. The dataset supporting this study is openly available in Zen-
+  odo at https://doi.org/10.5281/zenodo.21446194 and in the repository at https:
+  //github.com/bithabib/quantum_computer_simulator. It contains the full labeled
+  dataset of 20 000 variational circuits, including the per-circuit gradient-variance
+  statistics and the single-parameter label of the original preprint, and regenerates
+  end-to-end from a single command with fixed random seeds (root seed 12345 for data
+  generation, seed 0 for all models). Software: Python 3.9.6, NumPy 2.0.2, scikit-learn
+  1.6.1.
+• Materials availability. Not applicable.
+• Code availability. All code (the statevector simulator, the adjoint-gradient rou-
+  tine, the dataset generator, the validation script, and the analysis script that
+  produces every table and figure in this article) is openly available in the same
+  repository.
+• Author contribution. M.H.R. is the sole author and is responsible for all aspects
+  of the work.
+
+References
+ [1] Cerezo, M., Arrasmith, A., Babbush, R., Benjamin, S.C., Endo, S., Fujii, K.,
+     McClean, J.R., Mitarai, K., Yuan, X., Cincio, L., Coles, P.J.: Variational quantum
+
+
+
+                                           20
+    algorithms. Nature Reviews Physics 3, 625–644 (2021) https://doi.org/10.1038/
+    s42254-021-00348-9
+
+ [2] Havlíček, V., Córcoles, A.D., Temme, K., Harrow, A.W., Kandala, A.,
+     Chow, J.M., Gambetta, J.M.: Supervised learning with quantum-enhanced
+     feature spaces. Nature 567(7747), 209–212 (2019) https://doi.org/10.1038/
+     s41586-019-0980-2
+
+ [3] Farhi, E., Neven, H.: Classification with Quantum Neural Networks on Near Term
+     Processors. arXiv preprint arXiv:1802.06002 (2018) https://doi.org/10.48550/
+     arXiv.1802.06002
+
+ [4] Schuld, M., Bocharov, A., Svore, K.M., Wiebe, N.: Circuit-centric quantum
+     classifiers. Physical Review A 101(3), 032308 (2020) https://doi.org/10.1103/
+     PhysRevA.101.032308
+
+ [5] McClean, J.R., Boixo, S., Smelyanskiy, V.N., Babbush, R., Neven, H.: Barren
+     plateaus in quantum neural network training landscapes. Nature Communica-
+     tions 9(1), 4812 (2018) https://doi.org/10.1038/s41467-018-07090-4
+
+ [6] Larocca, M., Thanasilp, S., Wang, S., Sharma, K., Biamonte, J., Coles, P.J.,
+     Cincio, L., McClean, J.R., Holmes, Z., Cerezo, M.: Barren plateaus in variational
+     quantum computing. Nature Reviews Physics 7, 174–189 (2025) https://doi.org/
+     10.1038/s42254-025-00813-9 . arXiv:2405.00781
+
+ [7] Cerezo, M., Sone, A., Volkoff, T., Cincio, L., Coles, P.J.: Cost function dependent
+     barren plateaus in shallow parametrized quantum circuits. Nature Communica-
+     tions 12(1), 1791 (2021) https://doi.org/10.1038/s41467-021-21728-w
+
+ [8] Holmes, Z., Sharma, K., Cerezo, M., Coles, P.J.: Connecting ansatz expressibility
+     to gradient magnitudes and barren plateaus. PRX Quantum 3(1), 010313 (2022)
+     https://doi.org/10.1103/PRXQuantum.3.010313
+
+ [9] Grant, E., Wossnig, L., Ostaszewski, M., Benedetti, M.: An initialization strategy
+     for addressing barren plateaus in parametrized quantum circuits. Quantum 3,
+     214 (2019) https://doi.org/10.22331/q-2019-12-09-214
+
+[10] Wang, S., Fontana, E., Cerezo, M., Sharma, K., Sone, A., Cincio, L., Coles, P.J.:
+     Noise-induced barren plateaus in variational quantum algorithms. Nature Com-
+     munications 12(1), 6961 (2021) https://doi.org/10.1038/s41467-021-27045-6
+
+[11] Ragone, M., Bakalov, B.N., Sauvage, F., Kemper, A.F., Ortiz Marrero, C.,
+     Larocca, M., Cerezo, M.: A Lie algebraic theory of barren plateaus for deep
+     parameterized quantum circuits. Nature Communications 15, 7172 (2024) https:
+     //doi.org/10.1038/s41467-024-49909-3
+
+[12] Fontana, E., Herman, D., Chakrabarti, S., Kumar, N., Yalovetzky, R., Heredge,
+
+
+                                          21
+    J., Sureshbabu, S.H., Pistoia, M.: Characterizing barren plateaus in quantum
+    ansätze with the adjoint representation. Nature Communications 15, 7171 (2024)
+    https://doi.org/10.1038/s41467-024-49910-w
+
+[13] Kandala, A., Mezzacapo, A., Temme, K., Takita, M., Brink, M., Chow, J.M.,
+     Gambetta, J.M.: Hardware-eﬀicient variational quantum eigensolver for small
+     molecules and quantum magnets. Nature 549(7671), 242–246 (2017) https://doi.
+     org/10.1038/nature23879
+
+[14] Schuld, M., Killoran, N.: Is quantum advantage the right goal for quantum
+     machine learning? PRX Quantum 3(3), 030101 (2022) https://doi.org/10.1103/
+     PRXQuantum.3.030101
+
+[15] Bowles, J., Ahmed, S., Schuld, M.: Better than classical? The subtle art of bench-
+     marking quantum machine learning models. arXiv preprint arXiv:2403.07059
+     (2024) https://doi.org/10.48550/arXiv.2403.07059
+
+[16] Pesah, A., Cerezo, M., Wang, S., Volkoff, T., Sornborger, A.T., Coles, P.J.:
+     Absence of barren plateaus in quantum convolutional neural networks. Physical
+     Review X 11(4), 041011 (2021) https://doi.org/10.1103/PhysRevX.11.041011
+
+[17] Mitarai, K., Negoro, M., Kitagawa, M., Fujii, K.: Quantum circuit learning.
+     Physical Review A 98(3), 032309 (2018) https://doi.org/10.1103/PhysRevA.98.
+     032309
+
+[18] Schuld, M., Bergholm, V., Gogolin, C., Izaac, J., Killoran, N.: Evaluating analytic
+     gradients on quantum hardware. Physical Review A 99(3), 032331 (2019) https:
+     //doi.org/10.1103/PhysRevA.99.032331
+
+[19] Zhang, S.-X., Hsieh, C.-Y., Zhang, S., Yao, H.: Differentiable quantum archi-
+     tecture search. Quantum Science and Technology 7(4), 045023 (2022) https:
+     //doi.org/10.1088/2058-9565/ac87cd
+
+[20] Du, Y., Huang, T., You, S., Hsieh, M.-H., Tao, D.: Quantum circuit architecture
+     search for variational quantum algorithms. npj Quantum Information 8, 62 (2022)
+     https://doi.org/10.1038/s41534-022-00570-y
+
+[21] He, Z., Deng, M., Zheng, S., Li, L., Situ, H.: Training-free quantum architecture
+     search. In: Proceedings of the AAAI Conference on Artificial Intelligence, vol. 38,
+     pp. 12430–12438 (2024). https://doi.org/10.1609/aaai.v38i11.29135
+
+[22] Sim, S., Johnson, P.D., Aspuru-Guzik, A.: Expressibility and entangling capabil-
+     ity of parameterized quantum circuits for hybrid quantum-classical algorithms.
+     Advanced Quantum Technologies 2(12), 1900070 (2019) https://doi.org/10.
+     1002/qute.201900070
+
+[23] Cerezo, M., Larocca, M., García-Martín, D., et al.: Does provable absence of
+
+
+                                          22
+    barren plateaus imply classical simulability? Nature Communications 16, 7907
+    (2025) https://doi.org/10.1038/s41467-025-63099-6 . arXiv:2312.09121
+
+[24] Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O.,
+     Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A.,
+     Cournapeau, D., Brucher, M., Perrot, M., Duchesnay, E.: Scikit-learn: Machine
+     Learning in Python. Journal of Machine Learning Research 12, 2825–2830 (2011)
+
+[25] Ke, G., Meng, Q., Finley, T., Wang, T., Chen, W., Ma, W., Ye, Q., Liu, T.-
+     Y.: LightGBM: A Highly Eﬀicient Gradient Boosting Decision Tree. In: 31st
+     International Conference on Neural Information Processing Systems (NIPS’17),
+     pp. 3149–3157. Curran Associates Inc., Red Hook, NY, USA (2017)
+
+
+
+
+                                          23
+

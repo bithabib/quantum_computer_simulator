@@ -5,7 +5,12 @@ for a statevector or probabilities. Methods return ``self`` so calls can be
 chained: ``qc.h(0).cx(0, 1)``.
 """
 
-MAX_QUBITS = 12  # keep statevectors small enough to simulate instantly
+import os
+
+# Keep statevectors small enough to simulate instantly in the web app.  The
+# dataset generator raises the cap for the large-circuit test set via the
+# QSIM_MAX_QUBITS environment variable (2^16 amplitudes is still only 1 MB).
+MAX_QUBITS = int(os.environ.get("QSIM_MAX_QUBITS", "12"))
 
 
 class QuantumCircuit:

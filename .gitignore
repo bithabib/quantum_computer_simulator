@@ -25,3 +25,11 @@ data_bp/*.log
 
 # Local admin credentials - never commit (copy admin_user.example.csv)
 data_storage/admin_user.csv
+
+# Referee reports and submitted/preprint PDFs: confidential to the review
+# process, keep out of the public repository.
+paper/qmi/reviews/
+reviewer_*_comments.pdf
+v1_covered_*.pdf
+paper/qmi/response_to_reviewers.*
+paper/qmi/cover_letter.*

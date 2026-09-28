@@ -1,0 +1,18 @@
+\begin{tabular}{lcccc}
+\toprule
+ & \multicolumn{2}{c}{Regression} & \multicolumn{2}{c}{Classification} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+Model & $R^2$ & MAE & AUC & Accuracy \\
+\midrule
+\textbf{Hist Gradient Boosting} & $0.977 \pm 0.003$ & $0.076 \pm 0.004$ & $0.998 \pm 0.000$ & $0.980 \pm 0.003$ \\
+MLP & $0.978 \pm 0.003$ & $0.074 \pm 0.004$ & $0.999 \pm 0.000$ & $0.979 \pm 0.004$ \\
+Random Forest & $0.974 \pm 0.003$ & $0.074 \pm 0.003$ & $0.997 \pm 0.001$ & $0.973 \pm 0.003$ \\
+Extra Trees & $0.978 \pm 0.003$ & $0.065 \pm 0.003$ & $0.998 \pm 0.000$ & $0.978 \pm 0.003$ \\
+k-NN & $0.967 \pm 0.003$ & $0.100 \pm 0.004$ & $0.995 \pm 0.002$ & $0.970 \pm 0.005$ \\
+Linear baseline & $0.701 \pm 0.011$ & $0.376 \pm 0.006$ & $0.952 \pm 0.003$ & $0.880 \pm 0.006$ \\
+\midrule
+Physics-informed linear & $0.682 \pm 0.016$ & $0.392 \pm 0.008$ & $0.927 \pm 0.004$ & $0.847 \pm 0.006$ \\
+Cost-locality subgroup mean & $0.043 \pm 0.011$ & $0.771 \pm 0.011$ & $0.593 \pm 0.012$ & $0.591 \pm 0.012$ \\
+Training mean & $-0.002 \pm 0.002$ & $0.794 \pm 0.011$ & $0.500 \pm 0.000$ & $0.574 \pm 0.021$ \\
+\botrule
+\end{tabular}

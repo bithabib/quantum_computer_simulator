@@ -1,65 +1,86 @@
 # qml_bp — Barren-Plateau Trainability Dataset & Predictor
 
-Predict a variational quantum circuit's **trainability** (the variance of its cost
-gradient over random parameters — the barren-plateau signature) from its
-**architecture alone**. The `qsim` statevector simulator generates the ground-truth
-labels; a classical model learns to predict them.
+Predict a hardware-efficient variational circuit's **trainability** (the
+variance of its cost gradient over random parameters) from its **architecture
+alone**. The in-house `qsim` NumPy statevector simulator generates the
+ground-truth labels; a classical model learns to predict them.
 
-- **Input (X):** circuit spec — qubits, layers, ansatz, entanglement pattern,
-  entangler gate, cost locality, and derived counts (see `FEATURE_COLUMNS`).
-- **Label (Y):** `log10 Var[dC/dtheta]` (regression) and `barren` vs `trainable`
-  (classification, thresholded).
+- **Input (X):** circuit spec — qubits, layers, rotation scheme, entanglement
+  pattern, entangler gate, cost locality, and three derived counts
+  (see `FEATURE_COLUMNS` in `ansatz.py`).
+- **Label (y):** `log_var = log10` of the **mean gradient variance over all
+  `nL` parameters**, excluding *structural zeros* (parameters whose gradient is
+  identically zero by symmetry). Barren/trainable classification thresholds it
+  at `-2`.
 
-## Setup (macOS, Apple Silicon / M4)
+## What changed in version 2 (journal revision)
+
+| | v1 (preprint) | v2 (revised manuscript) |
+|---|---|---|
+| Gradient | parameter shift, one fixed parameter | adjoint differentiation, **every** parameter |
+| Label | `log10 max(Var, 1e-18)` of that one parameter | `log10` mean Var over non-structural parameters, no floor |
+| Structural zeros | clipped to floor and called "barren" | detected (`max|g| < 1e-10`), counted, excluded |
+| Evaluation | row-wise random split (leaks architectures) | architecture-grouped K-fold CV + controls |
+| Files | `data_bp/bp_dataset.csv` | `data_bp/bp_dataset_v2.csv` (v1 columns kept for comparison) |
+
+`v2` keeps the v1 columns (`grad_var`, `log_grad_var` = the single middle-layer,
+qubit-0 parameter) so the two labels can be compared row by row.
+
+## Setup
 ```bash
 cd quantum_computer_simulator
 python3 -m venv .venv && source .venv/bin/activate
-pip install -r qml_bp/requirements.txt   # numpy, pandas, scikit-learn
+pip install -r qml_bp/requirements.txt   # numpy, pandas, scikit-learn, matplotlib
 ```
 `qsim` is imported from the repo root, so run all commands from the repo root.
 
-## 1. Quick sanity run (seconds)
+## Reproduce the paper end to end
 ```bash
-python -m qml_bp.generate --n-specs 300 --samples 80 --out data_bp/sample.csv
-python -m qml_bp.train    --data data_bp/sample.csv
-```
-Sanity check: **global-cost** circuits and **more qubits/layers** should show much
-lower `grad_var` (barren); **local-cost, shallow** circuits should stay trainable.
+# 0. validate simulator + gradients (≈1 min)
+python -m qml_bp.validate --n-circuits 200 --seed 1 --json paper/qmi/results/validation.json
 
-## 2. Big dataset (overnight on an M4)
-The dataset is tiny on disk (~a few MB for 100k rows); the cost is CPU time.
-```bash
-python -m qml_bp.generate \
-  --n-specs 100000 --samples 200 \
-  --qubit-min 2 --qubit-max 12 \
-  --layer-min 1 --layer-max 20 \
-  --workers 10 \
-  --out data_bp/bp_dataset.csv
-```
-Tips for scale:
-- **Cost ≈ n_specs × samples × 2 × (gates) statevector sims.** Raising `--samples`
-  improves label quality (needed for tiny variances at high qubit counts) but costs
-  linearly. 150–300 is a good range.
-- **Qubit ceiling:** a statevector is `2^n` complex numbers. `n<=12` is fast and
-  light; `n=16` (~1 MB/state) is fine on 16 GB; go higher only if you raise
-  `--samples` too, since variances get tiny.
-- `--workers` ≈ physical cores (M4: try 8–10). Rows stream to CSV as they finish,
-  so you can stop and inspect partial output any time.
+# 1. dataset: 20,000 circuits x 200 samples, all-parameter labels (~1.5 h on 9 cores)
+python -m qml_bp.generate --n-specs 20000 --samples 200 \
+    --qubit-min 2 --qubit-max 12 --layer-min 1 --layer-max 20 \
+    --workers 9 --seed 12345 --label-mode all --out data_bp/bp_dataset_v2.csv
 
-## 3. Train + evaluate
-```bash
-python -m qml_bp.train --data data_bp/bp_dataset.csv --barren-threshold -2
-```
-Reports:
-- **Random split** R²/MAE (regression) and accuracy/AUC (classification).
-- **Extrapolation split** — trains on small qubit counts, tests on larger unseen
-  ones (the headline result for the paper).
-- **Permutation feature importance** — which design choices drive trainability
-  (expect cost locality + entanglement density to dominate).
+# 2. label repeatability (sampling uncertainty of the label)
+python -m qml_bp.repeat_labels --n-specs 200 --samples 200 --workers 9 \
+    --json paper/qmi/results/repeat.json
 
-## Notes for the paper
-- Ground-truth labels are limited to *simulable* qubit counts; extrapolation claims
-  must be scoped to that. This is the honest limitation to state.
-- Everything is seeded (`--seed`) and reproducible.
-- To scale beyond a laptop later, the generator is embarrassingly parallel and can
-  be sharded across machines by splitting `--n-specs` with different `--seed`s.
+# 3. every number, table and figure in the paper
+python -m qml_bp.analyze --data data_bp/bp_dataset_v2.csv \
+    --outdir paper/qmi/results --figdir paper/qmi/figs
+
+# 4. inline the numbers into the single-file manuscript and the response letter
+python paper/qmi/fill_numbers.py
+cd paper/qmi && tectonic main.tex && tectonic response_to_reviewers.tex
+```
+
+## Modules
+- `ansatz.py` — `CircuitSpec` (the circuit family), feature extraction,
+  `compute_datapoint_all` (v2 label) and `compute_datapoint` (v1 label).
+- `adjoint.py` — exact reverse-mode gradient of a Pauli-Z-string cost with
+  respect to every rotation angle, ≈3 forward passes per parameter vector.
+- `generate.py` — parallel dataset generator (multiprocessing, streaming CSV).
+  `--label-mode all` (default) or `legacy`.
+- `validate.py` — statevector vs dense-matrix reference; adjoint vs
+  parameter-shift; structural zeros are sample-independent.
+- `repeat_labels.py` — relabel fresh circuits twice; reports label noise.
+- `analyze.py` — architecture-grouped CV, controls (training mean,
+  cost-locality subgroup mean, physics-informed linear model), extrapolation
+  split with bootstrap CIs and per-subset breakdown, cutoff sensitivity,
+  feature-group ablation, figures and LaTeX table fragments.
+- `train.py`, `compare_models.py`, `describe_data.py` — the v1 scripts
+  (row-wise split, permutation importance). Kept for the record; they still run
+  on either CSV but are no longer used for the paper.
+
+## Conventions
+- Qubit 0 is the most significant bit of the basis-state index.
+- Entanglement patterns per layer: linear `(q, q+1)` for `q=0..n-2`; circular
+  adds `(n-1, 0)`; all-to-all every `(a, b)` with `a<b`. First index is the CX
+  control. Gates are applied in list order after the rotation layer.
+- Random-Pauli axes are drawn once per spec, per `(layer, qubit)`, from the
+  spec's seed; they are fixed across the 200 parameter samples.
+- Variance is the population variance (`ddof=0`) over the samples.
+- Seeds: root `12345` for generation (`SeedSequence.spawn`), `0` for models.
