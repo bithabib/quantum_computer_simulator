@@ -17,7 +17,7 @@ Status legend: [x] done · [~] in progress · [ ] pending
 - [x] F. Training-outcome validation: DONE and HELD OUT. Four budgets tried (GD exact, GD 100 shots, Adam 1000 shots, Adam 100 shots): 94-99% of circuits reach the ground state within 200 steps regardless of label; Spearman(predicted label, loss decrease) 0.08-0.17. At n<=12 the Z-string cost is easy to minimize, so the label does not predict optimization outcome in this regime. Not in the paper (paper claims gradient-variance prediction only). Code kept (qml_bp/training_outcome.py); outputs gitignored.
 
 ## Packaging
-- [~] G. Supplementary material (supplement.tex, 3 pp): hyperparameters, descriptive stats, cutoff, full extrapolation table, gap table, learning curve moved; training-outcome and 13-14-qubit tables to be added when E/F finish
+- [x] G. Supplementary material (supplement.tex, 3 pp): hyperparameters, descriptive stats, cutoff, full extrapolation table, gap table, learning curve
 - [x] H. Cover letter to the editor (cover_letter.tex, filled from results, gitignored)
-- [~] I. Git: branch `qmi-revision`, checkpoint commits made; release tag after final commit; Zenodo checklist written (ZENODO_CHECKLIST.md; upload needs the author's account)
-- [~] J. Final read-through: response letter now uses \ref via xr (check_refs.py); final pass after E/F land
+- [x] I. Git: branch `qmi-revision`, tag `v2.0-qmi-revision`; not pushed (author to push/merge); Zenodo checklist written (ZENODO_CHECKLIST.md; upload needs the author's account)
+- [x] J. Final pass: no unresolved references or placeholders in main (24 pp), supplement (3 pp), response (9 pp), cover letter (1 p); check_refs.py clean
