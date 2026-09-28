@@ -33,3 +33,11 @@ reviewer_*_comments.pdf
 v1_covered_*.pdf
 paper/qmi/response_to_reviewers.*
 paper/qmi/cover_letter.*
+
+# Exploratory training-outcome experiment: run, found uninformative at n<=12
+# (nearly every circuit trains under every budget tried), not used in the paper.
+paper/qmi/results/training_outcome*
+paper/qmi/results/training_sweep*
+paper/qmi/results/table_training*
+paper/qmi/figs/training_outcome*
+paper/qmi/*.hold

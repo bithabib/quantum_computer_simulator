@@ -142,6 +142,45 @@ def main():
         final = lc["16000"]["HGB"][0]
         M["LCRowsNinety"] = big(min(int(k) for k in lc if lc[k]["HGB"][0] > 0.9 and lc[k]["MLP"][0] > 0.9))
         M["LCRowsSaturate"] = big(min(int(k) for k in lc if final - lc[k]["HGB"][0] < 0.02))
+    large_path = os.path.join(RES, "large.json")
+    if os.path.exists(large_path):
+        Lg = json.load(open(large_path)); mm = Lg["models"]
+        M["LargeN"] = big(Lg["test_rows"])
+        for name, key in [("Hist Gradient Boosting", "HGB"), ("MLP", "MLP"), ("Physics-informed linear", "Phys")]:
+            e = mm[name]
+            M["LargeRsq" + key] = f(e["r2"]); M["LargeMae" + key] = f(e["mae"])
+            M["LargeRsq%sLo" % key] = f(e["r2_ci"][0]); M["LargeRsq%sHi" % key] = f(e["r2_ci"][1])
+            pn = e["per_n"]
+            M["LargeRsq%sThirteen" % key] = f((pn.get(13) or pn.get("13"))["r2"])
+            M["LargeRsq%sFourteen" % key] = f((pn.get(14) or pn.get("14"))["r2"])
+    else:
+        for k in ["LargeN"] + ["LargeRsq%s%s" % (a, b) for a in ["HGB", "MLP", "Phys"]
+                               for b in ["", "Lo", "Hi", "Thirteen", "Fourteen"]] + \
+                 ["LargeMae%s" % a for a in ["HGB", "MLP", "Phys"]]:
+            M[k] = "??"
+    sw_path = os.path.join(RES, "training_sweep.json")
+    if os.path.exists(sw_path):
+        for r in json.load(open(sw_path)):
+            key = {"_gd_exact": "GdExact", "_gd_100shots": "GdHundred", "": "AdamThousand",
+                   "_adam_100shots": "AdamHundred"}[r["tag"]]
+            M["TOSp" + key] = f(r["spearman_pred"], 2); M["TOSt" + key] = f(r["spearman_true"], 2)
+            M["TOdCB" + key] = f(r["dC_pred_barren"], 2); M["TOdCT" + key] = f(r["dC_pred_trainable"], 2)
+            M["TOFrB" + key] = pct(r["frac_pred_barren"], 0); M["TOFrT" + key] = pct(r["frac_pred_trainable"], 0)
+    for key in ["GdExact", "GdHundred", "AdamThousand", "AdamHundred"]:
+        for pre in ["TOSp", "TOSt", "TOdCB", "TOdCT", "TOFrB", "TOFrT"]:
+            M.setdefault(pre + key, "??")
+    to_path = os.path.join(RES, "training_outcome.json")
+    if os.path.exists(to_path):
+        T = json.load(open(to_path))
+        M["TON"] = str(T["n_circuits"]); M["TOSteps"] = str(T["steps"]); M["TORestarts"] = str(T["restarts"])
+        M["TOLr"] = "%g" % T["lr"]; M["TOShots"] = big(T["shots"])
+        M["TOSpearmanTrue"] = f(T["spearman_true_vs_dC"]); M["TOSpearmanPred"] = f(T["spearman_pred_vs_dC"])
+        M["TOdCBarren"] = f(T["dC_mean_pred_barren"], 2); M["TOdCTrainable"] = f(T["dC_mean_pred_trainable"], 2)
+        M["TOFracBarren"] = pct(T["frac_progress_pred_barren"], 0); M["TOFracTrainable"] = pct(T["frac_progress_pred_trainable"], 0)
+    else:
+        for k in ["TON", "TOSteps", "TORestarts", "TOLr", "TOShots", "TOSpearmanTrue", "TOSpearmanPred",
+                  "TOdCBarren", "TOdCTrainable", "TOFracBarren", "TOFracTrainable"]:
+            M[k] = "??"
     lopo_path = os.path.join(RES, "lopo.json")
     if os.path.exists(lopo_path):
         Lp = json.load(open(lopo_path)); lo = Lp["lopo"]
@@ -172,7 +211,7 @@ def main():
 
     tables = {}
     for t in ["datastats", "labelbydesign", "grouped_cv", "extrap", "extrap_breakdown",
-              "ablation", "cutoff", "lopo", "gap", "screening"]:
+              "ablation", "cutoff", "lopo", "gap", "screening", "large", "training", "training_sweep"]:
         tp = os.path.join(RES, "table_%s.tex" % t)
         tables[t] = open(tp).read().strip() if os.path.exists(tp) else "% (pending)"
 

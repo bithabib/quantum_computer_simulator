@@ -226,6 +226,60 @@
 \newcommand{\LCMLPSixteenThousand}{0.978}
 \newcommand{\LCRowsNinety}{2\,000}
 \newcommand{\LCRowsSaturate}{4\,000}
+\newcommand{\LargeN}{??}
+\newcommand{\LargeRsqHGB}{??}
+\newcommand{\LargeRsqHGBLo}{??}
+\newcommand{\LargeRsqHGBHi}{??}
+\newcommand{\LargeRsqHGBThirteen}{??}
+\newcommand{\LargeRsqHGBFourteen}{??}
+\newcommand{\LargeRsqMLP}{??}
+\newcommand{\LargeRsqMLPLo}{??}
+\newcommand{\LargeRsqMLPHi}{??}
+\newcommand{\LargeRsqMLPThirteen}{??}
+\newcommand{\LargeRsqMLPFourteen}{??}
+\newcommand{\LargeRsqPhys}{??}
+\newcommand{\LargeRsqPhysLo}{??}
+\newcommand{\LargeRsqPhysHi}{??}
+\newcommand{\LargeRsqPhysThirteen}{??}
+\newcommand{\LargeRsqPhysFourteen}{??}
+\newcommand{\LargeMaeHGB}{??}
+\newcommand{\LargeMaeMLP}{??}
+\newcommand{\LargeMaePhys}{??}
+\newcommand{\TOSpAdamThousand}{0.08}
+\newcommand{\TOStAdamThousand}{0.09}
+\newcommand{\TOdCBAdamThousand}{0.96}
+\newcommand{\TOdCTAdamThousand}{1.00}
+\newcommand{\TOFrBAdamThousand}{98}
+\newcommand{\TOFrTAdamThousand}{97}
+\newcommand{\TOSpGdExact}{??}
+\newcommand{\TOStGdExact}{??}
+\newcommand{\TOdCBGdExact}{??}
+\newcommand{\TOdCTGdExact}{??}
+\newcommand{\TOFrBGdExact}{??}
+\newcommand{\TOFrTGdExact}{??}
+\newcommand{\TOSpGdHundred}{??}
+\newcommand{\TOStGdHundred}{??}
+\newcommand{\TOdCBGdHundred}{??}
+\newcommand{\TOdCTGdHundred}{??}
+\newcommand{\TOFrBGdHundred}{??}
+\newcommand{\TOFrTGdHundred}{??}
+\newcommand{\TOSpAdamHundred}{??}
+\newcommand{\TOStAdamHundred}{??}
+\newcommand{\TOdCBAdamHundred}{??}
+\newcommand{\TOdCTAdamHundred}{??}
+\newcommand{\TOFrBAdamHundred}{??}
+\newcommand{\TOFrTAdamHundred}{??}
+\newcommand{\TON}{299}
+\newcommand{\TOSteps}{200}
+\newcommand{\TORestarts}{3}
+\newcommand{\TOLr}{0.05}
+\newcommand{\TOShots}{1\,000}
+\newcommand{\TOSpearmanTrue}{0.089}
+\newcommand{\TOSpearmanPred}{0.076}
+\newcommand{\TOdCBarren}{0.96}
+\newcommand{\TOdCTrainable}{1.00}
+\newcommand{\TOFracBarren}{98}
+\newcommand{\TOFracTrainable}{97}
 \newcommand{\LopoExtraRows}{9\,926}
 \newcommand{\LopoDescRsq}{0.974}
 \newcommand{\LopoIndexRsq}{0.975}
@@ -1005,6 +1059,40 @@ training range; the MLP can.}
 \label{fig:gap}
 \end{figure}
 
+\paragraph{Beyond the training range: 13 and 14 qubits.} As a final
+extrapolation test we generated a separate set of \LargeN{} circuits with
+$n\in\{13,14\}$, labeled exactly as the main dataset, and scored models
+trained on the full $n\le12$ dataset on it (Table~\ref{tab:large},
+Figure~\ref{fig:large}). %%CHECK-E
+The MLP reaches $R^2=\LargeRsqMLP$ (95\% CI
+$[\LargeRsqMLPLo,\LargeRsqMLPHi]$; \LargeRsqMLPThirteen{} at $n=13$ and
+\LargeRsqMLPFourteen{} at $n=14$), HGB \LargeRsqHGB, and the
+physics-informed control \LargeRsqPhys. These circuits are two to four
+times more expensive to label than the largest training circuits, so this
+is the regime in which a predictor is actually useful, and the numbers set
+the expectation for a user who trains on what can be simulated cheaply and
+predicts what cannot.
+
+\begin{table}[t]
+\centering
+\caption{Held-out 13- and 14-qubit circuits (\LargeN{} circuits, labeled as
+the main dataset), predicted by models trained on all $n\le12$ circuits.
+95\% bootstrap confidence intervals over test rows.}
+\label{tab:large}
+%%BEGIN-TABLE:large
+% (pending)
+%%END-TABLE:large
+\end{table}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figs/large.pdf}
+\caption{Predicted versus true label on the held-out 13- and 14-qubit
+circuits for HGB (left) and the MLP (right), both trained on $n\le12$
+only. The dashed line is $y=x$.}
+\label{fig:large}
+\end{figure}
+
 
 
 \begin{table}[t]
@@ -1206,6 +1294,7 @@ ones. Conversely, the bottom 10\% of the ranking is \ScreenBottomTen\%
 truly barren. A screening pipeline that keeps the top fifth of candidates
 therefore discards no good architecture in this design space and never
 forwards a barren one to the expensive stage.
+
 
 \begin{table}[t]
 \centering
