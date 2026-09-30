@@ -52,6 +52,17 @@ python -m qml_bp.repeat_labels --n-specs 200 --samples 200 --workers 9 \
 python -m qml_bp.analyze --data data_bp/bp_dataset_v2.csv \
     --outdir paper/qmi/results --figdir paper/qmi/figs
 
+# 3b. unseen-pattern, 13-14-qubit and Clifford-sampling experiments
+python -m qml_bp.generate --n-specs 10000 --patterns brickwork,star --workers 9 --seed 54321 --out data_bp/bp_patterns_v2.csv
+python -m qml_bp.lopo --main data_bp/bp_dataset_v2.csv --extra data_bp/bp_patterns_v2.csv
+QSIM_MAX_QUBITS=14 python -m qml_bp.generate --n-specs 2000 --qubit-min 13 --qubit-max 14 --workers 7 --seed 777 --out data_bp/bp_large_v2.csv
+QSIM_MAX_QUBITS=14 python -m qml_bp.eval_large --train data_bp/bp_dataset_v2.csv --test data_bp/bp_large_v2.csv
+python -m qml_bp.extra_experiments --data data_bp/bp_dataset_v2.csv
+python -m qml_bp.validate_clifford --n-circuits 200 --workers 9 --json paper/qmi/results/validation_clifford.json
+python -m qml_bp.generate_clifford --n-specs 8000 --qubit-min 2 --qubit-max 12 --workers 9 --seed 2026 --out data_bp/bp_clifford_train.csv
+python -m qml_bp.generate_clifford --n-specs 6000 --qubit-min 13 --qubit-max 32 --workers 9 --seed 2027 --out data_bp/bp_clifford_test.csv
+python -m qml_bp.clifford_study --train data_bp/bp_clifford_train.csv --test data_bp/bp_clifford_test.csv
+
 # 4. inline the numbers into the single-file manuscript and the response letter
 python paper/qmi/fill_numbers.py
 cd paper/qmi && tectonic main.tex && tectonic response_to_reviewers.tex
@@ -71,6 +82,13 @@ cd paper/qmi && tectonic main.tex && tectonic response_to_reviewers.tex
   cost-locality subgroup mean, physics-informed linear model), extrapolation
   split with bootstrap CIs and per-subset breakdown, cutoff sensitivity,
   feature-group ablation, figures and LaTeX table fragments.
+- `clifford.py` — exact gradient variance at any qubit count by Clifford
+  (Pauli-propagation) sampling; `validate_clifford.py` checks it against
+  adjoint gradients; `generate_clifford.py` builds datasets with it;
+  `clifford_study.py` is the 13-32-qubit extrapolation study.
+- `lopo.py` (unseen entanglement patterns), `eval_large.py` (13-14-qubit
+  statevector test set), `extra_experiments.py` (widening gap, learning curve,
+  ranking at fixed n), `training_outcome.py` (exploratory; not in the paper).
 - `train.py`, `compare_models.py`, `describe_data.py` — the v1 scripts
   (row-wise split, permutation importance). Kept for the record; they still run
   on either CSV but are no longer used for the paper.
@@ -83,4 +101,8 @@ cd paper/qmi && tectonic main.tex && tectonic response_to_reviewers.tex
 - Random-Pauli axes are drawn once per spec, per `(layer, qubit)`, from the
   spec's seed; they are fixed across the 200 parameter samples.
 - Variance is the population variance (`ddof=0`) over the samples.
+- Closed-form physics features (computed on load for older CSVs):
+  `cost_weight_eff` = weight of the observable after the last entangling layer
+  (CX conjugation); `cone_qubits`, `cone_frac` = backward causal cone of the
+  observable (per-qubit Pauli-type relaxation).
 - Seeds: root `12345` for generation (`SeedSequence.spawn`), `0` for models.

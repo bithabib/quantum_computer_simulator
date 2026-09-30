@@ -2,22 +2,32 @@
 
 Status legend: [x] done · [~] in progress · [ ] pending
 
-## Baseline revision (submittable version)
-- [x] Corrected label (all-parameter adjoint gradients, structural zeros removed), 20k dataset regenerated
-- [x] Validation (dense reference, parameter shift, structural-zero stability) and label repeatability
-- [x] Architecture-grouped CV, controls, noise ceiling, extrapolation breakdown (HGB + MLP), cutoff sensitivity, feature ablation
-- [x] Experiment 1: two new patterns (brickwork, star), graph descriptors, leave-one-pattern-out
-- [x] A. Fill transfer numbers, write outcome sentences, compile manuscript + response letter (main.pdf 23 pp, response 9 pp)
+## Round 1: baseline revision and experiments (complete, tag v2.0-qmi-revision)
+- [x] Corrected label, 20k dataset, validation, grouped CV, controls, ablation
+- [x] Unseen-pattern transfer (brickwork, star), widening-gap extrapolation, learning curve
+- [x] Held-out 13- and 14-qubit statevector test set
+- [x] Training-outcome experiment: run, uninformative at n<=12, held out of the paper
+- [x] Supplement, cover letter, response letter with label-driven references
 
-## Additional experiments (in order)
-- [x] B. Screening precision (Sec. 4.8, Table 13): Spearman 0.988; top 20% contains zero barren circuits
-- [x] C. Wider extrapolation gap (Sec. 4.2, Fig. gap, Table gap): MLP 0.95 -> 0.67 as k goes 10 -> 6; HGB collapses
-- [x] D. Learning curve (Sec. 4.7): R^2 > 0.9 by ~1,000-2,000 rows, saturates by ~4,000
-- [x] E. Held-out 13- and 14-qubit test set (1,991 circuits): trained on n<=12, MLP R^2 0.964 (0.966 at 13, 0.962 at 14), HGB 0.906, physics-linear 0.350. INCLUDED (Sec. 4.2 paragraph, Table large, Fig. large; abstract and conclusion updated)
-- [x] F. Training-outcome validation: DONE and HELD OUT. Four budgets tried (GD exact, GD 100 shots, Adam 1000 shots, Adam 100 shots): 94-99% of circuits reach the ground state within 200 steps regardless of label; Spearman(predicted label, loss decrease) 0.08-0.17. At n<=12 the Z-string cost is easy to minimize, so the label does not predict optimization outcome in this regime. Not in the paper (paper claims gradient-variance prediction only). Code kept (qml_bp/training_outcome.py); outputs gitignored.
+## Round 2: internal third-referee review (2026-09-30), all claims verified
+### K. Clifford-sampling experiment (labels beyond statevector reach)
+- [x] K1. Estimator `qml_bp/clifford.py` (bit-packed Pauli propagation, all parameters per sweep)
+- [x] K2. Validation against exact gradients: 200 circuits, 15,182 parameters; label MAD 0.009, max 0.12; 0 of 2,804 structural zeros had Clifford hits; same-architecture agreement with the statevector dataset: mean +0.002
+- [x] K3. Datasets: 8,000 training circuits n=2..12 (99.3% resolved); 6,000 test circuits n=13..32 (73% resolved; censoring reported)
+- [x] K4. Extrapolation study: from n<=12, reliable to ~20 qubits (structured linear R^2 0.92/0.90 at 13-16/17-20), degrades at 21-24, fails beyond; trained on n<=20 predicts 21-32 with R^2 0.90-0.94
+- [x] K5. INCLUDED as Sec. 4.3 (a horizon result, honestly framed) + Methods 3.6 + validation item (iv)
 
-## Packaging
-- [x] G. Supplementary material (supplement.tex, 3 pp): hyperparameters, descriptive stats, cutoff, full extrapolation table, gap table, learning curve
-- [x] H. Cover letter to the editor (cover_letter.tex, filled from results, gitignored)
-- [x] I. Git: branch `qmi-revision`, tag `v2.0-qmi-revision`; not pushed (author to push/merge); Zenodo checklist written (ZENODO_CHECKLIST.md; upload needs the author's account)
-- [x] J. Final pass: no unresolved references or placeholders in main (24 pp), supplement (3 pp), response (9 pp), cover letter (1 p); check_refs.py clean
+### L. Review concerns
+- [x] L1. Effective observable weight (CX conjugation) as a closed-form feature; physics insight paragraph
+- [x] L2. Stronger control: structured linear model (per-cell slopes); reframe "beyond known rules"
+- [x] L3. Screening: replace the global table by within-n screening; fix the wrong "discards no good architecture" sentence
+- [x] L4. MLP extrapolation averaged over 10 seeds everywhere; soften "degrades gracefully"
+- [x] L5. Noise ceiling with unbiased within-group variance (0.985)
+- [x] L6. Related work: efficient gradient-variance methods (Letcher et al. 2024; Uvarov & Biamonte 2021; Napp 2022); discuss what Clifford sampling means for the cost motivation
+- [x] L7. Text: move revision history out of the body; ablation wording; "seven qubits"; "statistically indistinguishable"; abstract to journal length; unused bib entry; strip unused macros; table headers "above/below cutoff"
+- [ ] L8. AUTHOR DECISION PENDING: one-paragraph limitation reporting that gradient variance did not predict optimization outcome at n<=12 (drafted in limitation_training_outcome.tex.hold, not inserted)
+
+### M. Packaging
+- [x] M1. Response letter and cover letter updated to the changed claims
+- [x] M2. Refilled, recompiled (main 29 pp, supplement 3, response 9, cover 2), references checked, committed, retagged v2.1-qmi-revision
+- [x] N. Causal-cone feature (closed-form, validated against exact structural-zero fraction) added after the Clifford study exposed cone saturation; transfer to unseen patterns improved from 0.41-0.74 to 0.75-0.95

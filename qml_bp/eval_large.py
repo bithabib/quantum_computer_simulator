@@ -13,8 +13,9 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error, r2_score, roc_auc_score
 
-from qml_bp.analyze import (CUTOFF, PhysicsLinear, SubgroupMean, bootstrap_ci,
-                            hgb_cls, hgb_reg, regressors, classifiers)
+from qml_bp.analyze import (CUTOFF, PhysicsLinear, StructuredLinear, SubgroupMean,
+                            bootstrap_ci, hgb_cls, hgb_reg, regressors, classifiers,
+                            load_dataset)
 from qml_bp.ansatz import FEATURE_COLUMNS
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
@@ -27,8 +28,8 @@ def main():
     ap.add_argument("--outdir", default="paper/qmi/results")
     ap.add_argument("--figdir", default="paper/qmi/figs")
     args = ap.parse_args()
-    tr = pd.read_csv(args.train).dropna(subset=["log_var"])
-    te = pd.read_csv(args.test).dropna(subset=["log_var"]).reset_index(drop=True)
+    tr = load_dataset(args.train).dropna(subset=["log_var"])
+    te = load_dataset(args.test).dropna(subset=["log_var"]).reset_index(drop=True)
     Xtr, ytr = tr[FEATURE_COLUMNS].to_numpy(float), tr.log_var.to_numpy(float)
     Xte, yte = te[FEATURE_COLUMNS].to_numpy(float), te.log_var.to_numpy(float)
     ctr, cte = (ytr < CUTOFF).astype(int), (yte < CUTOFF).astype(int)
@@ -42,6 +43,8 @@ def main():
     models = {"Hist Gradient Boosting": hgb_reg(), "MLP": regressors()["MLP"],
               "Random Forest": regressors()["Random Forest"], "k-NN": regressors()["k-NN"],
               "Linear baseline": regressors()["Linear baseline"],
+              "Structured linear": StructuredLinear("reg"),
+              "Physics-informed linear (effective weight)": PhysicsLinear("reg", effective=True),
               "Physics-informed linear": PhysicsLinear("reg"),
               "Cost-locality subgroup mean": SubgroupMean(FEATURE_COLUMNS.index("cost_global"))}
     for name, m in models.items():
@@ -63,16 +66,19 @@ def main():
     for name, m in {"Hist Gradient Boosting": hgb_cls(), "MLP": classifiers()["MLP"]}.items():
         pr = m.fit(Xtr, ctr).predict_proba(Xte)[:, 1]
         R["models"][name]["auc"] = float(roc_auc_score(cte, pr)) if len(np.unique(cte)) > 1 else float("nan")
-    # seed spread for MLP
-    seeds = [regressors(s)["MLP"].fit(Xtr, ytr).predict(Xte) for s in range(5)] if False else None
+    # seed spread for the MLP (10 seeds)
+    sv = [r2_score(yte, regressors(s)["MLP"].fit(Xtr, ytr).predict(Xte)) for s in range(10)]
+    R["mlp_seeds"] = {"mean": float(np.mean(sv)), "sd": float(np.std(sv, ddof=1)),
+                      "min": float(np.min(sv)), "max": float(np.max(sv)), "n": 10}
     json.dump(R, open(os.path.join(args.outdir, "large.json"), "w"), indent=1)
 
     lines = ["\\begin{tabular}{lcccccc}", "\\toprule",
              "Model & $R^2$ [95\\% CI] & MAE & $R^2$, $n=13$ & $R^2$, $n=14$ & $R^2$, local & $R^2$, global \\\\", "\\midrule"]
     for name in ["Hist Gradient Boosting", "MLP", "Random Forest", "k-NN", "Linear baseline",
+                 "Structured linear", "Physics-informed linear (effective weight)",
                  "Physics-informed linear", "Cost-locality subgroup mean"]:
         e = R["models"][name]
-        if name == "Physics-informed linear":
+        if name == "Structured linear":
             lines.append("\\midrule")
         lines.append("%s & %.3f [%.3f, %.3f] & %.3f & %.3f & %.3f & %.3f & %.3f \\\\" % (
             name, e["r2"], e["r2_ci"][0], e["r2_ci"][1], e["mae"], e["per_n"][13]["r2"], e["per_n"][14]["r2"],

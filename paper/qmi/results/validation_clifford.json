@@ -1,0 +1,14 @@
+{
+ "n_circuits": 200,
+ "n_params": 15182,
+ "sv_samples": 400,
+ "cl_samples": 65536,
+ "log10_diff_mean": 0.002958479382768168,
+ "log10_diff_mad": 0.00906794490056264,
+ "log10_diff_max": 0.1162899464985081,
+ "struct_sv_total": 2804,
+ "struct_with_clifford_hits": 0,
+ "both_zero_circuits": 0,
+ "mismatch_zero_circuits": 1,
+ "median_per_param_corr": 0.9830564681525971
+}

@@ -1,0 +1,342 @@
+{
+ "train_rows": 7941,
+ "train_unresolved": 59,
+ "test_rows": 6000,
+ "test_resolved": 4370,
+ "test_censored": 1630,
+ "median_rel_se_test": 0.022230997083721102,
+ "median_samples_test": 331776,
+ "label_min_resolved": -6.669838982303055,
+ "bins": {
+  "13-16": {
+   "rows": 1174,
+   "total": 1184,
+   "resolved_frac": 0.9915540540540541,
+   "resolved_frac_local": 0.9845360824742269,
+   "resolved_frac_global": 0.9983388704318937,
+   "label_mean": -3.525123526175657,
+   "label_std": 1.1345650872408322,
+   "label_min": -5.747598641215887,
+   "models": {
+    "Structured linear": {
+     "r2": 0.923293965704181,
+     "mae": 0.22009152594763434,
+     "bias": -0.07222809311638953,
+     "censored_consistent": 0.0
+    },
+    "MLP": {
+     "r2": 0.9558930117327591,
+     "mae": 0.16338935059195953,
+     "bias": -0.0025654665255796356,
+     "censored_consistent": 0.0
+    },
+    "Hist Gradient Boosting": {
+     "r2": 0.7122551289519853,
+     "mae": 0.463798205215894,
+     "bias": 0.43109666811555253,
+     "censored_consistent": 0.0
+    },
+    "Physics-informed linear (effective weight)": {
+     "r2": 0.5413837103046267,
+     "mae": 0.641684632109536,
+     "bias": -0.18045172584807262,
+     "censored_consistent": 0.0
+    },
+    "Physics-informed linear": {
+     "r2": 0.32893476708935565,
+     "mae": 0.7557513900868505,
+     "bias": -0.19466262740741413,
+     "censored_consistent": 0.0
+    },
+    "MLP_seeds": {
+     "r2_mean": 0.953505954111907,
+     "r2_sd": 0.006968749902713812,
+     "r2_min": 0.941797254411094,
+     "r2_max": 0.9617872155951787,
+     "mae_mean": 0.15696025549591497,
+     "mae_sd": 0.011865384696120257
+    }
+   },
+   "censored": 10
+  },
+  "17-20": {
+   "rows": 1151,
+   "total": 1205,
+   "resolved_frac": 0.9551867219917013,
+   "resolved_frac_local": 0.9731437598736177,
+   "resolved_frac_global": 0.9353146853146853,
+   "label_mean": -4.082553037816395,
+   "label_std": 1.5567807786451193,
+   "label_min": -6.524836548503903,
+   "models": {
+    "Structured linear": {
+     "r2": 0.9036898647599487,
+     "mae": 0.355599736273101,
+     "bias": -0.15620739988005353,
+     "censored_consistent": 0.037037037037037035
+    },
+    "MLP": {
+     "r2": 0.9185101128733885,
+     "mae": 0.3410518496653732,
+     "bias": -0.0853302223896734,
+     "censored_consistent": 0.35185185185185186
+    },
+    "Hist Gradient Boosting": {
+     "r2": 0.27315325632010035,
+     "mae": 1.0360971992980184,
+     "bias": 1.0128643590184845,
+     "censored_consistent": 0.0
+    },
+    "Physics-informed linear (effective weight)": {
+     "r2": 0.49527956129843587,
+     "mae": 0.9240681147231387,
+     "bias": -0.42618930351054496,
+     "censored_consistent": 0.16666666666666666
+    },
+    "Physics-informed linear": {
+     "r2": 0.20863392937242342,
+     "mae": 1.1308391873623185,
+     "bias": -0.4981325392758894,
+     "censored_consistent": 0.0
+    },
+    "MLP_seeds": {
+     "r2_mean": 0.8850906132522466,
+     "r2_sd": 0.03939149021009683,
+     "r2_min": 0.8154800423924959,
+     "r2_max": 0.9412797368981952,
+     "mae_mean": 0.3639696386933181,
+     "mae_sd": 0.05706454939345879
+    }
+   },
+   "censored": 54
+  },
+  "21-24": {
+   "rows": 760,
+   "total": 1197,
+   "resolved_frac": 0.6349206349206349,
+   "resolved_frac_local": 0.8552412645590682,
+   "resolved_frac_global": 0.412751677852349,
+   "label_mean": -3.719409670209836,
+   "label_std": 1.616503902475084,
+   "label_min": -6.626626091825187,
+   "models": {
+    "Structured linear": {
+     "r2": 0.7998978559679679,
+     "mae": 0.5409662761676163,
+     "bias": -0.4373122305257512,
+     "censored_consistent": 0.3890160183066362
+    },
+    "MLP": {
+     "r2": 0.7550540949369732,
+     "mae": 0.6608272846301024,
+     "bias": -0.4152598611286056,
+     "censored_consistent": 0.47368421052631576
+    },
+    "Hist Gradient Boosting": {
+     "r2": 0.30708420369833667,
+     "mae": 0.9375613152232631,
+     "bias": 0.91676746764145,
+     "censored_consistent": 0.0
+    },
+    "Physics-informed linear (effective weight)": {
+     "r2": -0.015388037889603412,
+     "mae": 1.442617388249278,
+     "bias": -1.1492324097985533,
+     "censored_consistent": 0.5331807780320366
+    },
+    "Physics-informed linear": {
+     "r2": -0.6914749215734752,
+     "mae": 1.7863877737396736,
+     "bias": -1.5196345899988386,
+     "censored_consistent": 0.21052631578947367
+    },
+    "MLP_seeds": {
+     "r2_mean": 0.46937255702594777,
+     "r2_sd": 0.24727566398272935,
+     "r2_min": 0.1447281726128885,
+     "r2_max": 0.8532459528152173,
+     "mae_mean": 0.8671197726475202,
+     "mae_sd": 0.2252565472527169
+    }
+   },
+   "censored": 437
+  },
+  "25-28": {
+   "rows": 656,
+   "total": 1204,
+   "resolved_frac": 0.5448504983388704,
+   "resolved_frac_local": 0.8225806451612904,
+   "resolved_frac_global": 0.25,
+   "label_mean": -3.265343229043177,
+   "label_std": 1.209488383397641,
+   "label_min": -6.587384144259043,
+   "models": {
+    "Structured linear": {
+     "r2": 0.2653035212000747,
+     "mae": 0.8390645283185885,
+     "bias": -0.8043919661412531,
+     "censored_consistent": 0.6113138686131386
+    },
+    "MLP": {
+     "r2": 0.05014555156331468,
+     "mae": 1.014162113224637,
+     "bias": -0.8968880323119709,
+     "censored_consistent": 0.7390510948905109
+    },
+    "Hist Gradient Boosting": {
+     "r2": 0.47468876917111136,
+     "mae": 0.6249679680275948,
+     "bias": 0.6053785472176493,
+     "censored_consistent": 0.0
+    },
+    "Physics-informed linear (effective weight)": {
+     "r2": -2.2911276990618528,
+     "mae": 2.0223894751507907,
+     "bias": -1.9413503123184768,
+     "censored_consistent": 0.6605839416058394
+    },
+    "Physics-informed linear": {
+     "r2": -4.851155838179911,
+     "mae": 2.692113204029533,
+     "bias": -2.661803831623744,
+     "censored_consistent": 0.4142335766423358
+    },
+    "MLP_seeds": {
+     "r2_mean": -1.861412011008913,
+     "r2_sd": 1.5341875596444225,
+     "r2_min": -3.715708437759571,
+     "r2_max": 0.5076650905960747,
+     "mae_mean": 1.6095750250507084,
+     "mae_sd": 0.5166365518849911
+    }
+   },
+   "censored": 548
+  },
+  "29-32": {
+   "rows": 629,
+   "total": 1210,
+   "resolved_frac": 0.5198347107438016,
+   "resolved_frac_local": 0.8148760330578513,
+   "resolved_frac_global": 0.22479338842975208,
+   "label_mean": -3.248599974388863,
+   "label_std": 1.2214855298145593,
+   "label_min": -6.669838982303055,
+   "models": {
+    "Structured linear": {
+     "r2": -0.07028636218284223,
+     "mae": 0.9939751096855964,
+     "bias": -0.9570663811358666,
+     "censored_consistent": 0.9690189328743546
+    },
+    "MLP": {
+     "r2": -0.559140564487628,
+     "mae": 1.3362856241624947,
+     "bias": -1.243808735164887,
+     "censored_consistent": 0.8674698795180723
+    },
+    "Hist Gradient Boosting": {
+     "r2": 0.4394410747305665,
+     "mae": 0.6639553553396017,
+     "bias": 0.6471985353309573,
+     "censored_consistent": 0.0
+    },
+    "Physics-informed linear (effective weight)": {
+     "r2": -4.00372887678048,
+     "mae": 2.548276510288487,
+     "bias": -2.515195920161957,
+     "censored_consistent": 0.7280550774526678
+    },
+    "Physics-informed linear": {
+     "r2": -8.332220903209182,
+     "mae": 3.49562397239935,
+     "bias": -3.4915086991466042,
+     "censored_consistent": 0.810671256454389
+    },
+    "MLP_seeds": {
+     "r2_mean": -5.1135606294688305,
+     "r2_sd": 3.480836742592984,
+     "r2_min": -9.071803011523002,
+     "r2_max": 0.0005596309043044423,
+     "mae_mean": 2.35973665011989,
+     "mae_sd": 0.7997751943253303
+    }
+   },
+   "censored": 581
+  }
+ },
+ "overall": {
+  "Structured linear": {
+   "r2": 0.7109075927140935,
+   "mae": 0.5158933163316899,
+   "bias": -0.39510839297557804,
+   "censored_consistent": 0.656441717791411,
+   "censored_pred_mean": -7.3181659277031414
+  },
+  "MLP": {
+   "r2": 0.6338954224286155,
+   "mae": 0.5932294088677927,
+   "bias": -0.4090477532596457,
+   "censored_consistent": 0.696319018404908,
+   "censored_pred_mean": -7.502196423878034
+  },
+  "Hist Gradient Boosting": {
+   "r2": 0.4350711183861147,
+   "mae": 0.7499314586773158,
+   "bias": 0.7260580884904774,
+   "censored_consistent": 0.0,
+   "censored_pred_mean": -3.65991872226741
+  },
+  "Physics-informed linear (effective weight)": {
+   "r2": -0.38911785710511015,
+   "mae": 1.337044117593308,
+   "bias": -1.0140491726764225,
+   "censored_consistent": 0.6300613496932516,
+   "censored_pred_mean": -7.512157854056088
+  },
+  "Physics-informed linear": {
+   "r2": -1.4313586984229425,
+   "mae": 1.7188275709704135,
+   "bias": -1.3499105379840641,
+   "censored_consistent": 0.48466257668711654,
+   "censored_pred_mean": -6.96673652895456
+  },
+  "MLP_seeds": {
+   "r2_mean": -0.15197915105282422,
+   "r2_sd": 0.615687269538226,
+   "r2_min": -0.8299274018557867,
+   "r2_max": 0.7767996115878364,
+   "mae_mean": 0.8701068628510308,
+   "mae_sd": 0.2459403952133254
+  }
+ },
+ "censored_ub_mean": -7.418562161021919,
+ "train_le20": {
+  "train_rows": 10266,
+  "test_rows": 2045,
+  "Structured linear": {
+   "r2": 0.8978914895072715,
+   "mae": 0.3053715691757358
+  },
+  "MLP": {
+   "r2": 0.9043075995149455,
+   "mae": 0.3114263989709774
+  },
+  "Hist Gradient Boosting": {
+   "r2": 0.9437578282776057,
+   "mae": 0.2273405962036044
+  },
+  "Physics-informed linear (effective weight)": {
+   "r2": -0.28309581156563346,
+   "mae": 1.4015541375710854
+  },
+  "Physics-informed linear": {
+   "r2": -1.9466510313667191,
+   "mae": 2.05814065114464
+  },
+  "MLP_seeds": {
+   "r2_mean": 0.8478994144931299,
+   "r2_sd": 0.06832865436557013
+  }
+ },
+ "macros": {}
+}

@@ -40,6 +40,9 @@ FEATURE_COLUMNS = [
     "cost_global",       # 0 = local Z_0, 1 = global Z...Z
     "n_entanglers",
     "depth_ratio",       # n_layers / n_qubits
+    "cost_weight_eff",   # weight of the observable after the last entangling layer
+    "cone_qubits",       # qubits in the backward causal cone of the observable
+    "cone_frac",         # fraction of parameters inside the causal cone
 ]
 
 
@@ -88,6 +91,58 @@ class CircuitSpec:
             return [(q, q + 1) for q in range(0, n - 1)]  # union over layers
         raise ValueError("unknown entangle_pattern %r" % self.entangle_pattern)
 
+    def effective_weight(self):
+        """Weight of the measured Z-string once the last entangling layer is
+        absorbed into it.  The last layer of CX/CZ gates sits between the final
+        rotations and the measurement and is Clifford, so it maps the nominal
+        observable O to another Pauli-Z string O_eff = U_ent^dag O U_ent.  CZ is
+        diagonal and leaves O unchanged; CX maps Z_target -> Z_control Z_target.
+        A nominally local cost can therefore be effectively global, and vice
+        versa."""
+        Z = set(self.cost_qubits)
+        if self.entangler_gate == "cx":
+            for (c, t) in reversed(self.pairs_for_layer(self.n_layers - 1)):
+                if t in Z:
+                    Z ^= {c}
+        return len(Z)
+
+    # Pauli types as (x, z) bit pairs: I=0, X=1, Z=2, Y=3.  The causal cone is
+    # computed by propagating the SET of possible types of every qubit backward
+    # through the circuit (a per-qubit relaxation: correlations between qubits
+    # are dropped, so the cone is an outer bound).  A rotation about axis a
+    # mixes the two types that anticommute with sigma_a; for the random-Pauli
+    # scheme any axis may occur, so any non-identity type may become any other.
+    _MIX = {"ry": {0: {0}, 3: {3}, 1: {1, 2}, 2: {1, 2}},
+            "any": {0: {0}, 1: {1, 2, 3}, 2: {1, 2, 3}, 3: {1, 2, 3}}}
+    _ANTI = {"ry": {1, 2}, "any": {1, 2, 3}}
+
+    def causal_cone(self):
+        """(cone_qubits, cone_params): the number of qubits whose Pauli type can
+        be non-identity when the observable is propagated back to the input,
+        and the number of rotations that can have a non-zero gradient.  These
+        are closed-form functions of the design parameters (for random-Pauli
+        axes the generic case is assumed)."""
+        axis = "ry" if self.ansatz_type == "ry" else "any"
+        T = [{2} if q in self.cost_qubits else {0} for q in range(self.n_qubits)]
+        n_par = 0
+        for layer in range(self.n_layers - 1, -1, -1):
+            for (a, b) in reversed(self.pairs_for_layer(layer)):
+                na, nb = set(), set()
+                for pa in T[a]:
+                    for pb in T[b]:
+                        xa, za, xb, zb = pa & 1, (pa >> 1) & 1, pb & 1, (pb >> 1) & 1
+                        if self.entangler_gate == "cx":
+                            xb ^= xa; za ^= zb
+                        else:
+                            za ^= xb; zb ^= xa
+                        na.add(xa | (za << 1)); nb.add(xb | (zb << 1))
+                T[a], T[b] = na, nb
+            for q in range(self.n_qubits):
+                if T[q] & self._ANTI[axis]:
+                    n_par += 1
+                T[q] = set().union(*[self._MIX[axis][t] for t in T[q]])
+        return sum(1 for q in range(self.n_qubits) if T[q] != {0}), n_par
+
     def pairs_for_layer(self, layer):
         """Ordered (control, target) pairs applied in ``layer``."""
         if self.entangle_pattern == "brickwork":
@@ -134,7 +189,28 @@ class CircuitSpec:
             "cost_global": int(self.cost_global),
             "n_entanglers": self.n_entanglers,
             "depth_ratio": self.n_layers / self.n_qubits,
+            "cost_weight_eff": self.effective_weight(),
+            "cone_qubits": self.causal_cone()[0],
+            "cone_frac": self.causal_cone()[1] / self.n_params,
         }
+
+
+def causal_cone(n_qubits, n_layers, ansatz_type, entangle_pattern, entangler_gate, cost_global):
+    """Closed-form (cone_qubits, cone_frac) from the design parameters."""
+    pat = entangle_pattern if isinstance(entangle_pattern, str) else ENTANGLE_PATTERNS[int(entangle_pattern)]
+    gate = entangler_gate if isinstance(entangler_gate, str) else ENTANGLER_GATES[int(entangler_gate)]
+    ans = ansatz_type if isinstance(ansatz_type, str) else ANSATZ_TYPES[int(ansatz_type)]
+    s = CircuitSpec(int(n_qubits), int(n_layers), ans, pat, gate, bool(cost_global), 0)
+    cq, cp = s.causal_cone()
+    return cq, cp / s.n_params
+
+
+def effective_weight(n_qubits, n_layers, entangle_pattern, entangler_gate, cost_global):
+    """Closed-form effective observable weight from the design parameters
+    (pattern and gate given by name or by index)."""
+    pat = entangle_pattern if isinstance(entangle_pattern, str) else ENTANGLE_PATTERNS[int(entangle_pattern)]
+    gate = entangler_gate if isinstance(entangler_gate, str) else ENTANGLER_GATES[int(entangler_gate)]
+    return CircuitSpec(int(n_qubits), int(n_layers), "ry", pat, gate, bool(cost_global), 0).effective_weight()
 
 
 # ---- pattern-agnostic descriptors of the entangling graph ----------------

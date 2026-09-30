@@ -25,7 +25,7 @@ import pandas as pd
 from sklearn.metrics import mean_absolute_error, r2_score, roc_auc_score
 
 from qml_bp.analyze import (CUTOFF, PhysicsLinear, SEED, SubgroupMean, arch_id,
-                            grouped_folds, hgb_cls, hgb_reg)
+                            grouped_folds, hgb_cls, hgb_reg, load_dataset)
 from qml_bp.ansatz import (ENTANGLE_PATTERNS, FEATURE_COLUMNS,
                            GRAPH_FEATURE_COLUMNS, entangling_graph_features)
 
@@ -60,13 +60,14 @@ def main():
     args = ap.parse_args()
     os.makedirs(args.outdir, exist_ok=True); os.makedirs(args.figdir, exist_ok=True)
 
-    df = pd.concat([pd.read_csv(args.main), pd.read_csv(args.extra)], ignore_index=True)
+    df = pd.concat([load_dataset(args.main), load_dataset(args.extra)], ignore_index=True)
     df = df.dropna(subset=["log_var"]).reset_index(drop=True)
     df = add_graph_features(df)
     y = df.log_var.to_numpy(float); yc = (y < args.cutoff).astype(int)
     pat = df.entangle_pattern.to_numpy(int)
     Xd = df[DESC_COLUMNS].to_numpy(float)        # descriptor features
     Xi = df[FEATURE_COLUMNS].to_numpy(float)     # original index features
+    Xd0 = df[[c for c in DESC_COLUMNS if c not in ("cost_weight_eff", "cone_qubits", "cone_frac")]].to_numpy(float)  # graph descriptors only, no physics features
     # PhysicsLinear indexes FEATURE_COLUMNS positions; build a view with the
     # same column order for the control.
     groups = arch_id(df).to_numpy()
@@ -90,7 +91,8 @@ def main():
         tr = np.where(pat != k)[0]; te = np.where(pat == k)[0]
         m = hgb_reg().fit(Xd[tr], y[tr]); p = m.predict(Xd[te])
         c = hgb_cls().fit(Xd[tr], yc[tr]); pr = c.predict_proba(Xd[te])[:, 1]
-        phys = PhysicsLinear("reg").fit(Xi[tr], y[tr]).predict(Xi[te])
+        phys = PhysicsLinear("reg", effective=True).fit(Xi[tr], y[tr]).predict(Xi[te])
+        m_noeff = hgb_reg().fit(Xd0[tr], y[tr]); p_noeff = m_noeff.predict(Xd0[te])
         sub = SubgroupMean(FEATURE_COLUMNS.index("cost_global")).fit(Xi[tr], y[tr]).predict(Xi[te])
         lopo[name] = {
             "rows": int(len(te)), "label_mean": float(y[te].mean()), "label_std": float(y[te].std()),
@@ -102,21 +104,22 @@ def main():
             "phys_r2": float(r2_score(y[te], phys)), "phys_mae": float(mean_absolute_error(y[te], phys)),
             "sub_mae": float(mean_absolute_error(y[te], sub)),
             "bias": float(np.mean(p - y[te])),
+            "unseen_r2_no_physics": float(r2_score(y[te], p_noeff)),
         }
-        print("%-11s unseen R2=%.3f MAE=%.3f | seen R2=%.3f MAE=%.3f | phys R2=%.3f MAE=%.3f | bias %+.2f"
-              % (name, lopo[name]["unseen_r2"], lopo[name]["unseen_mae"], lopo[name]["seen_r2"],
-                 lopo[name]["seen_mae"], lopo[name]["phys_r2"], lopo[name]["phys_mae"], lopo[name]["bias"]))
+        print("%-11s unseen R2=%.3f (no physics features %.3f) MAE=%.3f | seen R2=%.3f | phys R2=%.3f | bias %+.2f"
+              % (name, lopo[name]["unseen_r2"], lopo[name]["unseen_r2_no_physics"], lopo[name]["unseen_mae"],
+                 lopo[name]["seen_r2"], lopo[name]["phys_r2"], lopo[name]["bias"]))
     R["lopo"] = lopo
     json.dump(R, open(os.path.join(args.outdir, "lopo.json"), "w"), indent=1)
 
-    lines = ["\\begin{tabular}{lrcccccc}", "\\toprule",
-             " & & \\multicolumn{2}{c}{Pattern unseen} & \\multicolumn{2}{c}{Pattern seen} & \\multicolumn{2}{c}{Physics-linear} \\\\",
-             "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\\cmidrule(lr){7-8}",
-             "Held-out pattern & Rows & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\\\", "\\midrule"]
+    lines = ["\\begin{tabular}{lrccccccc}", "\\toprule",
+             " & & \\multicolumn{3}{c}{Pattern unseen} & \\multicolumn{2}{c}{Pattern seen} & \\multicolumn{2}{c}{Physics-linear} \\\\",
+             "\\cmidrule(lr){3-5}\\cmidrule(lr){6-7}\\cmidrule(lr){8-9}",
+             "Held-out pattern & Rows & $R^2$ & $R^2$, graph only & MAE & $R^2$ & MAE & $R^2$ & MAE \\\\", "\\midrule"]
     for name in ENTANGLE_PATTERNS:
         d = lopo[name]
-        lines.append("%s & %d & %.3f & %.3f & %.3f & %.3f & %.3f & %.3f \\\\" % (
-            NICE[name], d["rows"], d["unseen_r2"], d["unseen_mae"], d["seen_r2"], d["seen_mae"],
+        lines.append("%s & %d & %.3f & %.3f & %.3f & %.3f & %.3f & %.3f & %.3f \\\\" % (
+            NICE[name], d["rows"], d["unseen_r2"], d["unseen_r2_no_physics"], d["unseen_mae"], d["seen_r2"], d["seen_mae"],
             d["phys_r2"], d["phys_mae"]))
     lines += ["\\botrule", "\\end{tabular}"]
     open(os.path.join(args.outdir, "table_lopo.tex"), "w").write("\n".join(lines) + "\n")

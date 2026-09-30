@@ -28,11 +28,11 @@
 \newcommand{\LabelStd}{0.94}
 \newcommand{\LabelMin}{-4.89}
 \newcommand{\LabelMax}{-0.23}
-\newcommand{\WithinVar}{0.010}
+\newcommand{\WithinVar}{0.013}
 \newcommand{\TotalVar}{0.885}
-\newcommand{\RsqCeiling}{0.989}
+\newcommand{\RsqCeiling}{0.985}
 \newcommand{\RsqCeilingRy}{1.000}
-\newcommand{\RsqCeilingPauli}{0.979}
+\newcommand{\RsqCeilingPauli}{0.973}
 \newcommand{\StructFracParams}{17.0}
 \newcommand{\StructRowsAny}{87.0}
 \newcommand{\LegacyFloorFrac}{9.6}
@@ -45,49 +45,53 @@
 \newcommand{\NFolds}{10}
 \newcommand{\NFoldsK}{5}
 \newcommand{\NRepeats}{2}
-\newcommand{\RsqCV}{0.977}
+\newcommand{\RsqCV}{0.980}
 \newcommand{\RsqCVsd}{0.003}
-\newcommand{\MaeCV}{0.076}
-\newcommand{\MaeCVsd}{0.004}
+\newcommand{\MaeCV}{0.067}
+\newcommand{\MaeCVsd}{0.003}
 \newcommand{\AucCV}{0.998}
 \newcommand{\AucCVsd}{0.000}
-\newcommand{\AccCV}{0.980}
-\newcommand{\AccCVsd}{0.003}
+\newcommand{\AccCV}{0.979}
+\newcommand{\AccCVsd}{0.004}
 \newcommand{\RsqPhys}{0.682}
 \newcommand{\RsqSub}{0.043}
 \newcommand{\AucPhys}{0.927}
-\newcommand{\GainOverPhys}{0.29}
-\newcommand{\FracOfCeiling}{99}
-\newcommand{\OofRsq}{0.978}
-\newcommand{\OofRsqLo}{0.976}
-\newcommand{\OofRsqHi}{0.979}
+\newcommand{\GainOverPhys}{0.30}
+\newcommand{\FracOfCeiling}{100}
+\newcommand{\OofRsq}{0.980}
+\newcommand{\OofRsqLo}{0.979}
+\newcommand{\OofRsqHi}{0.982}
 \newcommand{\RowRsq}{0.979}
-\newcommand{\RowMae}{0.067}
+\newcommand{\RowMae}{0.064}
 \newcommand{\RowAuc}{0.999}
 \newcommand{\ExtrapCut}{10}
 \newcommand{\ExtrapTrainRows}{16\,278}
 \newcommand{\ExtrapTestRows}{3\,580}
-\newcommand{\RsqExtrap}{0.866}
-\newcommand{\MaeExtrap}{0.313}
-\newcommand{\RsqExtrapLo}{0.857}
-\newcommand{\RsqExtrapHi}{0.874}
-\newcommand{\MaeExtrapLo}{0.306}
-\newcommand{\MaeExtrapHi}{0.320}
-\newcommand{\RsqExtrapSeedSd}{0.002}
-\newcommand{\AucExtrap}{0.991}
+\newcommand{\RsqExtrap}{0.860}
+\newcommand{\MaeExtrap}{0.320}
+\newcommand{\RsqExtrapLo}{0.851}
+\newcommand{\RsqExtrapHi}{0.869}
+\newcommand{\MaeExtrapLo}{0.312}
+\newcommand{\MaeExtrapHi}{0.327}
+\newcommand{\RsqExtrapSeedSd}{0.001}
+\newcommand{\AucExtrap}{0.995}
 \newcommand{\RsqExtrapPhys}{0.326}
 \newcommand{\MaeExtrapPhys}{0.665}
 \newcommand{\RsqExtrapSub}{-1.027}
-\newcommand{\RsqFull}{0.977}
+\newcommand{\RsqFull}{0.980}
 \newcommand{\RsqPrim}{0.980}
-\newcommand{\DeltaDerived}{-0.002}
-\newcommand{\AblTopOne}{cost locality}
-\newcommand{\AblTopOneDelta}{0.342}
-\newcommand{\AblTopTwo}{entangler gate}
-\newcommand{\AblTopTwoDelta}{0.183}
-\newcommand{\AblTopThree}{entangle pattern}
-\newcommand{\AblTopThreeDelta}{0.051}
-\newcommand{\DeltaSize}{0.274}
+\newcommand{\DeltaDerived}{0.000}
+\newcommand{\AblTopOne}{qubit count $n$}
+\newcommand{\AblTopOneDelta}{0.721}
+\newcommand{\AblTopTwo}{cost locality}
+\newcommand{\AblTopTwoDelta}{0.304}
+\newcommand{\AblTopThree}{layers $L$}
+\newcommand{\AblTopThreeDelta}{0.259}
+\newcommand{\DeltaSize}{0.001}
+\newcommand{\DeltaAddEff}{0.002}
+\newcommand{\DeltaGatePrim}{0.155}
+\newcommand{\DeltaAddCone}{0.001}
+\newcommand{\DeltaAddBoth}{0.002}
 \newcommand{\PythonVersion}{3.9.6}
 \newcommand{\NumpyVersion}{2.0.2}
 \newcommand{\SklearnVersion}{1.6.1}
@@ -100,57 +104,75 @@
 \newcommand{\RepeatN}{200}
 \newcommand{\RepeatMAD}{0.021}
 \newcommand{\RepeatMax}{0.20}
-\newcommand{\MaeENOneOnelocal}{0.183}
+\newcommand{\RsqStruct}{0.969}
+\newcommand{\RsqStructsd}{0.002}
+\newcommand{\AucStruct}{0.997}
+\newcommand{\StructNcoef}{124}
+\newcommand{\RsqPhysEff}{0.750}
+\newcommand{\GainOverStruct}{0.011}
+\newcommand{\RsqExtrapStruct}{0.935}
+\newcommand{\MaeExtrapStruct}{0.169}
+\newcommand{\RsqExtrapMLPmean}{0.961}
+\newcommand{\RsqExtrapMLPsd}{0.003}
+\newcommand{\DeltaCostObs}{0.018}
+\newcommand{\DeltaGateEff}{0.047}
+\newcommand{\DeltaEffWeight}{0.000}
+\newcommand{\GateGap}{0.08}
+\newcommand{\NFeatures}{12}
+\newcommand{\ConeExactRy}{90}
+\newcommand{\ConeMadRy}{0.022}
+\newcommand{\ConeMadPauli}{0.159}
+\newcommand{\MaeENOneOnelocal}{0.185}
 \newcommand{\MaeEPNOneOnelocal}{0.805}
-\newcommand{\RsqENOneOnelocal}{0.950}
+\newcommand{\RsqENOneOnelocal}{0.951}
 \newcommand{\RsqEPNOneOnelocal}{0.220}
-\newcommand{\RsqEMNOneOnelocal}{0.967}
-\newcommand{\MaeEMNOneOnelocal}{0.132}
-\newcommand{\MaeENOneOneglobal}{0.273}
+\newcommand{\RsqEMNOneOnelocal}{0.971}
+\newcommand{\MaeEMNOneOnelocal}{0.113}
+\newcommand{\MaeENOneOneglobal}{0.280}
 \newcommand{\MaeEPNOneOneglobal}{0.438}
-\newcommand{\RsqENOneOneglobal}{0.823}
+\newcommand{\RsqENOneOneglobal}{0.811}
 \newcommand{\RsqEPNOneOneglobal}{0.199}
 \newcommand{\RsqEMNOneOneglobal}{0.911}
-\newcommand{\MaeEMNOneOneglobal}{0.119}
-\newcommand{\MaeENOneTwolocal}{0.297}
+\newcommand{\MaeEMNOneOneglobal}{0.109}
+\newcommand{\MaeENOneTwolocal}{0.309}
 \newcommand{\MaeEPNOneTwolocal}{0.907}
-\newcommand{\RsqENOneTwolocal}{0.881}
+\newcommand{\RsqENOneTwolocal}{0.876}
 \newcommand{\RsqEPNOneTwolocal}{0.163}
-\newcommand{\RsqEMNOneTwolocal}{0.936}
-\newcommand{\MaeEMNOneTwolocal}{0.209}
-\newcommand{\MaeENOneTwoglobal}{0.488}
+\newcommand{\RsqEMNOneTwolocal}{0.956}
+\newcommand{\MaeEMNOneTwolocal}{0.164}
+\newcommand{\MaeENOneTwoglobal}{0.494}
 \newcommand{\MaeEPNOneTwoglobal}{0.516}
-\newcommand{\RsqENOneTwoglobal}{0.624}
+\newcommand{\RsqENOneTwoglobal}{0.608}
 \newcommand{\RsqEPNOneTwoglobal}{0.188}
-\newcommand{\RsqEMNOneTwoglobal}{0.927}
-\newcommand{\MaeEMNOneTwoglobal}{0.152}
-\newcommand{\MaeENOneOne}{0.230}
+\newcommand{\RsqEMNOneTwoglobal}{0.923}
+\newcommand{\MaeEMNOneTwoglobal}{0.142}
+\newcommand{\MaeENOneOne}{0.234}
 \newcommand{\MaeEPNOneOne}{0.615}
-\newcommand{\RsqENOneOne}{0.923}
+\newcommand{\RsqENOneOne}{0.920}
 \newcommand{\RsqEPNOneOne}{0.347}
-\newcommand{\RsqEMNOneOne}{0.957}
-\newcommand{\MaeEMNOneOne}{0.125}
-\newcommand{\MaeENOneTwo}{0.391}
+\newcommand{\RsqEMNOneOne}{0.959}
+\newcommand{\MaeEMNOneOne}{0.111}
+\newcommand{\MaeENOneTwo}{0.400}
 \newcommand{\MaeEPNOneTwo}{0.713}
-\newcommand{\RsqENOneTwo}{0.823}
+\newcommand{\RsqENOneTwo}{0.815}
 \newcommand{\RsqEPNOneTwo}{0.307}
-\newcommand{\RsqEMNOneTwo}{0.944}
-\newcommand{\MaeEMNOneTwo}{0.181}
-\newcommand{\MaeELocal}{0.243}
+\newcommand{\RsqEMNOneTwo}{0.953}
+\newcommand{\MaeEMNOneTwo}{0.153}
+\newcommand{\MaeELocal}{0.250}
 \newcommand{\MaeEPLocal}{0.859}
-\newcommand{\RsqELocal}{0.911}
+\newcommand{\RsqELocal}{0.909}
 \newcommand{\RsqEPLocal}{0.189}
-\newcommand{\RsqEMLocal}{0.950}
-\newcommand{\MaeEMLocal}{0.172}
-\newcommand{\MaeEGlobal}{0.381}
+\newcommand{\RsqEMLocal}{0.963}
+\newcommand{\MaeEMLocal}{0.140}
+\newcommand{\MaeEGlobal}{0.388}
 \newcommand{\MaeEPGlobal}{0.477}
-\newcommand{\RsqEGlobal}{0.709}
+\newcommand{\RsqEGlobal}{0.695}
 \newcommand{\RsqEPGlobal}{0.202}
-\newcommand{\RsqEMGlobal}{0.921}
-\newcommand{\MaeEMGlobal}{0.136}
-\newcommand{\RsqExtrapMLPLo}{0.944}
-\newcommand{\RsqExtrapMLPHi}{0.955}
-\newcommand{\AucCutmOnepFive}{0.996}
+\newcommand{\RsqEMGlobal}{0.919}
+\newcommand{\MaeEMGlobal}{0.126}
+\newcommand{\RsqExtrapMLPLo}{0.950}
+\newcommand{\RsqExtrapMLPHi}{0.961}
+\newcommand{\AucCutmOnepFive}{0.997}
 \newcommand{\BarrenCutmOnepFive}{60}
 \newcommand{\AucCutmTwopZero}{0.998}
 \newcommand{\BarrenCutmTwopZero}{43}
@@ -158,141 +180,200 @@
 \newcommand{\BarrenCutmTwopFive}{27}
 \newcommand{\AucCutmThreepZero}{0.998}
 \newcommand{\BarrenCutmThreepZero}{15}
-\newcommand{\RsqCVMLP}{0.978}
+\newcommand{\RsqCVMLP}{0.979}
 \newcommand{\AucCVMLP}{0.999}
-\newcommand{\RsqExtrapMLP}{0.950}
-\newcommand{\RsqCVRandomForest}{0.974}
+\newcommand{\RsqExtrapMLP}{0.956}
+\newcommand{\RsqCVRandomForest}{0.976}
 \newcommand{\AucCVRandomForest}{0.997}
-\newcommand{\RsqExtrapRandomForest}{0.862}
+\newcommand{\RsqExtrapRandomForest}{0.861}
 \newcommand{\RsqCVExtraTrees}{0.978}
 \newcommand{\AucCVExtraTrees}{0.998}
-\newcommand{\RsqExtrapExtraTrees}{0.865}
-\newcommand{\RsqCVkNN}{0.967}
+\newcommand{\RsqExtrapExtraTrees}{0.864}
+\newcommand{\RsqCVkNN}{0.972}
 \newcommand{\AucCVkNN}{0.995}
-\newcommand{\RsqExtrapkNN}{0.858}
-\newcommand{\RsqCVLinearbaseline}{0.701}
-\newcommand{\AucCVLinearbaseline}{0.952}
-\newcommand{\RsqExtrapLinearbaseline}{0.338}
-\newcommand{\ScreenSpearman}{0.988}
+\newcommand{\RsqExtrapkNN}{0.864}
+\newcommand{\RsqCVLinearbaseline}{0.891}
+\newcommand{\AucCVLinearbaseline}{0.984}
+\newcommand{\RsqExtrapLinearbaseline}{0.755}
+\newcommand{\ScreenSpearman}{0.989}
 \newcommand{\ScreenTrainableFrac}{57.4}
 \newcommand{\ScreenPrecFifty}{99.7}
 \newcommand{\ScreenRecallFifty}{86.9}
 \newcommand{\ScreenBottomTen}{100.0}
 \newcommand{\ScreenTopPct}{20}
 \newcommand{\ScreenTopK}{3\,971}
-\newcommand{\GapHGBkSix}{-0.050}
-\newcommand{\GapMLPkSix}{0.674}
+\newcommand{\GapHGBkSix}{-0.062}
+\newcommand{\GapMLPkSix}{0.716}
 \newcommand{\GapPhyskSix}{0.332}
-\newcommand{\GapHGBkSeven}{0.288}
-\newcommand{\GapMLPkSeven}{0.811}
+\newcommand{\GapStructkSix}{0.839}
+\newcommand{\GapMLPmeankSix}{0.631}
+\newcommand{\GapMLPsdkSix}{0.110}
+\newcommand{\GapMLPminkSix}{0.47}
+\newcommand{\GapMLPmaxkSix}{0.81}
+\newcommand{\GapHGBkSeven}{0.257}
+\newcommand{\GapMLPkSeven}{0.832}
 \newcommand{\GapPhyskSeven}{0.330}
-\newcommand{\GapHGBkEight}{0.548}
-\newcommand{\GapMLPkEight}{0.881}
+\newcommand{\GapStructkSeven}{0.883}
+\newcommand{\GapMLPmeankSeven}{0.846}
+\newcommand{\GapMLPsdkSeven}{0.038}
+\newcommand{\GapMLPminkSeven}{0.78}
+\newcommand{\GapMLPmaxkSeven}{0.92}
+\newcommand{\GapHGBkEight}{0.541}
+\newcommand{\GapMLPkEight}{0.909}
 \newcommand{\GapPhyskEight}{0.324}
-\newcommand{\GapHGBkNine}{0.730}
-\newcommand{\GapMLPkNine}{0.915}
+\newcommand{\GapStructkEight}{0.902}
+\newcommand{\GapMLPmeankEight}{0.906}
+\newcommand{\GapMLPsdkEight}{0.017}
+\newcommand{\GapMLPminkEight}{0.88}
+\newcommand{\GapMLPmaxkEight}{0.93}
+\newcommand{\GapHGBkNine}{0.729}
+\newcommand{\GapMLPkNine}{0.946}
 \newcommand{\GapPhyskNine}{0.324}
-\newcommand{\GapHGBkTen}{0.866}
-\newcommand{\GapMLPkTen}{0.950}
+\newcommand{\GapStructkNine}{0.920}
+\newcommand{\GapMLPmeankNine}{0.949}
+\newcommand{\GapMLPsdkNine}{0.006}
+\newcommand{\GapMLPminkNine}{0.94}
+\newcommand{\GapMLPmaxkNine}{0.96}
+\newcommand{\GapHGBkTen}{0.860}
+\newcommand{\GapMLPkTen}{0.956}
 \newcommand{\GapPhyskTen}{0.326}
-\newcommand{\LCHGBTwoFifty}{0.593}
-\newcommand{\LCMLPTwoFifty}{0.752}
-\newcommand{\LCHGBFiveHundred}{0.692}
-\newcommand{\LCMLPFiveHundred}{0.866}
-\newcommand{\LCHGBOneThousand}{0.819}
-\newcommand{\LCMLPOneThousand}{0.919}
-\newcommand{\LCHGBTwoThousand}{0.908}
-\newcommand{\LCMLPTwoThousand}{0.950}
-\newcommand{\LCHGBFourThousand}{0.959}
-\newcommand{\LCMLPFourThousand}{0.968}
-\newcommand{\LCHGBEightThousand}{0.972}
-\newcommand{\LCMLPEightThousand}{0.975}
-\newcommand{\LCHGBSixteenThousand}{0.978}
-\newcommand{\LCMLPSixteenThousand}{0.978}
-\newcommand{\LCRowsNinety}{2\,000}
+\newcommand{\GapStructkTen}{0.935}
+\newcommand{\GapMLPmeankTen}{0.961}
+\newcommand{\GapMLPsdkTen}{0.003}
+\newcommand{\GapMLPminkTen}{0.95}
+\newcommand{\GapMLPmaxkTen}{0.96}
+\newcommand{\ScreenByNPrec}{100}
+\newcommand{\ScreenByNRecall}{35}
+\newcommand{\ScrSpHGBmin}{0.94}
+\newcommand{\ScrSpHGBmax}{0.98}
+\newcommand{\ScrSpPhysmin}{0.58}
+\newcommand{\ScrSpPhysmax}{0.64}
+\newcommand{\ScrSpStructmin}{0.91}
+\newcommand{\ScrSpStructmax}{0.97}
+\newcommand{\ScrAboveTwelve}{26}
+\newcommand{\ScrPrecTwelve}{99.5}
+\newcommand{\LCHGBTwoFifty}{0.841}
+\newcommand{\LCMLPTwoFifty}{0.877}
+\newcommand{\LCHGBFiveHundred}{0.877}
+\newcommand{\LCMLPFiveHundred}{0.929}
+\newcommand{\LCHGBOneThousand}{0.914}
+\newcommand{\LCMLPOneThousand}{0.943}
+\newcommand{\LCHGBTwoThousand}{0.950}
+\newcommand{\LCMLPTwoThousand}{0.962}
+\newcommand{\LCHGBFourThousand}{0.969}
+\newcommand{\LCMLPFourThousand}{0.970}
+\newcommand{\LCHGBEightThousand}{0.977}
+\newcommand{\LCMLPEightThousand}{0.978}
+\newcommand{\LCHGBSixteenThousand}{0.980}
+\newcommand{\LCMLPSixteenThousand}{0.979}
+\newcommand{\LCRowsNinety}{1\,000}
 \newcommand{\LCRowsSaturate}{4\,000}
 \newcommand{\LargeN}{1\,991}
-\newcommand{\LargeRsqHGB}{0.906}
-\newcommand{\LargeMaeHGB}{0.318}
+\newcommand{\LargeRsqMLPmean}{0.972}
+\newcommand{\LargeRsqMLPsd}{0.002}
+\newcommand{\LargeRsqHGB}{0.905}
+\newcommand{\LargeMaeHGB}{0.316}
 \newcommand{\LargeRsqHGBLo}{0.898}
 \newcommand{\LargeRsqHGBHi}{0.913}
-\newcommand{\LargeRsqHGBThirteen}{0.937}
-\newcommand{\LargeRsqHGBFourteen}{0.879}
-\newcommand{\LargeRsqMLP}{0.964}
-\newcommand{\LargeMaeMLP}{0.159}
-\newcommand{\LargeRsqMLPLo}{0.959}
-\newcommand{\LargeRsqMLPHi}{0.968}
-\newcommand{\LargeRsqMLPThirteen}{0.966}
-\newcommand{\LargeRsqMLPFourteen}{0.962}
+\newcommand{\LargeRsqHGBThirteen}{0.939}
+\newcommand{\LargeRsqHGBFourteen}{0.876}
+\newcommand{\LargeRsqMLP}{0.970}
+\newcommand{\LargeMaeMLP}{0.137}
+\newcommand{\LargeRsqMLPLo}{0.965}
+\newcommand{\LargeRsqMLPHi}{0.974}
+\newcommand{\LargeRsqMLPThirteen}{0.970}
+\newcommand{\LargeRsqMLPFourteen}{0.969}
 \newcommand{\LargeRsqPhys}{0.350}
 \newcommand{\LargeMaePhys}{0.815}
 \newcommand{\LargeRsqPhysLo}{0.326}
 \newcommand{\LargeRsqPhysHi}{0.375}
 \newcommand{\LargeRsqPhysThirteen}{0.354}
 \newcommand{\LargeRsqPhysFourteen}{0.345}
-\newcommand{\TOSpGdExact}{0.13}
-\newcommand{\TOStGdExact}{0.14}
-\newcommand{\TOdCBGdExact}{0.93}
-\newcommand{\TOdCTGdExact}{1.00}
-\newcommand{\TOFrBGdExact}{97}
-\newcommand{\TOFrTGdExact}{99}
-\newcommand{\TOSpGdHundred}{0.17}
-\newcommand{\TOStGdHundred}{0.19}
-\newcommand{\TOdCBGdHundred}{0.93}
-\newcommand{\TOdCTGdHundred}{1.02}
-\newcommand{\TOFrBGdHundred}{97}
-\newcommand{\TOFrTGdHundred}{96}
-\newcommand{\TOSpAdamThousand}{0.08}
-\newcommand{\TOStAdamThousand}{0.09}
-\newcommand{\TOdCBAdamThousand}{0.96}
-\newcommand{\TOdCTAdamThousand}{1.00}
-\newcommand{\TOFrBAdamThousand}{98}
-\newcommand{\TOFrTAdamThousand}{97}
-\newcommand{\TOSpAdamHundred}{0.17}
-\newcommand{\TOStAdamHundred}{0.19}
-\newcommand{\TOdCBAdamHundred}{0.93}
-\newcommand{\TOdCTAdamHundred}{1.02}
-\newcommand{\TOFrBAdamHundred}{94}
-\newcommand{\TOFrTAdamHundred}{96}
-\newcommand{\TON}{299}
-\newcommand{\TOSteps}{200}
-\newcommand{\TORestarts}{3}
-\newcommand{\TOLr}{0.05}
-\newcommand{\TOShots}{1\,000}
-\newcommand{\TOSpearmanTrue}{0.089}
-\newcommand{\TOSpearmanPred}{0.076}
-\newcommand{\TOdCBarren}{0.96}
-\newcommand{\TOdCTrainable}{1.00}
-\newcommand{\TOFracBarren}{98}
-\newcommand{\TOFracTrainable}{97}
+\newcommand{\LargeRsqStruct}{0.951}
+\newcommand{\LargeMaeStruct}{0.183}
+\newcommand{\LargeRsqStructLo}{0.945}
+\newcommand{\LargeRsqStructHi}{0.956}
+\newcommand{\LargeRsqStructThirteen}{0.950}
+\newcommand{\LargeRsqStructFourteen}{0.952}
+\newcommand{\ClValN}{200}
+\newcommand{\ClValParams}{15\,182}
+\newcommand{\ClValMAD}{0.009}
+\newcommand{\ClValMax}{0.12}
+\newcommand{\ClValStruct}{2\,804}
+\newcommand{\ClValStructHits}{0}
+\newcommand{\ClValSamples}{65\,536}
+\newcommand{\ClValSvSamples}{400}
+\newcommand{\ClTrainRows}{7\,941}
+\newcommand{\ClTestRows}{6\,000}
+\newcommand{\ClResolved}{4\,370}
+\newcommand{\ClCensored}{1\,630}
+\newcommand{\ClStructCensOK}{66}
+\newcommand{\ClStructRsqA}{0.92}
+\newcommand{\ClStructMaeA}{0.22}
+\newcommand{\ClMLPRsqA}{0.95 \pm 0.01}
+\newcommand{\ClHGBRsqA}{0.71}
+\newcommand{\ClResolvedFracA}{99}
+\newcommand{\ClStructRsqB}{0.90}
+\newcommand{\ClStructMaeB}{0.36}
+\newcommand{\ClMLPRsqB}{0.89 \pm 0.04}
+\newcommand{\ClHGBRsqB}{0.27}
+\newcommand{\ClResolvedFracB}{96}
+\newcommand{\ClStructRsqC}{0.80}
+\newcommand{\ClStructMaeC}{0.54}
+\newcommand{\ClMLPRsqC}{0.47 \pm 0.25}
+\newcommand{\ClHGBRsqC}{0.31}
+\newcommand{\ClResolvedFracC}{63}
+\newcommand{\ClStructRsqD}{0.27}
+\newcommand{\ClStructMaeD}{0.84}
+\newcommand{\ClMLPRsqD}{-1.86 \pm 1.53}
+\newcommand{\ClHGBRsqD}{0.47}
+\newcommand{\ClResolvedFracD}{54}
+\newcommand{\ClStructRsqE}{-0.07}
+\newcommand{\ClStructMaeE}{0.99}
+\newcommand{\ClMLPRsqE}{-5.11 \pm 3.48}
+\newcommand{\ClHGBRsqE}{0.44}
+\newcommand{\ClResolvedFracE}{52}
+\newcommand{\ClLeTwentyStruct}{0.90}
+\newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
+\newcommand{\ClLeTwentyHGB}{0.94}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels for circuits up to 32 qubits, models trained on at most 12 qubits remain accurate for about eight more qubits and fail beyond 24; trained on up to 20 qubits they predict 21- to 32-qubit circuits with $R^2\approx0.9$.}
+\newcommand{\ClTargetHits}{2\,000}
+\newcommand{\ClMaxSamples}{$2^{20}$}
+\newcommand{\ClResolvedHits}{100}
+\newcommand{\ClQmax}{32}
 \newcommand{\LopoExtraRows}{9\,926}
-\newcommand{\LopoDescRsq}{0.974}
-\newcommand{\LopoIndexRsq}{0.975}
-\newcommand{\LopoLinearUnseen}{0.732}
-\newcommand{\LopoLinearSeen}{0.980}
-\newcommand{\LopoLinearPhys}{0.662}
-\newcommand{\LopoLinearUnseenMae}{0.262}
-\newcommand{\LopoLinearUnseenAuc}{0.964}
-\newcommand{\LopoCircularUnseen}{0.694}
-\newcommand{\LopoCircularSeen}{0.976}
-\newcommand{\LopoCircularPhys}{0.685}
-\newcommand{\LopoCircularUnseenMae}{0.298}
-\newcommand{\LopoCircularUnseenAuc}{0.955}
-\newcommand{\LopoAllUnseen}{0.414}
-\newcommand{\LopoAllSeen}{0.970}
-\newcommand{\LopoAllPhys}{0.507}
-\newcommand{\LopoAllUnseenMae}{0.395}
-\newcommand{\LopoAllUnseenAuc}{0.959}
-\newcommand{\LopoBrickUnseen}{0.925}
-\newcommand{\LopoBrickSeen}{0.977}
-\newcommand{\LopoBrickPhys}{0.634}
-\newcommand{\LopoBrickUnseenMae}{0.144}
-\newcommand{\LopoBrickUnseenAuc}{0.983}
-\newcommand{\LopoStarUnseen}{0.742}
-\newcommand{\LopoStarSeen}{0.963}
+\newcommand{\LopoDescRsq}{0.978}
+\newcommand{\LopoIndexRsq}{0.978}
+\newcommand{\LopoLinearUnseen}{0.946}
+\newcommand{\LopoLinearSeen}{0.983}
+\newcommand{\LopoLinearPhys}{0.692}
+\newcommand{\LopoLinearUnseenMae}{0.128}
+\newcommand{\LopoLinearUnseenAuc}{0.987}
+\newcommand{\LopoLinearNoPhys}{0.732}
+\newcommand{\LopoCircularUnseen}{0.950}
+\newcommand{\LopoCircularSeen}{0.985}
+\newcommand{\LopoCircularPhys}{0.824}
+\newcommand{\LopoCircularUnseenMae}{0.132}
+\newcommand{\LopoCircularUnseenAuc}{0.988}
+\newcommand{\LopoCircularNoPhys}{0.694}
+\newcommand{\LopoAllUnseen}{0.753}
+\newcommand{\LopoAllSeen}{0.972}
+\newcommand{\LopoAllPhys}{0.621}
+\newcommand{\LopoAllUnseenMae}{0.241}
+\newcommand{\LopoAllUnseenAuc}{0.972}
+\newcommand{\LopoAllNoPhys}{0.414}
+\newcommand{\LopoBrickUnseen}{0.930}
+\newcommand{\LopoBrickSeen}{0.978}
+\newcommand{\LopoBrickPhys}{0.669}
+\newcommand{\LopoBrickUnseenMae}{0.141}
+\newcommand{\LopoBrickUnseenAuc}{0.980}
+\newcommand{\LopoBrickNoPhys}{0.925}
+\newcommand{\LopoStarUnseen}{0.924}
+\newcommand{\LopoStarSeen}{0.968}
 \newcommand{\LopoStarPhys}{0.726}
-\newcommand{\LopoStarUnseenMae}{0.286}
-\newcommand{\LopoStarUnseenAuc}{0.980}
+\newcommand{\LopoStarUnseenMae}{0.156}
+\newcommand{\LopoStarUnseenAuc}{0.996}
+\newcommand{\LopoStarNoPhys}{0.742}
 %%END-NUMBERS
 
 \raggedbottom
@@ -368,7 +449,7 @@ mean $\pm$ standard deviation over \NFoldsK{} architecture-grouped folds.}
 \toprule
 Cutoff $y<c$ & Barren fraction & AUC (grouped CV) \\
 \midrule
-$c=-1.5$ & 59.7\% & $0.996 \pm 0.001$ \\
+$c=-1.5$ & 59.7\% & $0.997 \pm 0.000$ \\
 $c=-2.0$ & 42.6\% & $0.998 \pm 0.000$ \\
 $c=-2.5$ & 27.0\% & $0.999 \pm 0.000$ \\
 $c=-3.0$ & 15.0\% & $0.998 \pm 0.001$ \\
@@ -392,13 +473,15 @@ intervals.}
 \toprule
 Model & $R^2$ & MAE & AUC & Accuracy \\
 \midrule
-\textbf{Hist Gradient Boosting} & 0.866 & 0.313 & 0.991 & 0.972 \\
-MLP & 0.950 & 0.154 & 0.997 & 0.977 \\
-Random Forest & 0.862 & 0.310 & 0.996 & 0.977 \\
-Extra Trees & 0.865 & 0.306 & 0.993 & 0.976 \\
-k-NN & 0.858 & 0.321 & 0.979 & 0.968 \\
-Linear baseline & 0.338 & 0.680 & 0.842 & 0.810 \\
+\textbf{Hist Gradient Boosting} & 0.860 & 0.320 & 0.995 & 0.966 \\
+MLP & 0.956 & 0.133 & 0.997 & 0.976 \\
+Random Forest & 0.861 & 0.312 & 0.997 & 0.974 \\
+Extra Trees & 0.864 & 0.308 & 0.997 & 0.980 \\
+k-NN & 0.864 & 0.311 & 0.983 & 0.976 \\
+Linear baseline & 0.755 & 0.389 & 0.963 & 0.904 \\
 \midrule
+Structured linear & 0.935 & 0.169 & 0.998 & 0.974 \\
+Physics-informed linear (effective weight) & 0.511 & 0.589 & 0.920 & 0.811 \\
 Physics-informed linear & 0.326 & 0.665 & 0.814 & 0.752 \\
 Cost-locality subgroup mean & -1.027 & 1.326 & 0.699 & 0.248 \\
 Training mean & -1.125 & 1.359 & 0.500 & 0.248 \\
@@ -415,17 +498,15 @@ Main-text Section~4.2 and Figure~5 discuss this table.
 $n>k$.}
 \label{tab:gap}
 %%BEGIN-TABLE:gap
-\begin{tabular}{crrcccccc}
+\begin{tabular}{crrcccc}
 \toprule
- & & & \multicolumn{2}{c}{HGB} & \multicolumn{2}{c}{MLP} & \multicolumn{2}{c}{Physics-linear} \\
-\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
-Train $n\le k$ & Train rows & Test rows & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
+Train $n\le k$ & Train rows & Test rows & HGB & MLP (10 seeds, mean $\pm$ sd [min, max]) & Structured linear & Physics-linear \\
 \midrule
-$k=6$ & 8916 & 10942 & -0.050 & 0.732 & 0.674 & 0.344 & 0.332 & 0.519 \\
-$k=7$ & 10671 & 9187 & 0.288 & 0.615 & 0.811 & 0.285 & 0.330 & 0.552 \\
-$k=8$ & 12572 & 7286 & 0.548 & 0.514 & 0.881 & 0.224 & 0.324 & 0.591 \\
-$k=9$ & 14448 & 5410 & 0.730 & 0.421 & 0.915 & 0.195 & 0.324 & 0.630 \\
-$k=10$ & 16278 & 3580 & 0.866 & 0.313 & 0.950 & 0.154 & 0.326 & 0.665 \\
+$k=6$ & 8916 & 10942 & -0.062 & $0.631 \pm 0.110$ [0.47, 0.81] & 0.839 & 0.332 \\
+$k=7$ & 10671 & 9187 & 0.257 & $0.846 \pm 0.038$ [0.78, 0.92] & 0.883 & 0.330 \\
+$k=8$ & 12572 & 7286 & 0.541 & $0.906 \pm 0.017$ [0.88, 0.93] & 0.902 & 0.324 \\
+$k=9$ & 14448 & 5410 & 0.729 & $0.949 \pm 0.006$ [0.94, 0.96] & 0.920 & 0.324 \\
+$k=10$ & 16278 & 3580 & 0.860 & $0.961 \pm 0.003$ [0.95, 0.96] & 0.935 & 0.326 \\
 \botrule
 \end{tabular}
 %%END-TABLE:gap

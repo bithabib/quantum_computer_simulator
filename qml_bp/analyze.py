@@ -42,14 +42,14 @@ from sklearn.neural_network import MLPClassifier, MLPRegressor
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-from qml_bp.ansatz import FEATURE_COLUMNS
+from qml_bp.ansatz import FEATURE_COLUMNS, causal_cone, effective_weight
 
 # Apple Accelerate emits spurious matmul RuntimeWarnings; results are unaffected.
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 PRIMITIVE = ["n_qubits", "n_layers", "ansatz_type", "entangle_pattern",
              "entangler_gate", "cost_global"]
-DERIVED = ["n_params", "n_entanglers", "depth_ratio"]
+DERIVED = ["n_params", "n_entanglers", "depth_ratio", "cost_weight_eff", "cone_qubits", "cone_frac"]
 GROUPS = {                       # feature groups for the ablation study
     "size (n, L, nL, L/n)": ["n_qubits", "n_layers", "n_params", "depth_ratio"],
     "qubit count n": ["n_qubits"],
@@ -59,6 +59,10 @@ GROUPS = {                       # feature groups for the ablation study
     "entangle pattern": ["entangle_pattern"],
     "entangler gate": ["entangler_gate"],
     "cost locality": ["cost_global"],
+    "effective observable weight": ["cost_weight_eff"],
+    "cost observable (locality + effective weight)": ["cost_global", "cost_weight_eff"],
+    "entangler gate + effective weight": ["entangler_gate", "cost_weight_eff"],
+    "causal cone (qubits, fraction)": ["cone_qubits", "cone_frac"],
     "rotation scheme": ["ansatz_type"],
 }
 SEED = 0
@@ -133,25 +137,102 @@ class SubgroupMean:
         p = np.clip(self.predict(X), 0, 1); return np.c_[1 - p, p]
 
 
-def physics_features(X):
-    """(n, L, 1_global, n*1_global) -- the reviewer's physics-informed model."""
+def load_dataset(path):
+    """Read a dataset CSV and add closed-form feature columns it may predate."""
+    df = pd.read_csv(path)
+    if "cost_weight_eff" not in df.columns:
+        cache = {}
+        vals = []
+        for key in zip(df.n_qubits, df.n_layers, df.entangle_pattern, df.entangler_gate, df.cost_global):
+            key = tuple(int(k) for k in key)
+            if key not in cache:
+                cache[key] = effective_weight(*key)
+            vals.append(cache[key])
+        df["cost_weight_eff"] = vals
+    if "cone_qubits" not in df.columns:
+        cache = {}; cq = []; cf = []
+        for key in zip(df.n_qubits, df.n_layers, df.ansatz_type, df.entangle_pattern, df.entangler_gate, df.cost_global):
+            key = tuple(int(k) for k in key)
+            if key not in cache:
+                cache[key] = causal_cone(*key)
+            cq.append(cache[key][0]); cf.append(cache[key][1])
+        df["cone_qubits"] = cq; df["cone_frac"] = cf
+    return df
+
+
+def physics_features(X, effective=False):
+    """(n, L, g, n*g).  g is the nominal global-cost indicator, or, with
+    ``effective=True``, the effective observable weight divided by n."""
     n = X[:, FEATURE_COLUMNS.index("n_qubits")]
     L = X[:, FEATURE_COLUMNS.index("n_layers")]
-    g = X[:, FEATURE_COLUMNS.index("cost_global")]
+    if effective:
+        g = X[:, FEATURE_COLUMNS.index("cost_weight_eff")] / n
+    else:
+        g = X[:, FEATURE_COLUMNS.index("cost_global")]
     return np.c_[n, L, g, n * g]
 
 
 class PhysicsLinear:
-    def __init__(self, task):
-        self.task = task
+    def __init__(self, task, effective=False):
+        self.task = task; self.effective = effective
         self.m = (LinearRegression() if task == "reg"
                   else LogisticRegression(max_iter=2000))
     def fit(self, X, y):
-        self.m.fit(physics_features(X), y); return self
+        self.m.fit(physics_features(X, self.effective), y); return self
     def predict(self, X):
-        return self.m.predict(physics_features(X))
+        return self.m.predict(physics_features(X, self.effective))
     def predict_proba(self, X):
-        return self.m.predict_proba(physics_features(X))
+        return self.m.predict_proba(physics_features(X, self.effective))
+
+
+class StructuredLinear:
+    """Interpretable control: one linear model per categorical cell.
+
+    A cell is a combination of (rotation scheme, entanglement pattern,
+    entangler gate, cost observable).  Within each cell the label is modeled
+    as an intercept plus slopes on four closed-form size terms,
+        c,  min(L, c),  exp(-L/c),  1/L,
+    where c is the number of qubits in the causal cone of the observable
+    (c = n whenever the cone covers the circuit), i.e. a linear decay in the
+    relevant qubit count and a saturating dependence on depth.  With
+    ``dilution=True`` (labels that average over ALL parameters, including
+    structural zeros) the model predicts the per-in-cone-parameter value and
+    adds log10 of the in-cone fraction.  Fitted by ridge regression (logistic
+    regression for classification)."""
+    CELL = ["ansatz_type", "entangle_pattern", "entangler_gate", "cost_global"]
+
+    def __init__(self, task, alpha=1e-3, dilution=False):
+        self.task = task; self.dilution = dilution
+        self.m = (Ridge(alpha=alpha) if task == "reg"
+                  else make_pipeline(StandardScaler(), LogisticRegression(max_iter=5000, C=10.0)))
+
+    def _offset(self, X):
+        if not self.dilution:
+            return 0.0
+        return np.log10(np.clip(X[:, FEATURE_COLUMNS.index("cone_frac")], 1e-6, None))
+
+    def _design(self, X):
+        n = X[:, FEATURE_COLUMNS.index("cone_qubits")]
+        L = X[:, FEATURE_COLUMNS.index("n_layers")]
+        base = np.c_[np.ones(len(X)), n, np.minimum(L, n), np.exp(-L / n), 1.0 / L]
+        keys = [tuple(int(v) for v in row) for row in X[:, [FEATURE_COLUMNS.index(c) for c in self.CELL]]]
+        oh = np.zeros((len(X), len(self.cells)))
+        for i, k in enumerate(keys):
+            j = self.cells.get(k)
+            if j is not None:
+                oh[i, j] = 1.0
+        return np.hstack([oh * base[:, [j]] for j in range(base.shape[1])] + [base[:, 1:]])
+
+    def fit(self, X, y):
+        keys = sorted({tuple(int(v) for v in row)
+                       for row in X[:, [FEATURE_COLUMNS.index(c) for c in self.CELL]]})
+        self.cells = {k: i for i, k in enumerate(keys)}
+        self.n_coef = len(keys) * 5 + 4
+        self.m.fit(self._design(X), y - self._offset(X)); return self
+    def predict(self, X):
+        return self.m.predict(self._design(X)) + self._offset(X)
+    def predict_proba(self, X):
+        return self.m.predict_proba(self._design(X))
 
 
 def controls_reg():
@@ -159,6 +240,8 @@ def controls_reg():
         "Training mean": MeanBaseline(),
         "Cost-locality subgroup mean": SubgroupMean(FEATURE_COLUMNS.index("cost_global")),
         "Physics-informed linear": PhysicsLinear("reg"),
+        "Physics-informed linear (effective weight)": PhysicsLinear("reg", effective=True),
+        "Structured linear": StructuredLinear("reg"),
     }
 
 
@@ -167,6 +250,8 @@ def controls_cls():
         "Training mean": MeanBaseline(),
         "Cost-locality subgroup mean": SubgroupMean(FEATURE_COLUMNS.index("cost_global")),
         "Physics-informed linear": PhysicsLinear("cls"),
+        "Physics-informed linear (effective weight)": PhysicsLinear("cls", effective=True),
+        "Structured linear": StructuredLinear("cls"),
     }
 
 
@@ -232,7 +317,7 @@ def main():
                       "numpy": np.__version__, "sklearn": sklearn.__version__,
                       "pandas": pd.__version__}}
 
-    raw = pd.read_csv(args.data)
+    raw = load_dataset(args.data)
     R["n_rows_raw"] = int(len(raw))
     R["n_all_structural"] = int(raw.log_var.isna().sum())
     df = raw.dropna(subset=["log_var"]).reset_index(drop=True)
@@ -262,7 +347,8 @@ def main():
     # Pauli axes and in sampling noise, so within-architecture label variance
     # is irreducible for any model that sees only the feature vector.
     gv = pd.Series(y).groupby(groups)
-    within = gv.transform(lambda s: s.var(ddof=0) if len(s) > 1 else np.nan)
+    # unbiased within-group variance (groups have a median of only 4 rows)
+    within = gv.transform(lambda s: s.var(ddof=1) if len(s) > 1 else np.nan)
     R["within_arch_var"] = float(np.nanmean(within))
     R["total_var"] = float(np.var(y))
     R["r2_ceiling"] = float(1 - np.nanmean(within) / np.var(y))
@@ -365,6 +451,14 @@ def main():
     sub = SubgroupMean(FEATURE_COLUMNS.index("cost_global")).fit(X[tr2], y[tr2]).predict(X[te2])
     mlp = regressors()["MLP"].fit(X[tr2], y[tr2]).predict(X[te2]) if not args.quick else phys
     R["extrap_mlp_r2_ci"] = bootstrap_ci(r2_score, y[te2], mlp)
+    stl = StructuredLinear("reg").fit(X[tr2], y[tr2]).predict(X[te2])
+    R["extrap_struct_r2_ci"] = bootstrap_ci(r2_score, y[te2], stl)
+    R["struct_n_coef"] = int(StructuredLinear("reg").fit(X, y).n_coef)
+    # the MLP is sensitive to its random initialisation out of range: 10 seeds
+    n_seeds = 2 if args.quick else 10
+    sv = [r2_score(y[te2], regressors(s)["MLP"].fit(X[tr2], y[tr2]).predict(X[te2])) for s in range(n_seeds)]
+    R["extrap_mlp_r2_seeds"] = {"mean": float(np.mean(sv)), "sd": float(np.std(sv, ddof=1)),
+                                "min": float(np.min(sv)), "max": float(np.max(sv)), "n": n_seeds}
     brk = {}
     for label, mask in [("n=11", nq[te2] == 11), ("n=12", nq[te2] == 12),
                         ("local", X[te2, 6] == 0), ("global", X[te2, 6] == 1),
@@ -385,6 +479,8 @@ def main():
             "mlp_r2": float(r2_score(yt, mlp[mask])),
             "mlp_mae": float(mean_absolute_error(yt, mlp[mask])),
             "mlp_mae_ci": bootstrap_ci(mean_absolute_error, yt, mlp[mask], 500),
+            "struct_r2": float(r2_score(yt, stl[mask])),
+            "struct_mae": float(mean_absolute_error(yt, stl[mask])),
             "sub_r2": float(r2_score(yt, sub[mask])),
             "sub_mae": float(mean_absolute_error(yt, sub[mask])),
         }
@@ -414,12 +510,41 @@ def main():
         return out
     full = cv_r2(FEATURE_COLUMNS); prim = cv_r2(PRIMITIVE)
     abl = {"full (9 features)": ms(full), "primitive only (6 features)": ms(prim)}
+    R["cone_vs_structural"] = {
+        "corr": float(np.corrcoef(1 - df.frac_structural, df.cone_frac)[0, 1]),
+        "mad": float(np.mean(np.abs((1 - df.frac_structural) - df.cone_frac))),
+        "mad_fixed_ry": float(np.mean(np.abs((1 - df.frac_structural) - df.cone_frac)[df.ansatz_type == 0])),
+        "mad_random_pauli": float(np.mean(np.abs((1 - df.frac_structural) - df.cone_frac)[df.ansatz_type == 1])),
+        "exact_frac_fixed_ry": float(np.mean(np.abs((1 - df.frac_structural) - df.cone_frac)[df.ansatz_type == 0] < 1e-9)),
+    }
+    R["n_features"] = len(FEATURE_COLUMNS)
     drops = {}
     for gname, cols in GROUPS.items():
         keep = [c for c in FEATURE_COLUMNS if c not in cols]
         v = cv_r2(keep)
         drops[gname] = {"r2": ms(v), "delta": ms(np.array(full) - np.array(v))}
     R["ablation"] = {"reference": abl, "drop": drops}
+
+    # ---- 6. nominal vs effective observable weight (n >= 10) -----------
+    R["gate_gap"] = float(abs(df[df.entangler_gate == 1].log_var.mean() - df[df.entangler_gate == 0].log_var.mean()))
+    big_n = df[df.n_qubits >= 10]
+    eff_rows = []
+    for gate, gname in [(0, "CZ"), (1, "CX")]:
+        for pat, pname in [(0, "linear"), (1, "circular"), (2, "all-to-all")]:
+            for cg, cname in [(0, "local"), (1, "global")]:
+                d = big_n[(big_n.entangler_gate == gate) & (big_n.entangle_pattern == pat) & (big_n.cost_global == cg)]
+                if len(d) == 0:
+                    continue
+                n_ = d.n_qubits.to_numpy(); w_ = d.cost_weight_eff.to_numpy()
+                if (w_ == 1).all(): wdesc = "$1$"
+                elif (w_ == n_).all(): wdesc = "$n$"
+                elif (w_ == n_ - 1).all(): wdesc = "$n-1$"
+                elif (w_ == n_ // 2).all() or (np.abs(w_ - n_ / 2) <= 0.5).all(): wdesc = "$\\approx n/2$"
+                else: wdesc = "%d--%d" % (w_.min(), w_.max())
+                eff_rows.append({"gate": gname, "pattern": pname, "cost": cname, "w": wdesc,
+                                 "w_min": int(w_.min()), "w_max": int(w_.max()),
+                                 "mean_label": float(d.log_var.mean()), "rows": int(len(d))})
+    R["effweight_table"] = eff_rows
 
     # ---- write JSON ----------------------------------------------------
     with open(os.path.join(args.outdir, "results.json"), "w") as fh:
@@ -430,7 +555,8 @@ def main():
     order = ["Hist Gradient Boosting", "MLP", "Random Forest", "Extra Trees",
              "k-NN", "Linear baseline"]
     order = [o for o in order if o in res_reg]
-    ctrl = ["Physics-informed linear", "Cost-locality subgroup mean", "Training mean"]
+    ctrl = ["Structured linear", "Physics-informed linear (effective weight)",
+            "Physics-informed linear", "Cost-locality subgroup mean", "Training mean"]
     lines = ["\\begin{tabular}{lcccc}", "\\toprule",
              " & \\multicolumn{2}{c}{Regression} & \\multicolumn{2}{c}{Classification} \\\\",
              "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}",
@@ -457,20 +583,20 @@ def main():
     write(os.path.join(args.outdir, "table_extrap.tex"), lines)
 
     lines = ["\\begin{tabular}{lrrcccc}", "\\toprule",
-             "Subset & Rows & Label mean (std) & HGB MAE [95\\% CI] & MLP MAE [95\\% CI] & Physics-linear MAE & Subgroup-mean MAE \\\\",
+             "Subset & Rows & Label mean (std) & HGB MAE [95\\% CI] & MLP MAE [95\\% CI] & Structured linear MAE & Physics-linear MAE \\\\",
              "\\midrule"]
     for label in ["n=11 local", "n=11 global", "n=12 local", "n=12 global", "all"]:
         b = brk[label]
         lines.append("%s & %d & $%.2f$ ($%.2f$) & %.3f [%.3f, %.3f] & %.3f [%.3f, %.3f] & %.3f & %.3f \\\\" % (
             label.replace("n=", "$n=$"), b["rows"], b["label_mean"], b["label_std"],
             b["hgb_mae"], b["hgb_mae_ci"][0], b["hgb_mae_ci"][1],
-            b["mlp_mae"], b["mlp_mae_ci"][0], b["mlp_mae_ci"][1], b["phys_mae"], b["sub_mae"]))
+            b["mlp_mae"], b["mlp_mae_ci"][0], b["mlp_mae_ci"][1], b["struct_mae"], b["phys_mae"]))
     lines += ["\\botrule", "\\end{tabular}"]
     write(os.path.join(args.outdir, "table_extrap_breakdown.tex"), lines)
 
     lines = ["\\begin{tabular}{lcc}", "\\toprule",
              "Features removed & $R^2$ (grouped CV) & $\\Delta R^2$ \\\\", "\\midrule",
-             "none (all 9 features) & %s & -- \\\\" % fmt_ms(full),
+             "none (all %d features) & %s & -- \\\\" % (len(FEATURE_COLUMNS), fmt_ms(full)),
              "derived features (keep 6 primitives) & %s & %s \\\\" % (
                  fmt_ms(prim), fmt_ms(np.array(full) - np.array(prim)))]
     for gname, d in drops.items():
@@ -486,6 +612,17 @@ def main():
             cut, 100 * d["barren_frac"], d["auc"][0], d["auc"][1]))
     lines += ["\\botrule", "\\end{tabular}"]
     write(os.path.join(args.outdir, "table_cutoff.tex"), lines)
+
+    lines = ["\\begin{tabular}{lllcrr}", "\\toprule",
+             "Gate & Pattern & Nominal cost & Effective weight & Mean $\\log_{10}\\overline{\\mathrm{Var}}$ & Circuits \\\\",
+             "\\midrule"]
+    for i, r_ in enumerate(eff_rows):
+        if i == 6:
+            lines.append("\\midrule")
+        lines.append("%s & %s & %s & %s & $%.2f$ & %d \\\\" % (
+            r_["gate"], r_["pattern"], r_["cost"], r_["w"], r_["mean_label"], r_["rows"]))
+    lines += ["\\botrule", "\\end{tabular}"]
+    write(os.path.join(args.outdir, "table_effweight.tex"), lines)
 
     # label-by-design and descriptive stats (new label)
     dfb = df.assign(barren=yc)
