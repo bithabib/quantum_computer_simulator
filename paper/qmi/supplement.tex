@@ -389,8 +389,9 @@ Circuits: A Data-Driven Model for Barren Plateaus}
 text: model hyperparameters (Table~S1), descriptive statistics of the dataset
 (Table~S2), sensitivity to the barren cutoff (Table~S3), the full model
 comparison on the qubit-count extrapolation split (Table~S4), the
-widening-gap extrapolation table (Table~S5), and the learning curve
-(Figure~S1). Every number is produced by the released analysis scripts.}
+widening-gap extrapolation table (Table~S5), the extrapolation error by
+subset of the 11- and 12-qubit test set (Table~S6), the learning curve
+(Figure~S1), and five further figures (Figures~S2--S6). Every number is produced by the released analysis scripts.}
 \maketitle
 
 \section{Model hyperparameters}
@@ -520,6 +521,89 @@ Main-text Section~4.7 discusses this figure.
 \caption{Learning curve: architecture-grouped CV $R^2$ against the number
 of training rows. Error bars: standard deviation over the five folds.}
 \label{fig:learningcurve}
+\end{figure}
+
+
+\section{Extrapolation error by subset of the 11- and 12-qubit test set}
+Main-text Section~4.2 discusses this table.
+\begin{table}[t]
+\centering
+\caption{Extrapolation error by subset of the $n\in\{11,12\}$ test set. MAE in
+$\log_{10}$ units, with 95\% bootstrap confidence intervals for HGB. The
+physics-informed linear model and the cost-locality subgroup mean are fitted
+on the same $n\le\ExtrapCut$ training set.}
+\label{tab:extrapbreak}
+%%BEGIN-TABLE:extrap_breakdown
+\begin{tabular}{lrrcccc}
+\toprule
+Subset & Rows & Label mean (std) & HGB MAE [95\% CI] & MLP MAE [95\% CI] & Structured linear MAE & Physics-linear MAE \\
+\midrule
+$n=$11 local & 836 & $-2.31$ ($1.04$) & 0.185 [0.175, 0.194] & 0.113 [0.105, 0.122] & 0.169 & 0.805 \\
+$n=$11 global & 904 & $-3.11$ ($0.72$) & 0.280 [0.271, 0.289] & 0.109 [0.099, 0.123] & 0.133 & 0.438 \\
+$n=$12 local & 930 & $-2.40$ ($1.13$) & 0.309 [0.294, 0.326] & 0.164 [0.154, 0.175] & 0.219 & 0.907 \\
+$n=$12 global & 910 & $-3.29$ ($0.86$) & 0.494 [0.479, 0.506] & 0.142 [0.129, 0.155] & 0.156 & 0.516 \\
+all & 3580 & $-2.78$ ($1.04$) & 0.320 [0.312, 0.327] & 0.133 [0.128, 0.139] & 0.169 & 0.665 \\
+\botrule
+\end{tabular}
+%%END-TABLE:extrap_breakdown
+\end{table}
+
+\section{Additional figures}
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.58\textwidth]{figs/structural.pdf}
+\caption{Mean percentage of parameters that are structural zeros, as a
+function of the number of layers $L$, for local and global cost observables.
+Shallow, local-cost circuits have many rotations outside the light cone of
+the observable.}
+\label{fig:structural}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.58\textwidth]{figs/label_compare.pdf}
+\caption{All-parameter label versus the single-parameter label, for the same
+circuits and parameter samples.
+Circles: the single parameter has a non-zero gradient and the two labels
+agree. Triangles (drawn at $-6.5$ for visibility): the single parameter is a
+structural zero; a label built on it clips these to a floor, whereas most
+have all-parameter labels above the cutoff.}
+\label{fig:labelcompare}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figs/large.pdf}
+\caption{Predicted versus true label on the held-out 13- and 14-qubit
+circuits for HGB (left) and the MLP (right), both trained on $n\le12$
+only. The dashed line is $y=x$.}
+\label{fig:large}
+\end{figure}
+
+\paragraph{Trainability versus qubit count.} Figure~\ref{fig:qubittrend} shows the mean label as a function of qubit
+count, split by cost locality. Global-cost circuits show a steep, monotone
+decay of the mean gradient variance with qubit number; local-cost circuits
+decay far more slowly. The shaded bands are one standard deviation of the
+label across the heterogeneous circuits at each $n$, not the uncertainty of
+the mean, which is much smaller. The dataset therefore contains the
+qubit-scaling behavior that the predictor must learn, within the finite range
+$n\le12$ where it can be measured exactly.
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.58\textwidth]{figs/qubit_trend.pdf}
+\caption{Mean $\log_{10}\Vbar$ versus qubit count for local and global cost
+observables. Shaded: $\pm1$ standard deviation across circuits at each $n$
+(spread of the population, not uncertainty of the mean).}
+\label{fig:qubittrend}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.7\textwidth]{figs/lopo.pdf}
+\caption{$R^2$ on each entanglement pattern when it is seen in training
+(grouped CV), when it is held out entirely (LOPO), and for the
+physics-informed linear control.}
+\label{fig:lopo}
 \end{figure}
 
 \end{document}

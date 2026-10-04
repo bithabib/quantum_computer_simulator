@@ -25,9 +25,10 @@ Status legend: [x] done · [~] in progress · [ ] pending
 - [x] L5. Noise ceiling with unbiased within-group variance (0.985)
 - [x] L6. Related work: efficient gradient-variance methods (Letcher et al. 2024; Uvarov & Biamonte 2021; Napp 2022); discuss what Clifford sampling means for the cost motivation
 - [x] L7. Text: move revision history out of the body; ablation wording; "seven qubits"; "statistically indistinguishable"; abstract to journal length; unused bib entry; strip unused macros; table headers "above/below cutoff"
-- [ ] L8. AUTHOR DECISION PENDING: one-paragraph limitation reporting that gradient variance did not predict optimization outcome at n<=12 (drafted in limitation_training_outcome.tex.hold, not inserted)
+- [x] L8. Author approved (2026-10-04): limitation (viii) on gradient variance vs optimization outcome inserted in Sec. 5
 
 ### M. Packaging
 - [x] M1. Response letter and cover letter updated to the changed claims
 - [x] M2. Refilled, recompiled (main 29 pp, supplement 3, response 9, cover 2), references checked, committed, retagged v2.1-qmi-revision
 - [x] N. Causal-cone feature (closed-form, validated against exact structural-zero fraction) added after the Clifford study exposed cone saturation; transfer to unseen patterns improved from 0.41-0.74 to 0.75-0.95
+- [x] O. Length: five secondary figures and one table moved to the supplement (main 29 -> 26 pp; supplement 6 pp). Original submission was 12 pp; the growth is the reviewer-requested material.

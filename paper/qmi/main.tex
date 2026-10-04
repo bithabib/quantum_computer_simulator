@@ -821,7 +821,7 @@ in an earlier preprint of this work, is the variance of a single parameter, the 
 $0$ in layer $\lfloor L/2\rfloor$, estimated by parameter shift. We keep that
 quantity as a secondary column of the dataset. In \LegacyFloorFrac\% of specs it is a
 structural zero, and a label built on it has to clip every such case to
-a floor, where it is indistinguishable from an extremely flat landscape. Figure~\ref{fig:labelcompare} compares the two
+a floor, where it is indistinguishable from an extremely flat landscape. Supplementary Figure~S3 compares the two
 labels. Where the single-parameter gradient is not a structural zero, the two
 labels agree closely (correlation \LegacyCorr, mean absolute difference
 \LegacyMAD). Where it is a structural zero, \LegacyFloorTrainable\% of the
@@ -901,11 +901,13 @@ numeric features and the label over the \Nused{} labeled rows. The label
 spans from \LabelMin{} to \LabelMax{} with mean \LabelMean{} and standard
 deviation \LabelStd. Structural zeros are common: \StructFracParams\% of all
 parameters are structural zeros, and \StructRowsAny\% of circuits contain at
-least one. Figure~\ref{fig:structural} shows that they concentrate in shallow
+least one. Supplementary Figure~S2 shows that they concentrate in shallow
 circuits and in local-cost circuits, as the light-cone picture predicts; at
 $L=1$ a local observable on qubit $0$ sees only a handful of rotations.
 Table~\ref{tab:labelbydesign} breaks the label and the structural-zero rate
-down by each design choice. Note that this table describes the dataset; it
+down by each design choice, and Supplementary Figure~S5 shows the mean label
+against qubit count: a steep, monotone decay for global costs and a much
+slower one for local costs. Note that this table describes the dataset; it
 involves no trained model. Global cost observables lower the mean label by
 \CostGap{} orders of magnitude relative to local costs, which is the
 cost-locality effect proved by Cerezo et al.~\cite{cerezo2021cost}. Denser
@@ -947,27 +949,7 @@ outputs.}
 %%END-TABLE:labelbydesign
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.58\textwidth]{figs/structural.pdf}
-\caption{Mean percentage of parameters that are structural zeros, as a
-function of the number of layers $L$, for local and global cost observables.
-Shallow, local-cost circuits have many rotations outside the light cone of
-the observable.}
-\label{fig:structural}
-\end{figure}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.58\textwidth]{figs/label_compare.pdf}
-\caption{All-parameter label versus the single-parameter label, for the same
-circuits and parameter samples.
-Circles: the single parameter has a non-zero gradient and the two labels
-agree. Triangles (drawn at $-6.5$ for visibility): the single parameter is a
-structural zero; a label built on it clips these to a floor, whereas most
-have all-parameter labels above the cutoff.}
-\label{fig:labelcompare}
-\end{figure}
 
 \subsection{Models and evaluation}\label{sec:eval}
 We compare six learner families spanning linear, instance-based, neural, and
@@ -1190,7 +1172,7 @@ line is $y=x$.}
 \end{figure}
 
 \subsection{Extrapolation across qubit count}\label{sec:extrap}
-Table~\ref{tab:extrapbreak} (and Supplementary Table~S4 for all learners)
+Supplementary Tables~S4 and S6
 reports the qubit-count split, with
 \ExtrapTrainRows{} training circuits at $n\le\ExtrapCut$ and
 \ExtrapTestRows{} test circuits at $n\in\{11,12\}$. HGB attains
@@ -1207,7 +1189,7 @@ range of a feature, so it cannot continue the decay in $n$ past $n=10$,
 whereas a model with continuous dependence on $n$ can. In-family the model
 classes are equivalent; out of range the inductive bias decides.
 
-Table~\ref{tab:extrapbreak} breaks the result down by qubit count and cost
+Supplementary Table~S6 breaks the result down by qubit count and cost
 locality. Error grows from $n=11$ to $n=12$ for both models, and global-cost
 circuits at $n=12$ are the hardest subset (HGB $R^2=\RsqENOneTwoglobal$, MLP
 \RsqEMNOneTwoglobal), as expected, since they are furthest from training in
@@ -1246,8 +1228,7 @@ around the MLP curve is the range over ten random seeds.}
 \paragraph{Beyond the training range: 13 and 14 qubits.} As a final
 extrapolation test we generated a separate set of \LargeN{} circuits with
 $n\in\{13,14\}$, labeled exactly as the main dataset, and scored models
-trained on the full $n\le12$ dataset on it (Table~\ref{tab:large},
-Figure~\ref{fig:large}).
+trained on the full $n\le12$ dataset on it (Table~\ref{tab:large}, Supplementary Figure~S4).
 The MLP reaches $R^2=\LargeRsqMLPmean\pm\LargeRsqMLPsd$ over ten seeds
 (\LargeRsqMLPThirteen{} at $n=13$ and \LargeRsqMLPFourteen{} at $n=14$ for
 the first seed), the structured linear model \LargeRsqStruct, HGB
@@ -1281,38 +1262,9 @@ Cost-locality subgroup mean & -0.889 [-1.024, -0.776] & 1.549 & -0.902 & -0.884 
 %%END-TABLE:large
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{figs/large.pdf}
-\caption{Predicted versus true label on the held-out 13- and 14-qubit
-circuits for HGB (left) and the MLP (right), both trained on $n\le12$
-only. The dashed line is $y=x$.}
-\label{fig:large}
-\end{figure}
 
 
 
-\begin{table}[t]
-\centering
-\caption{Extrapolation error by subset of the $n\in\{11,12\}$ test set. MAE in
-$\log_{10}$ units, with 95\% bootstrap confidence intervals for HGB. The
-physics-informed linear model and the cost-locality subgroup mean are fitted
-on the same $n\le\ExtrapCut$ training set.}
-\label{tab:extrapbreak}
-%%BEGIN-TABLE:extrap_breakdown
-\begin{tabular}{lrrcccc}
-\toprule
-Subset & Rows & Label mean (std) & HGB MAE [95\% CI] & MLP MAE [95\% CI] & Structured linear MAE & Physics-linear MAE \\
-\midrule
-$n=$11 local & 836 & $-2.31$ ($1.04$) & 0.185 [0.175, 0.194] & 0.113 [0.105, 0.122] & 0.169 & 0.805 \\
-$n=$11 global & 904 & $-3.11$ ($0.72$) & 0.280 [0.271, 0.289] & 0.109 [0.099, 0.123] & 0.133 & 0.438 \\
-$n=$12 local & 930 & $-2.40$ ($1.13$) & 0.309 [0.294, 0.326] & 0.164 [0.154, 0.175] & 0.219 & 0.907 \\
-$n=$12 global & 910 & $-3.29$ ($0.86$) & 0.494 [0.479, 0.506] & 0.142 [0.129, 0.155] & 0.156 & 0.516 \\
-all & 3580 & $-2.78$ ($1.04$) & 0.320 [0.312, 0.327] & 0.133 [0.128, 0.139] & 0.169 & 0.665 \\
-\botrule
-\end{tabular}
-%%END-TABLE:extrap_breakdown
-\end{table}
 
 \subsection{Extrapolation to 32 qubits with exact Clifford labels}\label{sec:clifford}
 Table~\ref{tab:clifford} and Figure~\ref{fig:clifford} report models trained
@@ -1387,25 +1339,6 @@ trained on $n\le12$; the band is the range over ten MLP seeds. Middle and
 right: predicted versus true label for the structured linear model and the
 MLP, colored by qubit count.}
 \label{fig:clifford}
-\end{figure}
-
-\subsection{Trainability versus qubit count}\label{sec:qubittrend}
-Figure~\ref{fig:qubittrend} shows the mean label as a function of qubit
-count, split by cost locality. Global-cost circuits show a steep, monotone
-decay of the mean gradient variance with qubit number; local-cost circuits
-decay far more slowly. The shaded bands are one standard deviation of the
-label across the heterogeneous circuits at each $n$, not the uncertainty of
-the mean, which is much smaller. The dataset therefore contains the
-qubit-scaling behavior that the predictor must learn, within the finite range
-$n\le12$ where it can be measured exactly.
-
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.58\textwidth]{figs/qubit_trend.pdf}
-\caption{Mean $\log_{10}\Vbar$ versus qubit count for local and global cost
-observables. Shaded: $\pm1$ standard deviation across circuits at each $n$
-(spread of the population, not uncertainty of the mean).}
-\label{fig:qubittrend}
 \end{figure}
 
 \subsection{Sensitivity to the barren cutoff}\label{sec:cutoff}
@@ -1522,7 +1455,7 @@ error bars are the standard deviation of the paired drop across folds.}
 \end{figure}
 
 \subsection{Transfer to unseen entanglement patterns}\label{sec:lopo}
-Table~\ref{tab:lopo} and Figure~\ref{fig:lopo} report the leave-one-pattern-out
+Table~\ref{tab:lopo} (Supplementary Figure~S6) reports the leave-one-pattern-out
 experiment. With the graph descriptors in place of the pattern index, the
 pooled five-pattern model loses nothing in-family (grouped-CV
 $R^2=\LopoDescRsq$ with descriptors versus \LopoIndexRsq{} with the index).
@@ -1581,14 +1514,6 @@ star & 4928 & 0.924 & 0.742 & 0.156 & 0.968 & 0.083 & 0.726 & 0.391 \\
 %%END-TABLE:lopo
 \end{table}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=0.7\textwidth]{figs/lopo.pdf}
-\caption{$R^2$ on each entanglement pattern when it is seen in training
-(grouped CV), when it is held out entirely (LOPO), and for the
-physics-informed linear control.}
-\label{fig:lopo}
-\end{figure}
 
 \subsection{How much data is needed}\label{sec:learningcurve}
 Supplementary Figure~S1 shows grouped-CV $R^2$ as a function of the
@@ -1710,7 +1635,20 @@ live; and the quadrature property fails as soon as parameters are shared
 between gates or generators are not Paulis, as in problem-inspired
 ans\"atze, where a predictor trained on simulable sizes has no such
 substitute.
-(viii)~\emph{Averaging over parameters.} The mean over parameters of the
+(viii)~\emph{Gradient variance is not optimization outcome.} The label measures
+how flat the landscape is on average, not whether training succeeds. As a
+check we trained several hundred fresh circuits from the same design space
+with gradient descent and with Adam, with exact gradients and with gradients
+estimated from 100 or 1\,000 shots, for 200 steps from random starts. At
+$n\le12$ between 94\% and 99\% of circuits reached the ground state of the
+observable regardless of their label, and the rank correlation between the
+label and the loss decrease was between 0.08 and 0.19. At these sizes even
+the smallest gradient variances in the dataset correspond to gradient
+components of order $10^{-2}$, which a modest shot budget resolves. The
+predictor should therefore be read as a screen for the gradient-variance
+scaling that becomes prohibitive at larger $n$, not as a forecast of
+optimization success at the sizes simulated here.
+(ix)~\emph{Averaging over parameters.} The mean over parameters of the
 gradient variance is one summary of a circuit's landscape. Other summaries,
 such as the minimum over parameters or the distribution across layers, may
 matter for particular optimizers. We release all per-circuit statistics
