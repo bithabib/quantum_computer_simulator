@@ -20,7 +20,7 @@
 \node[sim, right=of sim] (grad) {Adjoint gradient\\{\scriptsize all $nL$ angles, $\times 200\,\theta$}};
 \node[data, right=of grad] (label) {Label $y$\\{\scriptsize $\log_{10}$ mean$_k\,\mathrm{Var}[\partial C/\partial\theta_k]$}\\{\scriptsize (structural zeros excluded)}};
 \node[data, below=12mm of sim] (feat) {Features $X$\\{\scriptsize closed form}};
-\node[model, right=14mm of feat] (ml) {Gradient-boosted\\model};
+\node[model, right=14mm of feat] (ml) {Predictor\\{\scriptsize linear, trees, MLP}};
 \node[model, right=of ml] (pred) {Predict trainability\\{\scriptsize regression + barren?}};
 \draw[arr] (spec) -- (sim);
 \draw[arr] (sim) -- (grad);

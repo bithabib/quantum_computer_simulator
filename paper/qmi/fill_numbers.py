@@ -207,13 +207,25 @@ def main():
             M["ClMLPRsq" + L_] = "%.2f \\pm %.2f" % (m["MLP_seeds"]["r2_mean"], m["MLP_seeds"]["r2_sd"])
             M["ClHGBRsq" + L_] = f(m["Hist Gradient Boosting"]["r2"], 2)
             M["ClResolvedFrac" + L_] = pct(b["resolved_frac"], 0)
+        bc = CS["bins_by_cost"]
+        for k, L_ in letters.items():
+            l_, g_ = bc["local " + k], bc["global " + k]
+            M["ClLocStruct" + L_] = f(l_["struct_r2"], 2); M["ClLocBias" + L_] = "%+.2f" % l_["struct_bias"]
+            M["ClGloStruct" + L_] = f(g_["struct_r2"], 2)
+            M["ClGloCens" + L_] = pct(g_.get("censored_consistent", float("nan")), 0)
+        sh = CS["shallow_local"]
+        M["ClShallowTrueA"] = f(sh["13-16"]["true"], 2); M["ClShallowTrueE"] = f(sh["29-32"]["true"], 2)
+        M["ClShallowStructA"] = f(sh["13-16"]["struct"], 2); M["ClShallowStructE"] = f(sh["29-32"]["struct"], 2)
+        import math
+        M["ClFloorMinExp"] = "%d" % round(math.log10(CS["floor_min"])); M["ClFloorMaxExp"] = "%d" % round(math.log10(CS["floor_max"]))
         t20 = CS["train_le20"]
         M["ClLeTwentyStruct"] = f(t20["Structured linear"]["r2"], 2)
         M["ClLeTwentyMLP"] = "%.2f \\pm %.2f" % (t20["MLP_seeds"]["r2_mean"], t20["MLP_seeds"]["r2_sd"])
         M["ClLeTwentyHGB"] = f(t20["Hist Gradient Boosting"]["r2"], 2)
         M["ClAbstractSentence"] = ("With exact Clifford-sampled labels for circuits up to 32 qubits, models "
-            "trained on at most 12 qubits remain accurate for about eight more qubits and fail beyond "
-            "24; trained on up to 20 qubits they predict 21- to 32-qubit circuits with $R^2\\approx%.1f$." % t20["Structured linear"]["r2"])
+            "trained on at most 12 qubits remain accurate for about eight more qubits; beyond that they "
+            "overestimate the decay for local costs, whose causal cone saturates, and extending the "
+            "training range to 20 qubits restores $R^2\\approx%.1f$ up to 32 qubits." % t20["Structured linear"]["r2"])
     M["ClTargetHits"] = "2\\,000"; M["ClMaxSamples"] = "$2^{20}$"; M["ClResolvedHits"] = "100"
     M.setdefault("ClQmax", "32"); M.setdefault("ClAbstractSentence", "")
     lopo_path = os.path.join(RES, "lopo.json")
@@ -248,7 +260,7 @@ def main():
     tables = {}
     for t in ["datastats", "labelbydesign", "grouped_cv", "extrap", "extrap_breakdown",
               "ablation", "cutoff", "lopo", "gap", "screening_within", "large", "effweight",
-              "clifford", "clifford_by_n"]:
+              "clifford", "clifford_cost"]:
         tp = os.path.join(RES, "table_%s.tex" % t)
         tables[t] = open(tp).read().strip() if os.path.exists(tp) else "% (pending)"
 

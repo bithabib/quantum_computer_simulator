@@ -347,10 +347,36 @@
 \newcommand{\ClMLPRsqE}{-5.11 \pm 3.48}
 \newcommand{\ClHGBRsqE}{0.44}
 \newcommand{\ClResolvedFracE}{52}
+\newcommand{\ClLocStructA}{0.92}
+\newcommand{\ClLocBiasA}{-0.14}
+\newcommand{\ClGloStructA}{0.87}
+\newcommand{\ClGloCensA}{0}
+\newcommand{\ClLocStructB}{0.89}
+\newcommand{\ClLocBiasB}{-0.23}
+\newcommand{\ClGloStructB}{0.84}
+\newcommand{\ClGloCensB}{5}
+\newcommand{\ClLocStructC}{0.78}
+\newcommand{\ClLocBiasC}{-0.40}
+\newcommand{\ClGloStructC}{0.73}
+\newcommand{\ClGloCensC}{35}
+\newcommand{\ClLocStructD}{0.43}
+\newcommand{\ClLocBiasD}{-0.66}
+\newcommand{\ClGloStructD}{-0.35}
+\newcommand{\ClGloCensD}{60}
+\newcommand{\ClLocStructE}{0.23}
+\newcommand{\ClLocBiasE}{-0.77}
+\newcommand{\ClGloStructE}{-1.20}
+\newcommand{\ClGloCensE}{98}
+\newcommand{\ClShallowTrueA}{-2.07}
+\newcommand{\ClShallowTrueE}{-2.03}
+\newcommand{\ClShallowStructA}{-2.13}
+\newcommand{\ClShallowStructE}{-2.52}
+\newcommand{\ClFloorMinExp}{-7}
+\newcommand{\ClFloorMaxExp}{-5}
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels for circuits up to 32 qubits, models trained on at most 12 qubits remain accurate for about eight more qubits and fail beyond 24; trained on up to 20 qubits they predict 21- to 32-qubit circuits with $R^2\approx0.9$.}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels for circuits up to 32 qubits, models trained on at most 12 qubits remain accurate for about eight more qubits; beyond that they overestimate the decay for local costs, whose causal cone saturates, and extending the training range to 20 qubits restores $R^2\approx0.9$ up to 32 qubits.}
 \newcommand{\ClTargetHits}{2\,000}
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
@@ -668,7 +694,8 @@ with respect to every rotation angle is obtained by adjoint differentiation
 for \Samples{} random parameter vectors. The label $y$ is $\log_{10}$ of the
 mean gradient variance over all parameters that are not structural zeros.
 Closed-form architectural features $X$ are read directly from the
-specification, and a gradient-boosted model is trained on $(X,y)$.}
+specification, and predictors ranging from a structured linear model to
+gradient-boosted trees and a neural network are trained on $(X,y)$.}
 \label{fig:pipeline}
 \end{figure}
 
@@ -804,7 +831,7 @@ such rows. The classification label is $\mathbb{1}[y<-2]$, which we call
 ``barren'' for brevity. The cutoff is a modeling choice: $\Vbar<10^{-2}$
 means the typical gradient component has magnitude below $0.1$; in our data
 the mean label crosses this value between six and seven qubits. The regression
-target is threshold-free, and Section~\ref{sec:cutoff} reports the effect of
+target is threshold-free, and Supplementary Table~S3 reports the effect of
 moving the cutoff.
 
 \paragraph{Sampling uncertainty of the label.} Each $v_k$ is an estimate from
@@ -1173,7 +1200,7 @@ line is $y=x$.}
 
 \subsection{Extrapolation across qubit count}\label{sec:extrap}
 Supplementary Tables~S4 and S6
-reports the qubit-count split, with
+report the qubit-count split, with
 \ExtrapTrainRows{} training circuits at $n\le\ExtrapCut$ and
 \ExtrapTestRows{} test circuits at $n\in\{11,12\}$. HGB attains
 $R^2=\RsqExtrap$ (95\% CI $[\RsqExtrapLo,\RsqExtrapHi]$; seed spread
@@ -1269,32 +1296,47 @@ Cost-locality subgroup mean & -0.889 [-1.024, -0.776] & 1.549 & -0.902 & -0.884 
 \subsection{Extrapolation to 32 qubits with exact Clifford labels}\label{sec:clifford}
 Table~\ref{tab:clifford} and Figure~\ref{fig:clifford} report models trained
 on the \ClTrainRows{} Clifford-labeled circuits with $n\le12$ and tested on
-\ClTestRows{} circuits with $13\le n\le\ClQmax$. Two features of the test set
-must be kept in mind. First, censoring: \ClCensored{} test circuits fall
-below the sampling resolution, almost all of them global-cost circuits at
-$n>20$ (Table~\ref{tab:clifford} gives the counts), so the resolved test
-set is biased toward flatter decay at large $n$. Second, the test circuits
-span up to twenty qubits beyond the largest training circuit.
+\ClTestRows{} circuits with $13\le n\le\ClQmax$, up to twenty qubits beyond
+the largest training circuit. The results must be read separately for local
+and global costs, because censoring differs sharply between them. Of the
+\ClCensored{} test circuits that fall below the sampling resolution, almost
+all have a global cost: beyond 24 qubits only about a quarter of
+global-cost circuits are resolved, against more than four fifths of
+local-cost ones (Table~\ref{tab:clifford}). An $R^2$ computed on the
+resolved global-cost circuits at those sizes would measure which circuits
+survive, not how well the model predicts, so we do not report it.
 
 %%CHECK-CL
-Three regimes appear. Up to $n=20$, eight qubits beyond training, the
-structured linear model reaches $R^2=\ClStructRsqA$ (MAE \ClStructMaeA) on
-13--16 qubits and \ClStructRsqB{} (\ClStructMaeB) on 17--20 qubits, and the
-neural network is comparable ($\ClMLPRsqA$ and $\ClMLPRsqB$ over ten seeds).
-At 21--24 qubits accuracy degrades (\ClStructRsqC{} and $\ClMLPRsqC$), and
-beyond 24 qubits neither model predicts the resolved circuits
-($R^2<0.3$), both with a growing negative bias: they continue the decay in
-qubit count that they learned below twelve qubits, whereas for shallow
-local-cost circuits the true variance stops decaying once the causal cone no
-longer grows with $n$. The cone features reduce this bias but do not remove
-it, because the decay within the cone also has to be extrapolated. HGB
-predicts a constant beyond its training range and is wrong in the other
-direction. For the censored circuits, \ClStructCensOK\% of the structured model's
-predictions lie below the measured upper bound; the rest predict a variance
-larger than the bound allows, the same compression of the predicted range
-seen in the other direction.
+\paragraph{Local costs: a genuine horizon.} For local costs the structured
+linear model reaches $R^2=\ClLocStructA$ on 13--16 qubits and \ClLocStructB{}
+on 17--20 qubits, eight qubits beyond training, then \ClLocStructC{} at
+21--24, \ClLocStructD{} at 25--28 and \ClLocStructE{} at 29--32, with a bias
+that grows steadily from $\ClLocBiasA$ to $\ClLocBiasE$. The neural network
+matches it up to 20 qubits and then becomes seed-dependent and worse. The
+cause is visible in the shallowest circuits. For local costs with $L\le3$
+the true mean label is flat, $\ClShallowTrueA$ at 13--16 qubits and
+$\ClShallowTrueE$ at 29--32, because the causal cone stops growing and
+additional qubits change nothing that the observable can see. The model
+predicts $\ClShallowStructA$ and $\ClShallowStructE$: it continues, more
+weakly, the decay in qubit count that it learned below twelve qubits. The
+cone features reduce this error but do not remove it, since below twelve
+qubits the cone is rarely much smaller than the circuit and the model has
+few examples of saturation to learn from.
 
-The conclusion is a horizon, not a failure. A predictor trained on circuits
+\paragraph{Global costs: accurate where measurable.} For global costs the
+structured model reaches $R^2=\ClGloStructA$ and \ClGloStructB{} at 13--16
+and 17--20 qubits, with negligible bias. Beyond that most circuits are
+censored and the only available test is whether a prediction respects the
+measured upper bound on the label. At 21--24, 25--28 and 29--32 qubits,
+\ClGloCensC\%, \ClGloCensD\% and \ClGloCensE\% of the predictions for
+censored circuits do. Just beyond the resolution limit the model therefore
+predicts a variance that is too large, and at the largest sizes it is
+consistent with the bound. Tree ensembles predict a constant outside their
+training range; their apparent scores on the resolved circuits at large $n$
+(Supplementary Table~S7) reflect the same survivorship and should not be
+read as extrapolation.
+
+The conclusion is a horizon. A predictor trained on circuits
 that a laptop can simulate exactly is reliable for roughly eight more
 qubits, which is the regime where labeling by statevector simulation
 becomes impractical, and is unreliable beyond that. The remedy is cheap for
@@ -1306,29 +1348,30 @@ large-$n$ circuits are then within the range of behavior seen in training.
 
 \begin{table}[t]
 \centering
-\caption{Extrapolation with exact Clifford labels: models trained on
-$n\le12$ (\ClTrainRows{} circuits), tested on resolved circuits with
-$13\le n\le\ClQmax$. ``Censored'' counts test circuits whose variance is
-below the sampling resolution and which are excluded from $R^2$ and MAE.
-MLP: mean $\pm$ standard deviation over ten seeds.}
+\caption{Extrapolation with exact Clifford labels, by cost locality. Models
+are trained on $n\le12$ (\ClTrainRows{} circuits). ``Resolved'' is the
+fraction of test circuits above the sampling resolution; $R^2$ and bias
+(mean prediction minus mean label, structured linear model) are computed on
+resolved circuits and are omitted where fewer than half are resolved.
+``Censored OK'' is the fraction of censored circuits whose prediction
+respects the measured upper bound. MLP: mean $\pm$ standard deviation over
+ten seeds.}
 \label{tab:clifford}
-%%BEGIN-TABLE:clifford
-\begin{tabular}{lrrcccccc}
+%%BEGIN-TABLE:clifford_cost
+\begin{tabular}{lcccccccc}
 \toprule
- & & & \multicolumn{2}{c}{Structured linear} & \multicolumn{2}{c}{MLP (10 seeds)} & \multicolumn{2}{c}{HGB} \\
-\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
-Qubits & Resolved & Censored & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
+ & \multicolumn{4}{c}{Local cost} & \multicolumn{4}{c}{Global cost} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-9}
+Qubits & Resolved & Struct.~$R^2$ & MLP $R^2$ & Bias & Resolved & Struct.~$R^2$ & Bias & Censored OK \\
 \midrule
-13--16 & 1174 & 10 & 0.923 & 0.220 & $0.954 \pm 0.007$ & $0.157 \pm 0.012$ & 0.712 & 0.464 \\
-17--20 & 1151 & 54 & 0.904 & 0.356 & $0.885 \pm 0.039$ & $0.364 \pm 0.057$ & 0.273 & 1.036 \\
-21--24 & 760 & 437 & 0.800 & 0.541 & $0.469 \pm 0.247$ & $0.867 \pm 0.225$ & 0.307 & 0.938 \\
-25--28 & 656 & 548 & 0.265 & 0.839 & $-1.861 \pm 1.534$ & $1.610 \pm 0.517$ & 0.475 & 0.625 \\
-29--32 & 629 & 581 & -0.070 & 0.994 & $-5.114 \pm 3.481$ & $2.360 \pm 0.800$ & 0.439 & 0.664 \\
-\midrule
-13--32 & 4370 & 1630 & 0.711 & 0.516 & $-0.152 \pm 0.616$ & $0.870 \pm 0.246$ & 0.435 & 0.750 \\
+13--16 & 98\% & 0.92 & $0.96 \pm 0.01$ & $-0.14$ & 100\% & 0.87 & $-0.01$ & -- \\
+17--20 & 97\% & 0.89 & $0.87 \pm 0.05$ & $-0.23$ & 94\% & 0.84 & $-0.07$ & 5\% \\
+21--24 & 86\% & 0.78 & $0.39 \pm 0.27$ & $-0.40$ & 41\% & -- & -- & 35\% \\
+25--28 & 82\% & 0.43 & $-1.51 \pm 1.29$ & $-0.66$ & 25\% & -- & -- & 60\% \\
+29--32 & 81\% & 0.23 & $-4.04 \pm 2.70$ & $-0.77$ & 22\% & -- & -- & 98\% \\
 \botrule
 \end{tabular}
-%%END-TABLE:clifford
+%%END-TABLE:clifford_cost
 \end{table}
 
 \begin{figure}[t]
@@ -1340,14 +1383,6 @@ right: predicted versus true label for the structured linear model and the
 MLP, colored by qubit count.}
 \label{fig:clifford}
 \end{figure}
-
-\subsection{Sensitivity to the barren cutoff}\label{sec:cutoff}
-Supplementary Table~S3 moves the classification cutoff from $-1.5$ to $-3$,
-which changes the barren fraction from \BarrenCutmOnepFive\% to
-\BarrenCutmThreepZero\%. The AUC stays at or above \AucCutmOnepFive{} for
-every cutoff, so the ranking the classifier produces is not tied to the
-particular threshold. The regression target is unaffected by this choice.
-
 
 \subsection{What drives trainability}\label{sec:ablation}
 Table~\ref{tab:ablation} and Figure~\ref{fig:ablation} report the feature
@@ -1597,19 +1632,24 @@ ahead of any training-free proxy or actual training.
 Several limitations scope these claims.
 (i)~\emph{One circuit family.} The design space is one hardware-efficient
 ansatz with five fixed entanglement patterns. Section~\ref{sec:lopo} shows
-that graph descriptors allow partial transfer to a pattern the model has
-never seen, but with a measurable loss, so predictions for a new gate
-pattern should be supported by some labeled circuits of that pattern. The
-pipeline generates them from one command. Predictions outside the
-hardware-efficient family (for example, problem-inspired or
-Hamiltonian-variational ans\"atze) are unsupported.
-(ii)~\emph{Finite size.} Statevector labels exist only at $n\le14$, and
-Clifford labels resolve only variances above roughly $10^{-7}$. A barren plateau is a
-statement about scaling as $n\to\infty$; our label is a finite-size proxy,
-and the extrapolation result covers two additional qubits, not an asymptotic
-regime. Tree ensembles in particular cannot continue a trend in $n$ beyond
-the training range, so a user who needs predictions at larger $n$ should
-prefer the MLP or a model with an explicit scaling term.
+that a pattern the model has never seen can be predicted when it is
+described by its effect on the observable and on the causal cone, but with
+a measurable loss, so predictions for a new gate pattern should be
+supported by some labeled circuits of that pattern. The pipeline generates
+them from one command. Predictions outside the hardware-efficient family
+(for example, problem-inspired or Hamiltonian-variational ans\"atze) are
+unsupported.
+(ii)~\emph{Finite size.} Statevector labels exist only at $n\le14$.
+Clifford labels reach any $n$ but resolve only variances above
+$100/(2^{20}nL)$, between about $10^{\ClFloorMinExp}$ and
+$10^{\ClFloorMaxExp}$ depending on the number of parameters. A barren
+plateau is a statement about scaling as $n\to\infty$; our label is a
+finite-size proxy, and the extrapolation results cover two additional
+qubits with statevector labels and about eight with Clifford labels, not
+an asymptotic regime. Tree ensembles cannot continue a trend in $n$ beyond
+the training range, and the neural network is seed-dependent at large
+gaps, so a user who needs predictions at larger $n$ should prefer the
+structured model, or extend the training range with Clifford labels.
 (iii)~\emph{Ideal simulation.} We use a noiseless statevector simulator, so
 noise-induced plateaus~\cite{wang2021noise} are out of scope.
 (iv)~\emph{The label is an estimator.} Each variance is estimated from
@@ -1674,9 +1714,13 @@ the effective weight of the observable after the last entangling layer.
 Models with a continuous dependence on qubit count extrapolate to 13- and
 14-qubit circuits with $R^2=\LargeRsqMLPmean$ (neural network) and
 \LargeRsqStruct{} (structured linear); tree ensembles do not extrapolate.
-Transfer to an entanglement pattern absent from training is possible when
-its graph descriptors lie within the training range and fails at the
-extreme. The predictor is a cheap screening tool for one circuit family.
+With exact Clifford labels up to 32 qubits, a model trained on at most
+12 qubits remains accurate for about eight more qubits; for local costs it
+then overestimates the decay, because the causal cone saturates, and
+extending the training range to 20 qubits restores accuracy up to 32.
+Transfer to an entanglement pattern absent from training succeeds when the
+pattern is described by its effect on the observable and the causal cone
+($R^2$ between \LopoAllUnseen{} and \LopoCircularUnseen). The predictor is a cheap screening tool for one circuit family.
 Extending it to families with shared parameters, where no exact shortcut
 exists, and to noisy circuits are natural next steps.
 

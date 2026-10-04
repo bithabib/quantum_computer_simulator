@@ -333,10 +333,36 @@
 \newcommand{\ClMLPRsqE}{-5.11 \pm 3.48}
 \newcommand{\ClHGBRsqE}{0.44}
 \newcommand{\ClResolvedFracE}{52}
+\newcommand{\ClLocStructA}{0.92}
+\newcommand{\ClLocBiasA}{-0.14}
+\newcommand{\ClGloStructA}{0.87}
+\newcommand{\ClGloCensA}{0}
+\newcommand{\ClLocStructB}{0.89}
+\newcommand{\ClLocBiasB}{-0.23}
+\newcommand{\ClGloStructB}{0.84}
+\newcommand{\ClGloCensB}{5}
+\newcommand{\ClLocStructC}{0.78}
+\newcommand{\ClLocBiasC}{-0.40}
+\newcommand{\ClGloStructC}{0.73}
+\newcommand{\ClGloCensC}{35}
+\newcommand{\ClLocStructD}{0.43}
+\newcommand{\ClLocBiasD}{-0.66}
+\newcommand{\ClGloStructD}{-0.35}
+\newcommand{\ClGloCensD}{60}
+\newcommand{\ClLocStructE}{0.23}
+\newcommand{\ClLocBiasE}{-0.77}
+\newcommand{\ClGloStructE}{-1.20}
+\newcommand{\ClGloCensE}{98}
+\newcommand{\ClShallowTrueA}{-2.07}
+\newcommand{\ClShallowTrueE}{-2.03}
+\newcommand{\ClShallowStructA}{-2.13}
+\newcommand{\ClShallowStructE}{-2.52}
+\newcommand{\ClFloorMinExp}{-7}
+\newcommand{\ClFloorMaxExp}{-5}
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels for circuits up to 32 qubits, models trained on at most 12 qubits remain accurate for about eight more qubits and fail beyond 24; trained on up to 20 qubits they predict 21- to 32-qubit circuits with $R^2\approx0.9$.}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels for circuits up to 32 qubits, models trained on at most 12 qubits remain accurate for about eight more qubits; beyond that they overestimate the decay for local costs, whose causal cone saturates, and extending the training range to 20 qubits restores $R^2\approx0.9$ up to 32 qubits.}
 \newcommand{\ClTargetHits}{2\,000}
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
@@ -390,7 +416,8 @@ text: model hyperparameters (Table~S1), descriptive statistics of the dataset
 (Table~S2), sensitivity to the barren cutoff (Table~S3), the full model
 comparison on the qubit-count extrapolation split (Table~S4), the
 widening-gap extrapolation table (Table~S5), the extrapolation error by
-subset of the 11- and 12-qubit test set (Table~S6), the learning curve
+subset of the 11- and 12-qubit test set (Table~S6), the pooled
+Clifford-label extrapolation table (Table~S7), the learning curve
 (Figure~S1), and five further figures (Figures~S2--S6). Every number is produced by the released analysis scripts.}
 \maketitle
 
@@ -439,7 +466,11 @@ $\log_{10}\overline{\mathrm{Var}}$ (label) & $-1.88$ & $0.94$ & $-4.89$ & $-2.62
 \end{table}
 
 \section{Sensitivity to the barren cutoff}
-Main-text Section~4.4 discusses this table.
+Table~S3 moves the classification cutoff from $-1.5$ to $-3$,
+which changes the barren fraction from \BarrenCutmOnepFive\% to
+\BarrenCutmThreepZero\%. The AUC stays at or above \AucCutmOnepFive{} for
+every cutoff, so the ranking the classifier produces is not tied to the
+particular threshold. The regression target is unaffected by this choice.
 \begin{table}[t]
 \centering
 \caption{Classification with alternative barren cutoffs $y<c$. AUC is the
@@ -546,6 +577,36 @@ all & 3580 & $-2.78$ ($1.04$) & 0.320 [0.312, 0.327] & 0.133 [0.128, 0.139] & 0.
 \botrule
 \end{tabular}
 %%END-TABLE:extrap_breakdown
+\end{table}
+
+\section{Clifford-label extrapolation: all models, pooled over cost locality}
+Main-text Section~4.3 reports this experiment split by cost locality. The
+pooled scores below are computed on resolved circuits only; beyond 24 qubits
+most global-cost circuits are censored, so the pooled $R^2$ there mixes
+extrapolation with survivorship and is shown for completeness.
+\begin{table}[t]
+\centering
+\caption{Models trained on $n\le12$ with Clifford labels, tested on resolved
+circuits with $13\le n\le32$, pooled over cost locality. MLP: mean $\pm$
+standard deviation over ten seeds.}
+\label{tab:cliffordpooled}
+%%BEGIN-TABLE:clifford
+\begin{tabular}{lrrcccccc}
+\toprule
+ & & & \multicolumn{2}{c}{Structured linear} & \multicolumn{2}{c}{MLP (10 seeds)} & \multicolumn{2}{c}{HGB} \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Qubits & Resolved & Censored & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
+\midrule
+13--16 & 1174 & 10 & 0.923 & 0.220 & $0.954 \pm 0.007$ & $0.157 \pm 0.012$ & 0.712 & 0.464 \\
+17--20 & 1151 & 54 & 0.904 & 0.356 & $0.885 \pm 0.039$ & $0.364 \pm 0.057$ & 0.273 & 1.036 \\
+21--24 & 760 & 437 & 0.800 & 0.541 & $0.469 \pm 0.247$ & $0.867 \pm 0.225$ & 0.307 & 0.938 \\
+25--28 & 656 & 548 & 0.265 & 0.839 & $-1.861 \pm 1.534$ & $1.610 \pm 0.517$ & 0.475 & 0.625 \\
+29--32 & 629 & 581 & -0.070 & 0.994 & $-5.114 \pm 3.481$ & $2.360 \pm 0.800$ & 0.439 & 0.664 \\
+\midrule
+13--32 & 4370 & 1630 & 0.711 & 0.516 & $-0.152 \pm 0.616$ & $0.870 \pm 0.246$ & 0.435 & 0.750 \\
+\botrule
+\end{tabular}
+%%END-TABLE:clifford
 \end{table}
 
 \section{Additional figures}

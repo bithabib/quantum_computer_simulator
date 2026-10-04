@@ -108,6 +108,34 @@ def main():
             R["overall"][name]["censored_pred_mean"] = float(np.mean(p))
         R["censored_ub_mean"] = float(np.mean(ub))
 
+    # ---- split by cost locality: censoring differs sharply between the two ----
+    by_cost = {}
+    st_ce = pred_ce.get("Structured linear") if len(ce) else None
+    for cg, cname in [(0, "local"), (1, "global")]:
+        for lo, hi in BINS:
+            allb = te_all[(te_all.cost_global == cg) & (te_all.n_qubits >= lo) & (te_all.n_qubits <= hi)]
+            mk = (te.cost_global.to_numpy() == cg) & (nq >= lo) & (nq <= hi)
+            e = {"total": int(len(allb)), "resolved_frac": float(allb.resolved.mean()), "rows": int(mk.sum())}
+            for name, key in [("Structured linear", "struct"), ("Hist Gradient Boosting", "hgb")]:
+                e[key + "_r2"] = float(r2_score(yte[mk], pred[name][mk]))
+                e[key + "_bias"] = float(np.mean(pred[name][mk] - yte[mk]))
+                e[key + "_mae"] = float(mean_absolute_error(yte[mk], pred[name][mk]))
+            ss = [r2_score(yte[mk], p[mk]) for p in mlp_seed]
+            e["mlp_r2_mean"] = float(np.mean(ss)); e["mlp_r2_sd"] = float(np.std(ss, ddof=1))
+            if len(ce):
+                cm = (ce.cost_global.to_numpy() == cg) & (ce.n_qubits.to_numpy() >= lo) & (ce.n_qubits.to_numpy() <= hi)
+                e["censored"] = int(cm.sum())
+                e["censored_consistent"] = float(np.mean(st_ce[cm] <= ub[cm] + 0.3)) if cm.any() else float("nan")
+            by_cost["%s %d-%d" % (cname, lo, hi)] = e
+    R["bins_by_cost"] = by_cost
+    # shallow local-cost circuits: the true label is flat in n, the model keeps decaying
+    sh = (te.cost_global.to_numpy() == 0) & (te.n_layers.to_numpy() <= 3)
+    R["shallow_local"] = {"%d-%d" % (lo, hi): {
+        "true": float(yte[sh & (nq >= lo) & (nq <= hi)].mean()),
+        "struct": float(pred["Structured linear"][sh & (nq >= lo) & (nq <= hi)].mean())} for lo, hi in BINS}
+    floor = 100.0 / (2 ** 20 * te_all.n_params.to_numpy())
+    R["floor_min"] = float(floor.min()); R["floor_max"] = float(floor.max())
+
     # second regime: larger base, train n <= 20 (Clifford), test 21..32
     both = pd.concat([tr, te], ignore_index=True)
     m_tr = both.n_qubits <= 20; m_te = both.n_qubits > 20
@@ -150,6 +178,24 @@ def main():
         o["Hist Gradient Boosting"]["r2"], o["Hist Gradient Boosting"]["mae"]))
     lines += ["\\botrule", "\\end{tabular}"]
     open(os.path.join(args.outdir, "table_clifford.tex"), "w").write("\n".join(lines) + "\n")
+
+    # table split by cost locality (main text)
+    lines = ["\\begin{tabular}{lcccccccc}", "\\toprule",
+             " & \\multicolumn{4}{c}{Local cost} & \\multicolumn{4}{c}{Global cost} \\\\",
+             "\\cmidrule(lr){2-5}\\cmidrule(lr){6-9}",
+             "Qubits & Resolved & Struct.~$R^2$ & MLP $R^2$ & Bias & Resolved & Struct.~$R^2$ & Bias & Censored OK \\\\", "\\midrule"]
+    for lo, hi in BINS:
+        l_ = by_cost["local %d-%d" % (lo, hi)]; g_ = by_cost["global %d-%d" % (lo, hi)]
+        if g_["resolved_frac"] >= 0.5:
+            gtxt = "%.2f & $%+.2f$" % (g_["struct_r2"], g_["struct_bias"])
+        else:
+            gtxt = "-- & --"
+        cok = "%.0f\\%%" % (100 * g_["censored_consistent"]) if g_.get("censored", 0) >= 20 else "--"
+        lines.append("%d--%d & %.0f\\%% & %.2f & $%.2f \\pm %.2f$ & $%+.2f$ & %.0f\\%% & %s & %s \\\\" % (
+            lo, hi, 100 * l_["resolved_frac"], l_["struct_r2"], l_["mlp_r2_mean"], l_["mlp_r2_sd"], l_["struct_bias"],
+            100 * g_["resolved_frac"], gtxt, cok))
+    lines += ["\\botrule", "\\end{tabular}"]
+    open(os.path.join(args.outdir, "table_clifford_cost.tex"), "w").write("\n".join(lines) + "\n")
 
     # ---- figure ----
     import matplotlib

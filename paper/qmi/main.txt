@@ -233,42 +233,43 @@ is a property of quantum circuits; the predictor and its value are entirely clas
 
 
                                            5
- Sample circuit spec                                                                  Label y
-                           Build & simulate            Adjoint gradient
-     n, L, ansatz,                                                            log10 meank Var[∂C/∂θk ]
-                          NumPy statevector        all nL angles, ×200 θ
-  entanglement, cost                                                         (structural zeros excluded)
+ Sample circuit spec                                                                    Label y
+                           Build & simulate             Adjoint gradient
+     n, L, ansatz,                                                              log10 meank Var[∂C/∂θk ]
+                           NumPy statevector        all nL angles, ×200 θ
+  entanglement, cost                                                           (structural zeros excluded)
 
 
 
 
-                              Features X              Gradient-boosted     Predict trainability
-                              closed form                  model           regression + barren?
+                              Features X                   Predictor        Predict trainability
+                              closed form              linear, trees, MLP   regression + barren?
 
 
 Fig. 1 Method pipeline. A random circuit specification is built and simulated exactly with our
 NumPy statevector simulator. The exact gradient with respect to every rotation angle is obtained by
 adjoint differentiation for 200 random parameter vectors. The label y is log10 of the mean gradient
 variance over all parameters that are not structural zeros. Closed-form architectural features X are
-read directly from the specification, and a gradient-boosted model is trained on (X, y).
+read directly from the specification, and predictors ranging from a structured linear model to gradient-
+boosted trees and a neural network are trained on (X, y).
 
 
       Table 1 Architectural features used to predict trainability. The first six are the
       sampled design parameters; the last six are deterministic functions of them.
 
-      Feature              Meaning                                                     Type
-      n_qubits             number of qubits n                                          primitive
-      n_layers             number of ansatz layers L                                   primitive
-      ansatz_type          fixed-ry (0) versus random-Pauli axes (1)                   primitive
-      entangle_pattern     linear (0), circular (1), all-to-all (2)                    primitive
-      entangler_gate       CZ (0) versus CX (1)                                        primitive
-      cost_global          local Z0 (0) versus global Z ⊗n (1)                         primitive
-      n_params             nL trainable rotations                                      derived
-      n_entanglers         entangling gates per layer ×L                               derived
-      depth_ratio          L/n, ansatz layers per qubit                                derived
-      cost_weight_eff      weight of the observable after the last entangling layer    derived
-      cone_qubits          qubits in the backward causal cone of the observable        derived
-      cone_frac            fraction of rotations inside the causal cone                derived
+      Feature               Meaning                                                      Type
+      n_qubits              number of qubits n                                           primitive
+      n_layers              number of ansatz layers L                                    primitive
+      ansatz_type           fixed-ry (0) versus random-Pauli axes (1)                    primitive
+      entangle_pattern      linear (0), circular (1), all-to-all (2)                     primitive
+      entangler_gate        CZ (0) versus CX (1)                                         primitive
+      cost_global           local Z0 (0) versus global Z ⊗n (1)                          primitive
+      n_params              nL trainable rotations                                       derived
+      n_entanglers          entangling gates per layer ×L                                derived
+      depth_ratio           L/n, ansatz layers per qubit                                 derived
+      cost_weight_eff       weight of the observable after the last entangling layer     derived
+      cone_qubits           qubits in the backward causal cone of the observable         derived
+      cone_frac             fraction of rotations inside the causal cone                 derived
 
 
 
@@ -290,7 +291,7 @@ needed to obtain any feature.
 
 
 
-                                                  6
+                                                   6
 Rotation scheme.
 With the fixed-ry scheme every rotation in Eq. (1) is Ry . With the random-Pauli
 scheme the axis aℓ,q of each of the nL rotations is drawn independently and uniformly
@@ -322,7 +323,7 @@ to a different Z-string. We call the number of qubits on which Oeﬀ acts the ef
 weight. It follows from the design parameters in closed form and can differ sharply
 from the nominal weight: with circular CX entanglement the nominally local cost has
 effective weight n − 1, and with all-to-all CX entanglement the nominally global cost
-has effective weight 1 (Table 8).
+has effective weight 1 (Table 7).
 
 Causal cone.
 A rotation can only affect the cost if some sequence of entangling gates connects it
@@ -379,28 +380,31 @@ cannot be labeled and are excluded; there are 142 such rows. The classification 
 is ⊮[y < −2], which we call “barren” for brevity. The cutoff is a modeling choice:
 Var < 10−2 means the typical gradient component has magnitude below 0.1; in our
 data the mean label crosses this value between six and seven qubits. The regression
-target is threshold-free, and Section 4.5 reports the effect of moving the cutoff.
+target is threshold-free, and Supplementary Table S3 reports the effect of moving the
+cutoff.
 
 Sampling uncertainty of the label.
 Each vk is an estimate from 200 samples. To measure the resulting label noise directly,
 we relabeled 200 randomly chosen specs with an independent set of 200 parameter
 vectors. The mean absolute difference between the two labels was 0.021 in log10 units,
 and the largest difference was 0.20. This is small compared with the label’s spread
-across architectures (standard deviation 0.94) and with the model errors reported
-below.
+
 
                                             8
-Comparison with a single-parameter label.
+across architectures (standard deviation 0.94) and with the model errors reported
+below.
+
+Comparison with a single-parameter label.
 A simpler label, used in an earlier preprint of this work, is the variance of a single
 parameter, the rotation on qubit 0 in layer ⌊L/2⌋, estimated by parameter shift. We
 keep that quantity as a secondary column of the dataset. In 9.6% of specs it is a
-structural zero, and a label built on it has to clip every such case to a floor, where it is
-indistinguishable from an extremely flat landscape. Figure 3 compares the two labels.
-Where the single-parameter gradient is not a structural zero, the two labels agree
-closely (correlation 0.963, mean absolute difference 0.16). Where it is a structural zero,
-69% of the circuits are in fact trainable by the all-parameter label. A single-parameter
-label therefore mixes two different phenomena, and the all-parameter label removes
-the mixture.
+structural zero, and a label built on it has to clip every such case to a floor, where
+it is indistinguishable from an extremely flat landscape. Supplementary Figure S3
+compares the two labels. Where the single-parameter gradient is not a structural zero,
+the two labels agree closely (correlation 0.963, mean absolute difference 0.16). Where
+it is a structural zero, 69% of the circuits are in fact trainable by the all-parameter
+label. A single-parameter label therefore mixes two different phenomena, and the
+all-parameter label removes the mixture.
 
 3.3 Simulator and validation
 Statevectors are evolved exactly with a small in-house NumPy simulator (qsim in the
@@ -430,13 +434,10 @@ Architectures versus rows.
 The design space has only 5 280 distinct feature vectors, and the 20 000 rows cover
 5 168 of them, with a median of 4 and a maximum of 13 rows per architecture. Rows
 sharing an architecture differ only in their random-Pauli axis pattern (if applicable)
-and in the parameter samples used to label them. Two consequences follow. A row-
-wise random split places 95.0% of test rows next to a training row with the identical
-feature vector, so it measures interpolation within known architectures rather than
-generalization to new ones; we therefore evaluate with architecture-grouped splits
 
 
-                                             9
+
+                                            9
              Table 2 Sampled design space. Each spec draws these parameters
              independently and uniformly. The six parameters admit
              11 × 20 × 2 × 3 × 2 × 2 = 5 280 distinct combinations.
@@ -452,6 +453,10 @@ generalization to new ones; we therefore evaluate with architecture-grouped spli
 
 
 
+and in the parameter samples used to label them. Two consequences follow. A row-
+wise random split places 95.0% of test rows next to a training row with the identical
+feature vector, so it measures interpolation within known architectures rather than
+generalization to new ones; we therefore evaluate with architecture-grouped splits
 (Section 3.5). And the within-architecture spread of the label is irreducible for any
 model that sees only the feature vector. The mean within-architecture variance of y
 (unbiased estimate) is 0.013 against a total variance of 0.885, which caps the achievable
@@ -463,12 +468,14 @@ Descriptive statistics.
 Supplementary Table S2 summarizes the numeric features and the label over the
 19 858 labeled rows. The label spans from -4.89 to -0.23 with mean -1.88 and standard
 deviation 0.94. Structural zeros are common: 17.0% of all parameters are structural
-zeros, and 87.0% of circuits contain at least one. Figure 2 shows that they concentrate
-in shallow circuits and in local-cost circuits, as the light-cone picture predicts; at
-L = 1 a local observable on qubit 0 sees only a handful of rotations. Table 3 breaks
-the label and the structural-zero rate down by each design choice. Note that this table
-describes the dataset; it involves no trained model. Global cost observables lower the
-mean label by 0.40 orders of magnitude relative to local costs, which is the cost-
+zeros, and 87.0% of circuits contain at least one. Supplementary Figure S2 shows that
+they concentrate in shallow circuits and in local-cost circuits, as the light-cone picture
+predicts; at L = 1 a local observable on qubit 0 sees only a handful of rotations.
+Table 3 breaks the label and the structural-zero rate down by each design choice,
+and Supplementary Figure S5 shows the mean label against qubit count: a steep,
+monotone decay for global costs and a much slower one for local costs. Note that this
+table describes the dataset; it involves no trained model. Global cost observables lower
+the mean label by 0.40 orders of magnitude relative to local costs, which is the cost-
 locality effect proved by Cerezo et al. [7]. Denser entanglement and the CX entangler
 lower it further. This structure is what makes the prediction task learnable.
 
@@ -479,12 +486,6 @@ k-nearest neighbors, a multilayer perceptron with two hidden layers, random fore
 extremely randomized trees, and histogram-based gradient-boosted trees (HGB). All
 are scikit-learn implementations [27]; the histogram booster follows the design of
 LightGBM [28]. Supplementary Table S1 lists the hyperparameters. They were fixed
-a priori and not tuned on the test folds. Features are standardized (zero mean, unit
-variance on the training fold) for the linear, k-NN, and MLP models only.
-
-Controls.
-Because barren-plateau theory already predicts the direction of the main effects, a
-learner should be judged against what simple rules achieve on their own. We use
 
 
                                             10
@@ -493,79 +494,35 @@ learner should be judged against what simple rules achieve on their own. We use
      fraction of parameters that are structural zeros. These are properties of the labeled
      data, not model outputs.
 
-       Design choice                                   Count      Mean log10 Var       Barren %          Structural-zero %
-       Cost-observable locality
-        local Z0             9859                                             −1.68               33.4                29.5
-        global Z ⊗n          9999                                             −2.08               51.7                14.9
-       Entanglement pattern
-        linear             6608                                               −1.76               35.7                26.7
-        circular           6709                                               −2.01               48.9                16.8
-        all-to-all         6541                                               −1.86               43.3                23.0
-       Entangler gate
-        CZ                                              10021                 −1.84               39.2                20.7
-        CX                                               9837                 −1.92               46.2                23.6
-       Single-qubit rotation scheme
-         fixed-ry            9878                                             −1.77               39.5                15.8
-         random-Pauli        9980                                             −1.99               45.8                28.4
+      Design choice      Count       Mean log10 Var      Barren %       Structural-zero %
+      Cost-observable locality
+       local Z0             9859                −1.68          33.4                   29.5
+       global Z ⊗n          9999                −2.08          51.7                   14.9
+      Entanglement pattern
+       linear             6608                  −1.76          35.7                   26.7
+       circular           6709                  −2.01          48.9                   16.8
+       all-to-all         6541                  −1.86          43.3                   23.0
+      Entangler gate
+       CZ                 10021                 −1.84          39.2                   20.7
+       CX                  9837                 −1.92          46.2                   23.6
+      Single-qubit rotation scheme
+        fixed-ry            9878                −1.77          39.5                   15.8
+        random-Pauli        9980                −1.99          45.8                   28.4
 
 
 
 
-                                                       80
-                                                                                                  local Z0
+a priori and not tuned on the test folds. Features are standardized (zero mean, unit
+variance on the training fold) for the linear, k-NN, and MLP models only.
 
-
-
-
-                      structural-zero parameters (%)
-                                                                                                  global Z n
-                                                       60
-
-                                                       40
-
-                                                       20
-
-
-                                                                      5        10            15           20
-                                                                          number of layers L
-
-Fig. 2 Mean percentage of parameters that are structural zeros, as a function of the number of layers
-L, for local and global cost observables. Shallow, local-cost circuits have many rotations outside the
-light cone of the observable.
-
-
+Controls.
+Because barren-plateau theory already predicts the direction of the main effects, a
+learner should be judged against what simple rules achieve on their own. We use
 five controls of increasing strength. The training mean predicts the mean label of
 the training fold. The cost-locality subgroup mean predicts the training-fold mean
 separately for local and global costs. The physics-informed linear model fits
 
-                                                            ŷ = β0 + β1 n + β2 L + β3 g + β4 n g,                           (4)
-
-
-
-
-                                                                              11
-                                                0
-
-
-
-
-                       single-parameter label
-                                                2
-
-
-                                                4
-
-
-                                                6                            non-zero legacy gradient
-                                                                             legacy structural zero
-                                                     5       4       3         2        1          0
-                                                            all-parameter label log10 Var
-
-Fig. 3 All-parameter label versus the single-parameter label, for the same circuits and parameter
-samples. Circles: the single parameter has a non-zero gradient and the two labels agree. Triangles
-(drawn at −6.5 for visibility): the single parameter is a structural zero; a label built on it clips these
-to a floor, whereas most have all-parameter labels above the cutoff.
-
+                            ŷ = β0 + β1 n + β2 L + β3 g + β4 n g,                           (4)
 
 with g = ⊮global , which encodes a linear-in-n decay of log10 Var whose slope depends
 on the nominal cost locality. Its effective-weight variant uses g = weﬀ /n, the effec-
@@ -574,7 +531,7 @@ strongest control. It assigns every combination of rotation scheme, entanglement
 tern, entangler gate, and cost observable its own intercept and its own slopes on four
 closed-form size terms,
 
-                                                c,       min(L, c),        e−L/c ,        1/L,          (5)
+                           c,      min(L, c),        e−L/c ,     1/L,                        (5)
 
 where c is the number of qubits in the causal cone (c = n whenever the cone covers
 the circuit): a linear decay in the relevant qubit count and a saturating dependence on
@@ -582,7 +539,9 @@ depth, fitted by ridge regression with 124 coeﬀicients in total. It has no int
 beyond the cell structure and can be read off as a table. All controls are fitted by least
 squares (logistic regression on the same design for classification).
 
-Architecture-grouped cross-validation.
+
+                                                11
+Architecture-grouped cross-validation.
 Our primary protocol is K-fold cross-validation with K = 5 in which the folds are
 formed from whole architectures. Every row is assigned to one fold according to its
 feature vector, so no architecture appears in both the training and the test fold. Each
@@ -591,11 +550,7 @@ scored exactly once. We repeat the whole procedure 2 times with a different rand
 assignment of architectures to folds, giving 10 scores per model, and report their mean
 and standard deviation. The standard deviation measures split-to-split variability.
 
-
-
-
-                                                                      12
-Row-wise random split (for contrast only).
+Row-wise random split (for contrast only).
 We also report a single random split of rows with 20% held out. As explained above,
 this split places identical feature vectors on both sides, and its scores are upper bounds
 on generalization.
@@ -630,7 +585,10 @@ the even nearest-neighbor pairs (0, 1), (2, 3), . . . on even-numbered layers an
 pairs (1, 2), (3, 4), . . . on odd-numbered layers, so each layer has about n/2 gates and
 the union graph is the chain. Star applies (0, q) for q = 1, . . . , n − 1 in every layer, so
 qubit 0 has degree n−1 and the diameter is 2. Everything else is sampled as in Table 2.
-For each of the five patterns we train HGB on the descriptor features using the other
+
+
+                                             12
+For each of the five patterns we train HGB on the descriptor features using the other
 four patterns only and test on the held-out one (leave-one-pattern-out, LOPO). We
 compare with the same model and features when the pattern is included in training
 (architecture-grouped cross-validation on the pooled data, scored on that pattern’s
@@ -639,11 +597,7 @@ rows) and with the physics-informed linear control.
 code, command lines, seeds, and software versions are released; see the data availability
 statement.
 
-
-
-
-                                             13
-3.6 Exact labels beyond statevector reach
+3.6 Exact labels beyond statevector reach
 Statevector simulation limits the labeled circuits to n ≤ 14. For this circuit family a
 second exact method has no such limit. Every angle appears once and every rotation
 generator is a Pauli, so C(θ) is a trigonometric polynomial of degree one in each angle
@@ -677,19 +631,9 @@ and 6 000 with n ∈ [13, 32] for testing, sampled as in Table 2 otherwise.
 Table 4 reports architecture-grouped cross-validation for all six learners and the five
 controls. HGB gives R2 = 0.980 ± 0.003 and MAE 0.067 ± 0.003 on regression, and
 AUC 0.998 ± 0.000 with accuracy 0.979 ± 0.004 on classification. The four non-linear
-learners with enough capacity (HGB, the MLP, random forests, and extra trees) differ
-by less than the fold-to-fold standard deviation, with R2 between 0.976 and 0.980; k-
-NN is close behind and the linear baseline is far behind (R2 = 0.891). We keep HGB
-as the reference model because it is deterministic, fast to train, and needs no feature
-scaling. Figure 4 shows its out-of-fold predictions.
-    Three comparisons put these numbers in context. First, the controls. The five-
-coeﬀicient physics-informed model of Eq. (4) reaches R2 = 0.682, and 0.750 when
-the nominal locality is replaced by the effective weight. The structured linear model
-reaches R2 = 0.969, within 0.011 of HGB. The flexible learners therefore do not
-find structure that a well-specified linear model misses; their accuracy shows that
 
 
-                                                14
+                                                13
 Table 4 Architecture-grouped cross-validation (mean ± standard deviation over 10 folds). Regression predicts
 log10 Var; classification predicts y < −2. The controls below the rule are ordered from strongest to weakest. The
 selected model is shown in bold.
@@ -712,6 +656,16 @@ selected model is shown in bold.
 
 
 
+learners with enough capacity (HGB, the MLP, random forests, and extra trees) differ
+by less than the fold-to-fold standard deviation, with R2 between 0.976 and 0.980; k-
+NN is close behind and the linear baseline is far behind (R2 = 0.891). We keep HGB
+as the reference model because it is deterministic, fast to train, and needs no feature
+scaling. Figure 2 shows its out-of-fold predictions.
+    Three comparisons put these numbers in context. First, the controls. The five-
+coeﬀicient physics-informed model of Eq. (4) reaches R2 = 0.682, and 0.750 when
+the nominal locality is replaced by the effective weight. The structured linear model
+reaches R2 = 0.969, within 0.011 of HGB. The flexible learners therefore do not
+find structure that a well-specified linear model misses; their accuracy shows that
 the label is predictable, and the structured model shows that the prediction rule
 is simple: within each categorical cell, log10 Var falls linearly with qubit count and
 saturates with depth. What a flexible learner does add is convenience. It reaches the
@@ -725,22 +679,12 @@ architecture adds little beyond seeing its neighbors. One caveat applies to the 
 protocol itself. The design space is a dense grid (5 168 of 5 280 cells are populated), so
 a held-out architecture always has close neighbors in training, differing by one qubit
 or one layer. The grouped score therefore measures interpolation across a dense design
-space, not extrapolation; Sections 4.2, 4.3 and 4.7 probe beyond it.
-
-4.2 Extrapolation across qubit count
-Table 6 (and Supplementary Table S4 for all learners) reports the qubit-count split,
-with 16 278 training circuits at n ≤ 10 and 3 580 test circuits at n ∈ {11, 12}. HGB
-attains R2 = 0.860 (95% CI [0.851, 0.869]; seed spread ±0.001) and MAE 0.320 (95%
-CI [0.312, 0.327]). The five-coeﬀicient physics-informed model reaches only R2 = 0.326:
-a single linear-in-n slope per cost type, fitted on n ≤ 10, does not describe the
-n = 11, 12 circuits. Two models do well. The MLP reaches R2 = 0.961 ± 0.003 (mean
-and standard deviation over ten random seeds), and the structured linear model
-reaches 0.935. Both are well above every tree ensemble, as expected: a tree ensemble’s
-prediction is constant outside the training range of a feature, so it cannot continue
+space, not extrapolation; Sections 4.2, 4.3 and 4.5 probe beyond it.
 
 
 
-                                                15
+
+                                                14
                                                         architecture-grouped CV R 2 = 0.98
                                                 0
 
@@ -759,40 +703,40 @@ prediction is constant outside the training range of a feature, so it cannot con
                                                     5        4        3        2     1       0
                                                                    true log10 Var
 
-Fig. 4 Out-of-fold predicted versus true log10 Var for the HGB regressor under architecture-grouped
+Fig. 2 Out-of-fold predicted versus true log10 Var for the HGB regressor under architecture-grouped
 cross-validation (first repeat). Every point is predicted by a model that never saw its architecture.
 The dashed line is y = x.
 
 
-the decay in n past n = 10, whereas a model with continuous dependence on n can.
-In-family the model classes are equivalent; out of range the inductive bias decides.
-    Table 6 breaks the result down by qubit count and cost locality. Error grows
-from n = 11 to n = 12 for both models, and global-cost circuits at n = 12 are the
-hardest subset (HGB R2 = 0.608, MLP 0.923), as expected, since they are furthest
-from training in both n and label value. Every subset is predicted far better than
-the subgroup-mean and physics-informed controls. The result should still be read
+4.2 Extrapolation across qubit count
+Supplementary Tables S4 and S6 report the qubit-count split, with 16 278 training
+circuits at n ≤ 10 and 3 580 test circuits at n ∈ {11, 12}. HGB attains R2 = 0.860
+(95% CI [0.851, 0.869]; seed spread ±0.001) and MAE 0.320 (95% CI [0.312, 0.327]).
+The five-coeﬀicient physics-informed model reaches only R2 = 0.326: a single linear-in-
+n slope per cost type, fitted on n ≤ 10, does not describe the n = 11, 12 circuits. Two
+models do well. The MLP reaches R2 = 0.961 ± 0.003 (mean and standard deviation
+over ten random seeds), and the structured linear model reaches 0.935. Both are well
+above every tree ensemble, as expected: a tree ensemble’s prediction is constant outside
+the training range of a feature, so it cannot continue the decay in n past n = 10,
+whereas a model with continuous dependence on n can. In-family the model classes
+are equivalent; out of range the inductive bias decides.
+    Supplementary Table S6 breaks the result down by qubit count and cost locality.
+Error grows from n = 11 to n = 12 for both models, and global-cost circuits at n = 12
+are the hardest subset (HGB R2 = 0.608, MLP 0.923), as expected, since they are
+furthest from training in both n and label value. Every subset is predicted far better
+than the subgroup-mean and physics-informed controls. The result should still be read
 narrowly: small-circuit labels transfer usefully to the largest sizes we can simulate
 exactly, two qubits beyond training. This is not evidence of unbounded extrapolation,
 and Section 5 lists it as a limitation.
 
 Widening the gap.
-Figure 5 (Supplementary Table S5) repeats the experiment with the training cutoff
+Figure 3 (Supplementary Table S5) repeats the experiment with the training cutoff
 moved down: train on n ≤ k and test on every larger circuit, for k = 6, . . . , 10. HGB
 falls from 0.860 at k = 10 to -0.062 at k = 6, no better than the training mean. The
 structured linear model is the most stable, from 0.935 to 0.839. The MLP is accurate
-for small gaps (0.961 ± 0.003 at k = 10) but becomes unreliable for large ones: at
-k = 6, where 7- to 12-qubit circuits are predicted from 2- to 6-qubit ones, ten seeds
-give 0.631 ± 0.110 with a range from 0.47 to 0.81. A neural network can extrapolate,
-but how well depends on its initialization, and a user cannot know in advance which
-seed is the good one. For prediction well beyond the training range, the model with
-an explicit scaling form is the safer choice.
-
-Beyond the training range: 13 and 14 qubits.
-As a final extrapolation test we generated a separate set of 1 991 circuits with n ∈
-{13, 14}, labeled exactly as the main dataset, and scored models trained on the full
 
 
-                                                                    16
+                                                                    15
                     1.0
                     0.8                                                                          0.8
                     0.6
@@ -808,250 +752,181 @@ As a final extrapolation test we generated a separate set of 1 991 circuits with
                           6             7          8           9          10                           9             10             11         12
                               largest training qubit count k (test: n > k)                                 test qubit count n (trained on n 8)
 
-Fig. 5 Extrapolation with a widening gap. Left: R2 on all circuits with n > k when training on
+Fig. 3 Extrapolation with a widening gap. Left: R2 on all circuits with n > k when training on
 n ≤ k. Right: R2 at each test qubit count when training on n ≤ 8. HGB cannot continue the decay
 in n beyond its training range. The band around the MLP curve is the range over ten random seeds.
 
 
+for small gaps (0.961 ± 0.003 at k = 10) but becomes unreliable for large ones: at
+k = 6, where 7- to 12-qubit circuits are predicted from 2- to 6-qubit ones, ten seeds
+give 0.631 ± 0.110 with a range from 0.47 to 0.81. A neural network can extrapolate,
+but how well depends on its initialization, and a user cannot know in advance which
+seed is the good one. For prediction well beyond the training range, the model with
+an explicit scaling form is the safer choice.
 
-Table 5 Held-out 13- and 14-qubit circuits (1 991 circuits, labeled as the main dataset), predicted by models trained on all n ≤ 12
-circuits. 95% bootstrap confidence intervals over test rows.
-
- Model                                                                           R2 [95% CI]                       MAE       R2 , n = 13     R2 , n = 14   R2 , local   R2 , global
- Hist Gradient Boosting                                                     0.905 [0.898, 0.913]                   0.316        0.939           0.876        0.942        0.749
- MLP                                                                        0.970 [0.965, 0.974]                   0.137        0.970           0.969        0.971        0.943
- Random Forest                                                              0.907 [0.899, 0.914]                   0.308        0.942           0.877        0.940        0.759
- k-NN                                                                       0.904 [0.895, 0.911]                   0.314        0.937           0.874        0.944        0.739
- Linear baseline                                                            0.771 [0.755, 0.787]                   0.474        0.778           0.763        0.810        0.498
- Structured linear                                                         0.951 [0.945, 0.956]                    0.183        0.950            0.952       0.947         0.919
- Physics-informed linear (effective weight)                                0.561 [0.544, 0.576]                    0.694       0.547             0.571       0.452         0.428
- Physics-informed linear                                                   0.350 [0.326, 0.375]                    0.815        0.354            0.345       0.187         0.157
- Cost-locality subgroup mean                                              -0.889 [-1.024, -0.776]                  1.549       -0.902           -0.884      -0.442        -3.400
-
-
-
-
-n ≤ 12 dataset on it (Table 5, Figure 6). The MLP reaches R2 = 0.972 ± 0.002 over
-ten seeds (0.970 at n = 13 and 0.969 at n = 14 for the first seed), the structured
-linear model 0.951, HGB 0.905, and the five-coeﬀicient control 0.350. These circuits
-are two to four times more expensive to label by statevector simulation than the
-largest training circuits.
+Beyond the training range: 13 and 14 qubits.
+As a final extrapolation test we generated a separate set of 1 991 circuits with n ∈
+{13, 14}, labeled exactly as the main dataset, and scored models trained on the full
+n ≤ 12 dataset on it (Table 5, Supplementary Figure S4). The MLP reaches R2 =
+0.972 ± 0.002 over ten seeds (0.970 at n = 13 and 0.969 at n = 14 for the first seed),
+the structured linear model 0.951, HGB 0.905, and the five-coeﬀicient control 0.350.
+These circuits are two to four times more expensive to label by statevector simulation
+than the largest training circuits.
 
 4.3 Extrapolation to 32 qubits with exact Clifford labels
-Table 7 and Figure 7 report models trained on the 7 941 Clifford-labeled circuits with
-n ≤ 12 and tested on 6 000 circuits with 13 ≤ n ≤ 32. Two features of the test set must
-be kept in mind. First, censoring: 1 630 test circuits fall below the sampling resolution,
-almost all of them global-cost circuits at n > 20 (Table 7 gives the counts), so the
-resolved test set is biased toward flatter decay at large n. Second, the test circuits
-span up to twenty qubits beyond the largest training circuit.
-
-
-                                                                                17
-                                              HGB: R 2 = 0.91                                MLP: R 2 = 0.97
-                               0
-
-
-
-
- predicted (trained on n 12)
-                               1
-                               2
-                               3
-                               4
-                               5
-
-                                   5        4        3     2      1     0           5       4        3     2      1   0
-                                         true label, n {13, 14}                          true label, n {13, 14}
-
-Fig. 6 Predicted versus true label on the held-out 13- and 14-qubit circuits for HGB (left) and the
-MLP (right), both trained on n ≤ 12 only. The dashed line is y = x.
-
-
-
-Table 6 Extrapolation error by subset of the n ∈ {11, 12} test set. MAE in log10 units, with 95% bootstrap confidence interv
-The physics-informed linear model and the cost-locality subgroup mean are fitted on the same n ≤ 10 training set.
-
-    Subset                             Rows      Label mean (std)     HGB MAE [95% CI]        MLP MAE [95% CI]        Structured linear MAE   Physic
-    n =11 local                         836           −2.31 (1.04)    0.185 [0.175, 0.194]     0.113 [0.105, 0.122]           0.169
-    n =11 global                        904           −3.11 (0.72)    0.280 [0.271, 0.289]     0.109 [0.099, 0.123]           0.133
-    n =12 local                         930           −2.40 (1.13)    0.309 [0.294, 0.326]     0.164 [0.154, 0.175]           0.219
-    n =12 global                        910           −3.29 (0.86)    0.494 [0.479, 0.506]     0.142 [0.129, 0.155]           0.156
-    all                                3580           −2.78 (1.04)    0.320 [0.312, 0.327]     0.133 [0.128, 0.139]           0.169
+Table 6 and Figure 4 report models trained on the 7 941 Clifford-labeled circuits with
+n ≤ 12 and tested on 6 000 circuits with 13 ≤ n ≤ 32, up to twenty qubits beyond
+the largest training circuit. The results must be read separately for local and global
+costs, because censoring differs sharply between them. Of the 1 630 test circuits that
+fall below the sampling resolution, almost all have a global cost: beyond 24 qubits
+only about a quarter of global-cost circuits are resolved, against more than four fifths
+of local-cost ones (Table 6). An R2 computed on the resolved global-cost circuits at
+those sizes would measure which circuits survive, not how well the model predicts, so
+we do not report it.
 
 
 
 
-    Three regimes appear. Up to n = 20, eight qubits beyond training, the structured
-linear model reaches R2 = 0.92 (MAE 0.22) on 13–16 qubits and 0.90 (0.36) on 17–
-20 qubits, and the neural network is comparable (0.95 ± 0.01 and 0.89 ± 0.04 over
-ten seeds). At 21–24 qubits accuracy degrades (0.80 and 0.47 ± 0.25), and beyond 24
-qubits neither model predicts the resolved circuits (R2 < 0.3), both with a growing
-negative bias: they continue the decay in qubit count that they learned below twelve
-qubits, whereas for shallow local-cost circuits the true variance stops decaying once
-the causal cone no longer grows with n. The cone features reduce this bias but do
-not remove it, because the decay within the cone also has to be extrapolated. HGB
-predicts a constant beyond its training range and is wrong in the other direction. The
-censored circuits are the ones the models find easiest: 66% of the structured model’s
-predictions for them respect the measured upper bound.
-    The conclusion is a horizon, not a failure. A predictor trained on circuits that
-a laptop can simulate exactly is reliable for roughly eight more qubits, which is the
-regime where labeling by statevector simulation becomes impractical, and is unreliable
-beyond that. The remedy is cheap for this family: when the training range is extended
-to n ≤ 20 with Clifford labels, the same models predict 21- to 32-qubit circuits with
+                                                                                16
+Table 5 Held-out 13- and 14-qubit circuits (1 991 circuits, labeled as the main dataset), predicted by models trained on all n ≤ 12
+circuits. 95% bootstrap confidence intervals over test rows.
 
-
-                                                                       18
-Table 7 Extrapolation with exact Clifford labels: models trained on n ≤ 12 (7 941 circuits), tested on
-resolved circuits with 13 ≤ n ≤ 32. “Censored” counts test circuits whose variance is below the sampling
-resolution and which are excluded from R2 and MAE. MLP: mean ± standard deviation over ten seeds.
-
-                                                                           Structured linear                     MLP (10 seeds)                           HGB
-   Qubits                    Resolved                 Censored                 R2        MAE                    R2                  MAE              R2       MAE
-   13–16                               1174                   10            0.923        0.220           0.954 ± 0.007        0.157 ± 0.012         0.712     0.464
-   17–20                               1151                   54            0.904        0.356           0.885 ± 0.039        0.364 ± 0.057         0.273     1.036
-   21–24                                760                  437            0.800        0.541           0.469 ± 0.247        0.867 ± 0.225         0.307     0.938
-   25–28                                656                  548            0.265        0.839          −1.861 ± 1.534        1.610 ± 0.517         0.475     0.625
-   29–32                                629                  581           -0.070        0.994          −5.114 ± 3.481        2.360 ± 0.800         0.439     0.664
-   13–32                               4370               1630             0.711         0.516          −0.152 ± 0.616        0.870 ± 0.246         0.435     0.750
+ Model                                            R2 [95% CI]           MAE     R2 , n = 13   R2 , n = 14   R2 , local   R2 , global
+ Hist Gradient Boosting                        0.905 [0.898, 0.913]     0.316     0.939         0.876         0.942        0.749
+ MLP                                           0.970 [0.965, 0.974]     0.137     0.970         0.969         0.971        0.943
+ Random Forest                                 0.907 [0.899, 0.914]     0.308     0.942         0.877         0.940        0.759
+ k-NN                                          0.904 [0.895, 0.911]     0.314     0.937         0.874         0.944        0.739
+ Linear baseline                               0.771 [0.755, 0.787]     0.474     0.778         0.763         0.810        0.498
+ Structured linear                             0.951 [0.945, 0.956]     0.183      0.950         0.952        0.947         0.919
+ Physics-informed linear (effective weight)    0.561 [0.544, 0.576]     0.694     0.547          0.571        0.452         0.428
+ Physics-informed linear                       0.350 [0.326, 0.375]     0.815      0.354         0.345        0.187         0.157
+ Cost-locality subgroup mean                  -0.889 [-1.024, -0.776]   1.549     -0.902        -0.884       -0.442        -3.400
 
 
 
 
-                                                                                Structured linear: R 2 = 0.71                 MLP: R 2 = 0.63
-                     3.5         Structured linear                         0                                         0
-                                 HGB                                                                                                                  30.0
-                     3.0         physics-linear                            1
-                                 MLP (10 seeds)                            2                                         2                                27.5
+Local costs: a genuine horizon.
+For local costs the structured linear model reaches R2 = 0.92 on 13–16 qubits and
+0.89 on 17–20 qubits, eight qubits beyond training, then 0.78 at 21–24, 0.43 at 25–28
+and 0.23 at 29–32, with a bias that grows steadily from −0.14 to −0.77. The neural
+network matches it up to 20 qubits and then becomes seed-dependent and worse. The
+cause is visible in the shallowest circuits. For local costs with L ≤ 3 the true mean
+label is flat, −2.07 at 13–16 qubits and −2.03 at 29–32, because the causal cone stops
+growing and additional qubits change nothing that the observable can see. The model
+predicts −2.13 and −2.52: it continues, more weakly, the decay in qubit count that it
+learned below twelve qubits. The cone features reduce this error but do not remove
+it, since below twelve qubits the cone is rarely much smaller than the circuit and the
+model has few examples of saturation to learn from.
+
+Global costs: accurate where measurable.
+For global costs the structured model reaches R2 = 0.87 and 0.84 at 13–16 and 17–
+20 qubits, with negligible bias. Beyond that most circuits are censored and the only
+available test is whether a prediction respects the measured upper bound on the label.
+At 21–24, 25–28 and 29–32 qubits, 35%, 60% and 98% of the predictions for censored
+circuits do. Just beyond the resolution limit the model therefore predicts a variance
+that is too large, and at the largest sizes it is consistent with the bound. Tree ensembles
+predict a constant outside their training range; their apparent scores on the resolved
+circuits at large n (Supplementary Table S7) reflect the same survivorship and should
+not be read as extrapolation.
+    The conclusion is a horizon. A predictor trained on circuits that a laptop can
+simulate exactly is reliable for roughly eight more qubits, which is the regime where
+labeling by statevector simulation becomes impractical, and is unreliable beyond that.
+The remedy is cheap for this family: when the training range is extended to n ≤ 20
+with Clifford labels, the same models predict 21- to 32-qubit circuits with R2 = 0.90
+(structured linear), 0.85 ± 0.07 (neural network, five seeds) and 0.94 (HGB), because
+the resolved large-n circuits are then within the range of behavior seen in training.
+
+
+                                                17
+Table 6 Extrapolation with exact Clifford labels, by cost locality. Models are trained on n ≤ 12 (7 941
+circuits). “Resolved” is the fraction of test circuits above the sampling resolution; R2 and bias (mean prediction
+minus mean label, structured linear model) are computed on resolved circuits and are omitted where fewer than
+half are resolved. “Censored OK” is the fraction of censored circuits whose prediction respects the measured
+upper bound. MLP: mean ± standard deviation over ten seeds.
+
+                                                              Local cost                                                                  Global cost
+   Qubits                    Resolved                 Struct. R2                 MLP R2               Bias        Resolved       Struct. R2            Bias      Censored OK
+   13–16                           98%                   0.92                    0.96 ± 0.01         −0.14         100%               0.87         −0.01             –
+   17–20                           97%                   0.89                    0.87 ± 0.05         −0.23         94%                0.84         −0.07            5%
+   21–24                           86%                   0.78                   0.39 ± 0.27          −0.40         41%                  –            –              35%
+   25–28                           82%                   0.43                   −1.51 ± 1.29         −0.66         25%                  –            –              60%
+   29–32                           81%                   0.23                   −4.04 ± 2.70         −0.77         22%                  –            –              98%
+
+
+
+
+                                                                                  Structured linear: R 2 = 0.71                  MLP: R 2 = 0.63
+                     3.5         Structured linear                          0                                        0
+                                 HGB                                                                                                                      30.0
+                     3.0         physics-linear                             1
+                                 MLP (10 seeds)                             2                                        2                                    27.5
 
 
 
  MAE (log10 units)
-                     2.5                                                                                                                              25.0
-                                                                           3
-                                                               predicted
-                     2.0                                                                                             4                                22.5
-                                                                           4                                                                              n
-                     1.5                                                   5                                                                          20.0
-                     1.0                                                   6                                         6                                17.5
-                     0.5                                                   7                                                                          15.0
+                     2.5                                                                                                                                  25.0
+                                                                            3
+                                                                predicted
+                     2.0                                                                                             4                                    22.5
+                                                                            4                                                                                 n
+                     1.5                                                    5                                                                             20.0
+                     1.0                                                    6                                        6                                    17.5
+                     0.5                                                    7                                                                             15.0
                                                                                                                      8
-                     0.0                                                   8
-                            15         20        25     30                          6       4       2      0              6        4      2     0
-                      test qubit count n (trained on n 12)                          true label, 13 n 32                  true label, 13 n 32
+                     0.0                                                    8
+                            15         20        25      30                          6        4       2      0               6        4      2     0
+                      test qubit count n (trained on n 12)                          true label, 13 n 32                   true label, 13 n 32
 
-Fig. 7 Left: mean absolute error against test qubit count for models trained on n ≤ 12; the band is
+Fig. 4 Left: mean absolute error against test qubit count for models trained on n ≤ 12; the band is
 the range over ten MLP seeds. Middle and right: predicted versus true label for the structured linear
 model and the MLP, colored by qubit count.
 
 
-R2 = 0.90 (structured linear), 0.85±0.07 (neural network, five seeds) and 0.94 (HGB),
-because the resolved large-n circuits are then within the range of behavior seen in
-training.
-
-4.4 Trainability versus qubit count
-Figure 8 shows the mean label as a function of qubit count, split by cost locality.
-Global-cost circuits show a steep, monotone decay of the mean gradient variance with
-qubit number; local-cost circuits decay far more slowly. The shaded bands are one
-standard deviation of the label across the heterogeneous circuits at each n, not the
-uncertainty of the mean, which is much smaller. The dataset therefore contains the
-qubit-scaling behavior that the predictor must learn, within the finite range n ≤ 12
-where it can be measured exactly.
-
-
-
-
-                                                                                            19
-                                                                      local Z0
-                                       1                              global Z n
-
-
-
-
-                      mean log10 Var
-                                       2
-
-                                       3
-
-                                       4
-                                           2   4      6        8      10      12
-                                                   number of qubits n
-
-Fig. 8 Mean log10 Var versus qubit count for local and global cost observables. Shaded: ±1 standard
-deviation across circuits at each n (spread of the population, not uncertainty of the mean).
-
-
-4.5 Sensitivity to the barren cutoff
-Supplementary Table S3 moves the classification cutoff from −1.5 to −3, which
-changes the barren fraction from 60% to 15%. The AUC stays at or above 0.997
-for every cutoff, so the ranking the classifier produces is not tied to the particular
-threshold. The regression target is unaffected by this choice.
-
-4.6 What drives trainability
-Table 9 and Figure 9 report the feature ablation, in two parts. The first part asks
+4.4 What drives trainability
+Table 8 and Figure 5 report the feature ablation, in two parts. The first part asks
 what the derived features add to the six design parameters. In-family they add almost
 nothing: the six primitive features alone reach R2 = 0.980, and adding the effective
 weight, the causal cone, or all derived features changes this by 0.002 or less. A tree
 ensemble reconstructs these quantities from the primitives when it has seen every
 architecture’s neighbors. Their value appears out of range: they raise transfer to unseen
-entanglement patterns (Section 4.7) and extrapolation in qubit count (Sections 4.2
+entanglement patterns (Section 4.5) and extrapolation in qubit count (Sections 4.2
 and 4.3), where the model must rely on structure it cannot interpolate.
     The second part removes one primitive feature at a time from the six-feature model.
 Two cautions apply to its reading. The drop measures information that the remaining
 features cannot supply, so a feature that is implied by the others scores low however
 relevant it is. And a large drop does not mean that the variable explains the label on
 its own; the cost-locality subgroup mean of Table 4 scores only R2 = 0.043. Most of
-the information enters through interactions. With that understood, the largest drops
-come from qubit count n (∆R2 = 0.721), cost locality (0.304), and layers L (0.259).
-The entangler gate costs 0.155 even though the mean labels of CZ and CX circuits
-differ by only 0.08. Table 8 resolves this apparent contradiction. The entangler gate
-matters mainly because it decides what is measured. With CX, the nominally local
-cost on a circular pattern has effective weight n − 1 and the lowest mean label of all
-local-cost families, and the nominally global cost on an all-to-all pattern has effective
 
 
-                                                      20
-      Table 8 Nominal and effective observable weight for circuits with n ≥ 10, with the
+                                                                                              18
+      Table 7 Nominal and effective observable weight for circuits with n ≥ 10, with the
       mean label of each family. CZ leaves the observable unchanged; CX maps it to a
       different Z-string.
 
-        Gate     Pattern      Nominal cost    Effective weight      Mean log10 Var   Circuits
-        CZ       linear       local                     1                   −1.25        491
-        CZ       linear       global                    n                   −3.37        481
-        CZ       circular     local                     1                   −1.81        425
-        CZ       circular     global                    n                   −3.42        503
-        CZ       all-to-all   local                     1                   −2.67        416
-        CZ       all-to-all   global                    n                   −3.14        471
-        CX       linear       local                   1                     −2.07        435
-        CX       linear       global                ≈ n/2                   −3.22        410
-        CX       circular     local                 n−1                     −3.32        467
-        CX       circular     global                ≈ n/2                   −3.26        413
-        CX       all-to-all   local                   1                     −2.70        455
-        CX       all-to-all   global                  1                     −2.13        443
+        Gate   Pattern      Nominal cost   Effective weight   Mean log10 Var   Circuits
+        CZ     linear       local                  1                  −1.25        491
+        CZ     linear       global                 n                  −3.37        481
+        CZ     circular     local                  1                  −1.81        425
+        CZ     circular     global                 n                  −3.42        503
+        CZ     all-to-all   local                  1                  −2.67        416
+        CZ     all-to-all   global                 n                  −3.14        471
+        CX     linear       local                1                    −2.07        435
+        CX     linear       global             ≈ n/2                  −3.22        410
+        CX     circular     local              n−1                    −3.32        467
+        CX     circular     global             ≈ n/2                  −3.26        413
+        CX     all-to-all   local                1                    −2.70        455
+        CX     all-to-all   global               1                    −2.13        443
 
 
 
 
-         Table 9 Feature ablation under architecture-grouped cross-validation (HGB;
-         mean ± standard deviation over 10 folds). Upper part: what the derived
-         features add to the six primitive features. Lower part: the drop when one
-         primitive feature is removed from the six.
-
-             Feature set                                R2 (grouped CV)          ∆R2
-             six primitive features                         0.980 ± 0.003          –
-                + effective weight                          0.981 ± 0.003    0.002 ± 0.001
-                + causal cone                               0.981 ± 0.003    0.001 ± 0.001
-                + effective weight + causal cone            0.981 ± 0.003    0.001 ± 0.001
-             all 12 features                                0.980 ± 0.003    0.000 ± 0.001
-             primitive minus qubit count n                  0.259 ± 0.021    0.721 ± 0.019
-             primitive minus layers L                       0.721 ± 0.022    0.259 ± 0.021
-             primitive minus rotation scheme                0.938 ± 0.005    0.042 ± 0.003
-             primitive minus entanglement pattern           0.795 ± 0.020    0.184 ± 0.019
-             primitive minus entangler gate                 0.825 ± 0.017    0.155 ± 0.018
-             primitive minus cost locality                  0.676 ± 0.028    0.304 ± 0.027
-
-
-
-
+the information enters through interactions. With that understood, the largest drops
+come from qubit count n (∆R2 = 0.721), cost locality (0.304), and layers L (0.259).
+The entangler gate costs 0.155 even though the mean labels of CZ and CX circuits
+differ by only 0.08. Table 7 resolves this apparent contradiction. The entangler gate
+matters mainly because it decides what is measured. With CX, the nominally local
+cost on a circular pattern has effective weight n − 1 and the lowest mean label of all
+local-cost families, and the nominally global cost on an all-to-all pattern has effective
 weight 1 and the highest mean label of all global-cost families. The label tracks the
 effective weight, not the nominal one. This is the cost-locality effect of Cerezo et al. [7]
 applied to the observable that is actually measured, and it is why the five-coeﬀicient
@@ -1059,13 +934,45 @@ model improves from 0.682 to 0.750 when the nominal indicator is replaced by the
 effective weight. The ablation is a consistency check on the model, not an independent
 discovery: the features were chosen with the theory in mind.
 
-4.7 Transfer to unseen entanglement patterns
-Table 10 and Figure 10 report the leave-one-pattern-out experiment. With the graph
-descriptors in place of the pattern index, the pooled five-pattern model loses nothing
+4.5 Transfer to unseen entanglement patterns
+Table 9 (Supplementary Figure S6) reports the leave-one-pattern-out experiment.
+With the graph descriptors in place of the pattern index, the pooled five-pattern model
+loses nothing in-family (grouped-CV R2 = 0.978 with descriptors versus 0.978 with
+the index). When a pattern is held out entirely, the outcome depends on two things:
+whether the model is given the physics features, and where the pattern’s descriptors
+fall relative to the training patterns. With graph descriptors alone (Table 9, third
+column) transfer is partial: brickwork, whose union graph is the same chain as linear
+and whose descriptors lie inside the training range, reaches R2 = 0.925, but linear
+(0.732), circular (0.694) and star (0.742) are predicted only moderately and all-to-all,
+the extreme of every descriptor, fails (0.414). Adding the effective observable weight
+and the causal cone changes the picture. These two quantities are computed for the
+held-out pattern from its own gate list, so the model receives, in closed form, the
 
 
-                                                   21
-                           qubit count n
+
+                                              19
+          Table 8 Feature ablation under architecture-grouped cross-validation (HGB;
+          mean ± standard deviation over 10 folds). Upper part: what the derived
+          features add to the six primitive features. Lower part: the drop when one
+          primitive feature is removed from the six.
+
+           Feature set                                      R2 (grouped CV)            ∆R2
+           six primitive features                             0.980 ± 0.003              –
+              + effective weight                              0.981 ± 0.003        0.002 ± 0.001
+              + causal cone                                   0.981 ± 0.003        0.001 ± 0.001
+              + effective weight + causal cone                0.981 ± 0.003        0.001 ± 0.001
+           all 12 features                                    0.980 ± 0.003        0.000 ± 0.001
+           primitive minus qubit count n                      0.259 ± 0.021        0.721 ± 0.019
+           primitive minus layers L                           0.721 ± 0.022        0.259 ± 0.021
+           primitive minus rotation scheme                    0.938 ± 0.005        0.042 ± 0.003
+           primitive minus entanglement pattern               0.795 ± 0.020        0.184 ± 0.019
+           primitive minus entangler gate                     0.825 ± 0.017        0.155 ± 0.018
+           primitive minus cost locality                      0.676 ± 0.028        0.304 ± 0.027
+
+
+
+
+                           qubit count n
                              cost locality
                                  layers L
                     entanglement pattern
@@ -1075,97 +982,75 @@ descriptors in place of the pattern index, the pooled five-pattern model loses n
                                              0.0       0.2         0.4       0.6
                                                R 2 when the primitive feature is removed
 
-Fig. 9 Drop in grouped-CV R2 when each primitive feature is removed from the six-feature HGB
+Fig. 5 Drop in grouped-CV R2 when each primitive feature is removed from the six-feature HGB
 regressor. Bars are means over 10 folds; error bars are the standard deviation of the paired drop
 across folds.
 
 
-in-family (grouped-CV R2 = 0.978 with descriptors versus 0.978 with the index).
-When a pattern is held out entirely, the outcome depends on two things: whether the
-model is given the physics features, and where the pattern’s descriptors fall relative to
-the training patterns. With graph descriptors alone (Table 10, third column) transfer is
-partial: brickwork, whose union graph is the same chain as linear and whose descriptors
-lie inside the training range, reaches R2 = 0.925, but linear (0.732), circular (0.694)
-and star (0.742) are predicted only moderately and all-to-all, the extreme of every
-descriptor, fails (0.414). Adding the effective observable weight and the causal cone
-changes the picture. These two quantities are computed for the held-out pattern from
-its own gate list, so the model receives, in closed form, the part of the pattern’s effect
-that acts through the observable. Held-out linear is then predicted with R2 = 0.946
-(0.983 when seen), circular with 0.950 (0.985), brickwork with 0.930 (0.978), star with
-0.924 (0.968), and even all-to-all with 0.753 (0.972), far above the physics-informed
-control (0.621). The classifier is more forgiving still: AUC stays above 0.988 for every
-held-out pattern.
-    Two readings follow. First, transfer to a pattern the model has never seen is possible
+part of the pattern’s effect that acts through the observable. Held-out linear is then
+predicted with R2 = 0.946 (0.983 when seen), circular with 0.950 (0.985), brickwork
+with 0.930 (0.978), star with 0.924 (0.968), and even all-to-all with 0.753 (0.972), far
+above the physics-informed control (0.621). The classifier is more forgiving still: AUC
+stays above 0.988 for every held-out pattern.
+   Two readings follow. First, transfer to a pattern the model has never seen is possible
 when the pattern is described by what it does to the observable and to the causal cone,
 rather than by a name. Second, it is not free: every held-out pattern is still predicted
 worse than a seen one, and the extreme pattern loses the most. A user who needs the
 best accuracy for a new gate pattern should add a modest number of labeled circuits of
 that pattern to the training set, which the released pipeline does from one command.
 
-4.8 How much data is needed
+
+                                                       20
+Table 9 Leave-one-pattern-out transfer. For each row, HGB is trained on the other four patterns
+and tested on the held-out one (“unseen”), with the full pattern-agnostic feature set or with
+graph descriptors only (“graph only”, no effective weight and no causal cone); “seen” scores the
+same rows under architecture-grouped cross-validation on the pooled data; the physics-informed
+linear control (effective-weight variant) is fitted on the same training rows.
+
+                                     Pattern unseen             Pattern seen    Physics-linear
+  Held-out pattern   Rows     R2     R2 , graph only   MAE       R2     MAE       R2     MAE
+  linear             6608    0.946        0.732        0.128    0.983   0.068   0.692    0.400
+  circular           6709    0.950        0.694        0.132    0.985   0.058   0.824    0.310
+  all-to-all         6541    0.753        0.414        0.241    0.972   0.076   0.621    0.442
+  brickwork          4998    0.930        0.925        0.141    0.978   0.074   0.669    0.409
+  star               4928    0.924        0.742        0.156    0.968   0.083   0.726    0.391
+
+
+
+
+4.6 How much data is needed
 Supplementary Figure S1 shows grouped-CV R2 as a function of the number of train-
 ing rows, with whole architectures added at a time. Both models reach R2 > 0.9 with
 about 1 000 rows and are within 0.02 of their final value by 4 000 rows; the MLP is
 the more data-eﬀicient of the two below 2 000 rows (0.929 versus 0.877 at 500 rows).
 For a user extending the predictor to a new circuit family, this sets the expectation:
-
-
-                                                       22
-Table 10 Leave-one-pattern-out transfer. For each row, HGB is trained on the other four
-patterns and tested on the held-out one (“unseen”), with the full pattern-agnostic feature set or
-with graph descriptors only (“graph only”, no effective weight and no causal cone); “seen” scores
-the same rows under architecture-grouped cross-validation on the pooled data; the
-physics-informed linear control (effective-weight variant) is fitted on the same training rows.
-
-                                                             Pattern unseen                 Pattern seen    Physics-linear
-  Held-out pattern                         Rows     R2      R2 , graph only       MAE        R2     MAE      R2     MAE
-  linear                                   6608   0.946            0.732          0.128    0.983    0.068   0.692   0.400
-  circular                                 6709   0.950            0.694          0.132    0.985    0.058   0.824   0.310
-  all-to-all                               6541   0.753            0.414          0.241    0.972    0.076   0.621   0.442
-  brickwork                                4998   0.930            0.925          0.141    0.978    0.074   0.669   0.409
-  star                                     4928   0.924            0.742          0.156    0.968    0.083   0.726   0.391
-
-
-
-
-                                          1.0
-
-                                          0.8
-
-
-
-
-                R 2 on held-out pattern
-                                          0.6
-
-                                          0.4
-
-                                          0.2      pattern seen (grouped CV)
-                                                   pattern unseen (LOPO)
-                                                   physics-informed linear
-                                          0.0
-                                                  linear     circular      all-to-all brickwork    star
-Fig. 10 R2 on each entanglement pattern when it is seen in training (grouped CV), when it is held
-out entirely (LOPO), and for the physics-informed linear control.
-
-
 a few thousand labeled circuits, which the released generator produces in well under
 an hour on a laptop for n ≤ 12, suﬀice to reach the plateau.
 
-4.9 Ranking circuits at fixed qubit count
+4.7 Ranking circuits at fixed qubit count
 The intended use of the predictor is to rank candidate architectures and pass the
 most promising ones to a more expensive evaluation. A global ranking is not an
 informative test of this use. Every circuit in the dataset with n ≤ 5 lies above the
 cutoff, so ranking by qubit count alone selects a top fifth that is entirely above the
 cutoff (100% precision, 35% recall), and the predictor does the same. The informative
 question is whether the predictor ranks circuits correctly within a fixed qubit count,
-where size carries no information. Table 11 answers it with the out-of-fold predictions
+where size carries no information. Table 10 answers it with the out-of-fold predictions
 of Section 4.1. For every n at which both classes occur, the rank correlation between
 the HGB prediction and the true label lies between 0.94 and 0.98, against 0.58 to
+0.64 for the five-coeﬀicient model; the structured linear model is again close to HGB
+(0.91 to 0.97). At n = 12, where only 26% of circuits are above the cutoff, 99.5% of
+the top fifth of the HGB ranking are. The top fifth is a shortlist, not a complete list:
+by construction it contains at most a fifth of the circuits and so misses the remaining
+ones above the cutoff.
+
+5 Discussion
+Our results support one main claim, stated within its scope. For the hardware-eﬀicient
+family studied here, the mean gradient variance is a simple function of the architecture.
+Within each combination of categorical design choices it falls linearly in log10 with
 
 
-                                                                        23
-Table 11 Ranking within a fixed qubit count, from out-of-fold predictions. Spearman correlation between predicted
+                                              21
+Table 10 Ranking within a fixed qubit count, from out-of-fold predictions. Spearman correlation between predicted
 and true label, and the percentage of the top 20% of each ranking that lies above the cutoff y ≥ −2. Qubit counts at
 which every circuit is above the cutoff are omitted.
 
@@ -1183,59 +1068,64 @@ which every circuit is above the cutoff are omitted.
 
 
 
-0.64 for the five-coeﬀicient model; the structured linear model is again close to HGB
-(0.91 to 0.97). At n = 12, where only 26% of circuits are above the cutoff, 99.5% of
-the top fifth of the HGB ranking are. The top fifth is a shortlist, not a complete list:
-by construction it contains at most a fifth of the circuits and so misses the remaining
-ones above the cutoff.
-
-5 Discussion
-Our results support one main claim, stated within its scope. For the hardware-eﬀicient
-family studied here, the mean gradient variance is a simple function of the architecture.
-Within each combination of categorical design choices it falls linearly in log10 with
 qubit count and saturates with depth, and a model of that form, or a flexible learner
 that knows nothing of the form, predicts it to within the label noise for architectures
 it has never seen. Much of what the simplest physical rule misses is accounted for by
 the effective weight of the measured observable.
     This suggests a practical workflow. First, screen a large space of candidate ansätze
 with the learned model, at microseconds per candidate. Then reserve expensive
-gradient-variance estimation for the shortlist it flags as trainable. Section 4.9 shows
+gradient-variance estimation for the shortlist it flags as trainable. Section 4.7 shows
 that the ranking is reliable at fixed qubit count. Within a QAS loop, the predictor
 could act as a zero-cost filter ahead of any training-free proxy or actual training.
     Several limitations scope these claims. (i) One circuit family. The design space is
-one hardware-eﬀicient ansatz with five fixed entanglement patterns. Section 4.7 shows
-that graph descriptors allow partial transfer to a pattern the model has never seen, but
-with a measurable loss, so predictions for a new gate pattern should be supported by
-some labeled circuits of that pattern. The pipeline generates them from one command.
-Predictions outside the hardware-eﬀicient family (for example, problem-inspired or
-Hamiltonian-variational ansätze) are unsupported. (ii) Finite size. Statevector labels
-exist only at n ≤ 14, and Clifford labels resolve only variances above roughly 10−7 . A
-barren plateau is a statement about scaling as n → ∞; our label is a finite-size proxy,
-and the extrapolation result covers two additional qubits, not an asymptotic regime.
+one hardware-eﬀicient ansatz with five fixed entanglement patterns. Section 4.5 shows
+that a pattern the model has never seen can be predicted when it is described by
+its effect on the observable and on the causal cone, but with a measurable loss, so
+predictions for a new gate pattern should be supported by some labeled circuits of
+that pattern. The pipeline generates them from one command. Predictions outside the
+hardware-eﬀicient family (for example, problem-inspired or Hamiltonian-variational
+ansätze) are unsupported. (ii) Finite size. Statevector labels exist only at n ≤ 14.
+Clifford labels reach any n but resolve only variances above 100/(220 nL), between
+about 10−7 and 10−5 depending on the number of parameters. A barren plateau
+is a statement about scaling as n → ∞; our label is a finite-size proxy, and the
+extrapolation results cover two additional qubits with statevector labels and about
+eight with Clifford labels, not an asymptotic regime. Tree ensembles cannot continue
+a trend in n beyond the training range, and the neural network is seed-dependent at
+large gaps, so a user who needs predictions at larger n should prefer the structured
+model, or extend the training range with Clifford labels. (iii) Ideal simulation. We use a
+noiseless statevector simulator, so noise-induced plateaus [10] are out of scope. (iv) The
+label is an estimator. Each variance is estimated from 200 samples. We measured the
+resulting label noise directly (mean absolute relabeling difference 0.021 in log10 units)
+and it is small relative to the model error, but it is not zero. (v) Hidden axis patterns.
 
 
-                                                  24
-Tree ensembles in particular cannot continue a trend in n beyond the training range,
-so a user who needs predictions at larger n should prefer the MLP or a model with an
-explicit scaling term. (iii) Ideal simulation. We use a noiseless statevector simulator,
-so noise-induced plateaus [10] are out of scope. (iv) The label is an estimator. Each
-variance is estimated from 200 samples. We measured the resulting label noise directly
-(mean absolute relabeling difference 0.021 in log10 units) and it is small relative to the
-model error, but it is not zero. (v) Hidden axis patterns. For random-Pauli circuits the
-drawn axis pattern is part of the circuit but not of the feature vector. It contributes
-irreducible label variation, which we quantified as a noise ceiling rather than hiding
-it. (vi) The cutoff. The barren cutoff y < −2 is a modeling choice. The regression
-target is threshold-free, and Supplementary Table S3 shows the classifier’s behavior
-at other cutoffs. (vii) Exact alternatives for this family. Because every angle appears
-once with a Pauli generator, the gradient variance of these circuits can be estimated
-exactly by Clifford sampling at any qubit count (Section 4.3), at a cost of seconds per
-circuit. This weakens the argument that labels are expensive. Three things remain
-in favor of a predictor: it costs microseconds per candidate, which matters when the
-design space is searched; sampling cannot resolve variances far below the reciprocal of
-the sample count, which is where barren plateaus live; and the quadrature property
-fails as soon as parameters are shared between gates or generators are not Paulis,
-as in problem-inspired ansätze, where a predictor trained on simulable sizes has no
-such substitute. (viii) Averaging over parameters. The mean over parameters of the
+
+                                                  22
+For random-Pauli circuits the drawn axis pattern is part of the circuit but not of the
+feature vector. It contributes irreducible label variation, which we quantified as a noise
+ceiling rather than hiding it. (vi) The cutoff. The barren cutoff y < −2 is a modeling
+choice. The regression target is threshold-free, and Supplementary Table S3 shows the
+classifier’s behavior at other cutoffs. (vii) Exact alternatives for this family. Because
+every angle appears once with a Pauli generator, the gradient variance of these circuits
+can be estimated exactly by Clifford sampling at any qubit count (Section 4.3), at
+a cost of seconds per circuit. This weakens the argument that labels are expensive.
+Three things remain in favor of a predictor: it costs microseconds per candidate, which
+matters when the design space is searched; sampling cannot resolve variances far
+below the reciprocal of the sample count, which is where barren plateaus live; and the
+quadrature property fails as soon as parameters are shared between gates or generators
+are not Paulis, as in problem-inspired ansätze, where a predictor trained on simulable
+sizes has no such substitute. (viii) Gradient variance is not optimization outcome. The
+label measures how flat the landscape is on average, not whether training succeeds.
+As a check we trained several hundred fresh circuits from the same design space with
+gradient descent and with Adam, with exact gradients and with gradients estimated
+from 100 or 1 000 shots, for 200 steps from random starts. At n ≤ 12 between 94% and
+99% of circuits reached the ground state of the observable regardless of their label,
+and the rank correlation between the label and the loss decrease was between 0.08
+and 0.19. At these sizes even the smallest gradient variances in the dataset correspond
+to gradient components of order 10−2 , which a modest shot budget resolves. The
+predictor should therefore be read as a screen for the gradient-variance scaling that
+becomes prohibitive at larger n, not as a forecast of optimization success at the sizes
+simulated here. (ix) Averaging over parameters. The mean over parameters of the
 gradient variance is one summary of a circuit’s landscape. Other summaries, such
 as the minimum over parameters or the distribution across layers, may matter for
 particular optimizers. We release all per-circuit statistics (mean, median, minimum,
@@ -1250,20 +1140,24 @@ can be predicted from architecture alone. With the label defined as the mean ove
 parameters and structural zeros removed, the answer is: almost completely. Gradient-
 boosted trees, a neural network, and a structured linear model with one set of
 coeﬀicients per categorical cell all reach R2 ≈ 0.980 on unseen architectures, against
-a noise ceiling of 0.985 and 0.682 for a five-coeﬀicient rule in qubit count, depth, and
-nominal cost locality. Part of the gap is explained by the effective weight of the observ-
-able after the last entangling layer. Models with a continuous dependence on qubit
-count extrapolate to 13- and 14-qubit circuits with R2 = 0.972 (neural network) and
-0.951 (structured linear); tree ensembles do not extrapolate. Transfer to an entangle-
-ment pattern absent from training is possible when its graph descriptors lie within
-the training range and fails at the extreme. The predictor is a cheap screening tool for
-one circuit family. Extending it to families with shared parameters, where no exact
-shortcut exists, and to noisy circuits are natural next steps.
+a noise ceiling of 0.985 and 0.682 for a five-coeﬀicient rule in qubit count, depth,
+and nominal cost locality. Part of the gap is explained by the effective weight of the
+observable after the last entangling layer. Models with a continuous dependence on
+qubit count extrapolate to 13- and 14-qubit circuits with R2 = 0.972 (neural network)
+and 0.951 (structured linear); tree ensembles do not extrapolate. With exact Clifford
 
 
 
-                                           25
-Acknowledgements. During the preparation of this manuscript, the author used
+                                           23
+labels up to 32 qubits, a model trained on at most 12 qubits remains accurate for
+about eight more qubits; for local costs it then overestimates the decay, because the
+causal cone saturates, and extending the training range to 20 qubits restores accu-
+racy up to 32. Transfer to an entanglement pattern absent from training succeeds
+when the pattern is described by its effect on the observable and the causal cone (R2
+between 0.753 and 0.950). The predictor is a cheap screening tool for one circuit fam-
+ily. Extending it to families with shared parameters, where no exact shortcut exists,
+and to noisy circuits are natural next steps.
+Acknowledgements. During the preparation of this manuscript, the author used
 ChatGPT (OpenAI) and Claude (Anthropic) for language editing, grammar cor-
 rection, and refinement of the written text, and for assistance in developing the
 accompanying open-source research code. The author reviewed and edited all content
@@ -1298,8 +1192,11 @@ References
 
  [2] Havlíček, V., Córcoles, A.D., Temme, K., Harrow, A.W., Kandala, A.,
      Chow, J.M., Gambetta, J.M.: Supervised learning with quantum-enhanced
-     feature spaces. Nature 567(7747), 209–212 (2019) https://doi.org/10.1038/
-     s41586-019-0980-2
+
+
+                                          24
+    feature spaces. Nature 567(7747), 209–212 (2019) https://doi.org/10.1038/
+    s41586-019-0980-2
 
  [3] Farhi, E., Neven, H.: Classification with Quantum Neural Networks on Near Term
      Processors. arXiv preprint arXiv:1802.06002 (2018) https://doi.org/10.48550/
@@ -1307,10 +1204,7 @@ References
 
  [4] Schuld, M., Bocharov, A., Svore, K.M., Wiebe, N.: Circuit-centric quantum
      classifiers. Physical Review A 101(3), 032308 (2020) https://doi.org/10.1103/
-
-
-                                          26
-    PhysRevA.101.032308
+     PhysRevA.101.032308
 
  [5] McClean, J.R., Boixo, S., Smelyanskiy, V.N., Babbush, R., Neven, H.: Barren
      plateaus in quantum neural network training landscapes. Nature Communica-
@@ -1348,19 +1242,18 @@ References
      https://doi.org/10.1038/s41467-024-49910-w
 
 [13] Kandala, A., Mezzacapo, A., Temme, K., Takita, M., Brink, M., Chow, J.M.,
-     Gambetta, J.M.: Hardware-eﬀicient variational quantum eigensolver for small
-     molecules and quantum magnets. Nature 549(7671), 242–246 (2017) https://doi.
-     org/10.1038/nature23879
+
+
+                                          25
+    Gambetta, J.M.: Hardware-eﬀicient variational quantum eigensolver for small
+    molecules and quantum magnets. Nature 549(7671), 242–246 (2017) https://doi.
+    org/10.1038/nature23879
 
 [14] Schuld, M., Killoran, N.: Is quantum advantage the right goal for quantum
      machine learning? PRX Quantum 3(3), 030101 (2022) https://doi.org/10.1103/
      PRXQuantum.3.030101
 
-
-
-
-                                          27
-[15] Bowles, J., Ahmed, S., Schuld, M.: Better than classical? The subtle art of bench-
+[15] Bowles, J., Ahmed, S., Schuld, M.: Better than classical? The subtle art of bench-
      marking quantum machine learning models. arXiv preprint arXiv:2403.07059
      (2024) https://doi.org/10.48550/arXiv.2403.07059
 
@@ -1399,7 +1292,10 @@ References
 
 [24] Napp, J.C.: Quantifying the barren plateau phenomenon for a model of unstruc-
      tured variational ansätze. arXiv:2203.06174 (2022). https://doi.org/10.48550/
-     arXiv.2203.06174
+
+
+                                          26
+    arXiv.2203.06174
 
 [25] Letcher, A., Woerner, S., Zoufal, C.: Tight and eﬀicient gradient bounds for
      parameterized quantum circuits. Quantum 8, 1484 (2024) https://doi.org/10.
@@ -1407,10 +1303,7 @@ References
 
 [26] Cerezo, M., Larocca, M., García-Martín, D., et al.: Does provable absence of
      barren plateaus imply classical simulability? Nature Communications 16, 7907
-
-
-                                          28
-    (2025) https://doi.org/10.1038/s41467-025-63099-6 . arXiv:2312.09121
+     (2025) https://doi.org/10.1038/s41467-025-63099-6 . arXiv:2312.09121
 
 [27] Pedregosa, F., Varoquaux, G., Gramfort, A., Michel, V., Thirion, B., Grisel, O.,
      Blondel, M., Prettenhofer, P., Weiss, R., Dubourg, V., Vanderplas, J., Passos, A.,
@@ -1425,5 +1318,5 @@ References
 
 
 
-                                          29
+                                          27
 
