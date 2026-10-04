@@ -376,7 +376,7 @@
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels for circuits up to 32 qubits, models trained on at most 12 qubits remain accurate for about eight more qubits; beyond that they overestimate the decay for local costs, whose causal cone saturates, and extending the training range to 20 qubits restores $R^2\approx0.9$ up to 32 qubits.}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits, such models stay accurate for about eight qubits beyond training; further out they overestimate the decay for local costs, whose causal cone saturates, and training up to 20 qubits restores $R^2\approx0.9$ up to 32.}
 \newcommand{\ClTargetHits}{2\,000}
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
@@ -432,28 +432,26 @@ Data-Driven Model for Barren Plateaus}
 
 \abstract{Barren plateaus, the exponential decay of the cost-gradient
 variance with qubit number, are a central obstacle to training variational
-quantum circuits. Diagnosing them by sampling gradients is costly when many
-candidate circuits must be screened. We ask how well the gradient variance
-of a hardware-efficient circuit can be predicted from its architecture
-alone: qubit count, depth, rotation scheme, entanglement pattern, entangler
-gate, and cost observable. We simulate \Nrows{} random circuits with 2 to 12
-qubits, compute the exact gradient of every parameter, and use the mean
-gradient variance over all parameters as the label, excluding parameters
-whose gradient vanishes identically. Under architecture-grouped
-cross-validation, gradient-boosted trees and a neural network reach
-$R^2=\RsqCV$ against a noise ceiling of \RsqCeiling. A structured linear
-model reaches \RsqStruct, so the map from architecture to gradient variance
-is simple, whereas a five-coefficient rule in qubit count, depth, and cost
-locality reaches \RsqPhys. Part of the difference is that the last
-entangling layer changes the weight of the measured observable. Trained on
-at most 12 qubits, models with a continuous dependence on qubit count reach
-$R^2\approx\LargeRsqMLPmean$ on held-out 13- and 14-qubit circuits; tree
-ensembles do not extrapolate. \ClAbstractSentence{} Graph descriptors allow
-partial transfer to entanglement patterns absent from training. At fixed
-qubit count the predictor ranks circuits with Spearman correlation
-\ScrSpHGBmin{} to \ScrSpHGBmax. The predicted quantity is a finite-size
-gradient-variance proxy for one circuit family, not optimization success
-and not a proof of scaling.}
+quantum circuits. We ask how well the gradient variance of a
+hardware-efficient circuit can be predicted from its architecture alone:
+qubit count, depth, rotation scheme, entanglement pattern, entangler gate,
+and cost observable. We simulate \Nrows{} random circuits with 2 to 12
+qubits and use the mean gradient variance over all parameters as the label,
+excluding parameters whose gradient vanishes identically. Under
+architecture-grouped cross-validation, gradient-boosted trees and a neural
+network reach $R^2=\RsqCV$ against a noise ceiling of \RsqCeiling. A
+structured linear model reaches \RsqStruct, so the map from architecture to
+gradient variance is simple, whereas a five-coefficient rule in qubit
+count, depth, and cost locality reaches \RsqPhys. Part of the difference is
+that the last entangling layer changes the weight of the measured
+observable. Models with a continuous dependence on qubit count, trained on
+at most 12 qubits, reach $R^2\approx\LargeRsqMLPmean$ on held-out 13- and
+14-qubit circuits; tree ensembles do not extrapolate.
+\ClAbstractSentence{} Describing an entanglement pattern by its effect on
+the observable and the causal cone allows transfer to patterns absent from
+training. The predicted quantity is a finite-size gradient-variance proxy
+for one circuit family, not optimization success and not a proof of
+scaling.}
 
 \keywords{Barren plateaus, Variational quantum circuits, Quantum machine
 learning, Trainability, Gradient variance, Statevector simulation, Gradient

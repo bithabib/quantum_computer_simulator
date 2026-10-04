@@ -222,10 +222,10 @@ def main():
         M["ClLeTwentyStruct"] = f(t20["Structured linear"]["r2"], 2)
         M["ClLeTwentyMLP"] = "%.2f \\pm %.2f" % (t20["MLP_seeds"]["r2_mean"], t20["MLP_seeds"]["r2_sd"])
         M["ClLeTwentyHGB"] = f(t20["Hist Gradient Boosting"]["r2"], 2)
-        M["ClAbstractSentence"] = ("With exact Clifford-sampled labels for circuits up to 32 qubits, models "
-            "trained on at most 12 qubits remain accurate for about eight more qubits; beyond that they "
-            "overestimate the decay for local costs, whose causal cone saturates, and extending the "
-            "training range to 20 qubits restores $R^2\\approx%.1f$ up to 32 qubits." % t20["Structured linear"]["r2"])
+        M["ClAbstractSentence"] = ("With exact Clifford-sampled labels up to 32 qubits, such models stay "
+            "accurate for about eight qubits beyond training; further out they overestimate the decay for "
+            "local costs, whose causal cone saturates, and training up to 20 qubits restores "
+            "$R^2\\approx%.1f$ up to 32." % t20["Structured linear"]["r2"])
     M["ClTargetHits"] = "2\\,000"; M["ClMaxSamples"] = "$2^{20}$"; M["ClResolvedHits"] = "100"
     M.setdefault("ClQmax", "32"); M.setdefault("ClAbstractSentence", "")
     lopo_path = os.path.join(RES, "lopo.json")
