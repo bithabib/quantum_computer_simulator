@@ -3,6 +3,13 @@
 \usepackage{graphicx}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{booktabs}
+\usepackage{xr}\externaldocument[M-]{main}
+\newsavebox{\tblbox}
+% typeset a table at natural size, or scaled down to the text width if wider.
+% Tables use the class's underlying float (tableorg) because its threeparttable
+% wrapper does not accept a boxed tabular.
+\newcommand{\fittable}[1]{\sbox{\tblbox}{#1}\ifdim\wd\tblbox>\textwidth
+  \resizebox{\textwidth}{!}{\usebox{\tblbox}}\else\usebox{\tblbox}\fi}
 \newcommand{\Vbar}{\overline{\mathrm{Var}}}
 \renewcommand{\thetable}{S\arabic{table}}
 \renewcommand{\thefigure}{S\arabic{figure}}
@@ -422,12 +429,13 @@ Clifford-label extrapolation table (Table~S7), the learning curve
 \maketitle
 
 \section{Model hyperparameters}
-\begin{table}[t]
-\centering
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
 \caption{Model hyperparameters. Everything not listed is the scikit-learn
 \SklearnVersion{} default. Features are standardized (zero mean, unit variance
 on the training fold) for the linear, $k$-NN, and MLP models only.}
 \label{tab:hyper}
+\fittable{%
 \begin{tabular}{ll}
 \toprule
 \textbf{Model} & \textbf{Settings}\\
@@ -439,16 +447,18 @@ Random forest & 400 trees\\
 Extra trees & 400 trees\\
 HGB & 400 iterations, learning rate 0.08, 31 leaves\\
 \botrule
-\end{tabular}
-\end{table}
+\end{tabular}%
+}
+\end{tableorg}
 
 \section{Descriptive statistics}
-\begin{table}[t]
-\centering
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
 \caption{Descriptive statistics of the numeric features and the regression
 label over the \Nused{} labeled circuits.}
 \label{tab:datastats}
 %%BEGIN-TABLE:datastats
+\fittable{%
 \begin{tabular}{lrrrrrr}
 \toprule
 \textbf{Variable} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{25\%} & \textbf{Median} & \textbf{Max}\\
@@ -461,9 +471,10 @@ label over the \Nused{} labeled circuits.}
 structural-zero fraction & $0.22$ & $0.25$ & $0.00$ & $0.05$ & $0.12$ & $0.99$\\
 $\log_{10}\overline{\mathrm{Var}}$ (label) & $-1.88$ & $0.94$ & $-4.89$ & $-2.62$ & $-1.78$ & $-0.23$\\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:datastats
-\end{table}
+\end{tableorg}
 
 \section{Sensitivity to the barren cutoff}
 Table~S3 moves the classification cutoff from $-1.5$ to $-3$,
@@ -471,12 +482,13 @@ which changes the barren fraction from \BarrenCutmOnepFive\% to
 \BarrenCutmThreepZero\%. The AUC stays at or above \AucCutmOnepFive{} for
 every cutoff, so the ranking the classifier produces is not tied to the
 particular threshold. The regression target is unaffected by this choice.
-\begin{table}[t]
-\centering
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
 \caption{Classification with alternative barren cutoffs $y<c$. AUC is the
 mean $\pm$ standard deviation over \NFoldsK{} architecture-grouped folds.}
 \label{tab:cutoff}
 %%BEGIN-TABLE:cutoff
+\fittable{%
 \begin{tabular}{lcc}
 \toprule
 Cutoff $y<c$ & Barren fraction & AUC (grouped CV) \\
@@ -486,21 +498,23 @@ $c=-2.0$ & 42.6\% & $0.998 \pm 0.000$ \\
 $c=-2.5$ & 27.0\% & $0.999 \pm 0.000$ \\
 $c=-3.0$ & 15.0\% & $0.998 \pm 0.001$ \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:cutoff
-\end{table}
+\end{tableorg}
 
 \section{Qubit-count extrapolation: all learners}
-Main-text Section~4.2 discusses this table; the per-subset breakdown with
-confidence intervals is main-text Table~8.
-\begin{table}[t]
-\centering
+Main-text Section~\ref{M-sec:extrap} discusses this table; the per-subset
+breakdown with confidence intervals is Table~S6.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
 \caption{Extrapolation split: trained on $n\le\ExtrapCut$
 (\ExtrapTrainRows{} circuits), tested on $n\in\{11,12\}$ (\ExtrapTestRows{}
 circuits). Single split; see Table~\ref{tab:extrapbreak} for confidence
 intervals.}
 \label{tab:extrap}
 %%BEGIN-TABLE:extrap
+\fittable{%
 \begin{tabular}{lcccc}
 \toprule
 Model & $R^2$ & MAE & AUC & Accuracy \\
@@ -518,18 +532,20 @@ Physics-informed linear & 0.326 & 0.665 & 0.814 & 0.752 \\
 Cost-locality subgroup mean & -1.027 & 1.326 & 0.699 & 0.248 \\
 Training mean & -1.125 & 1.359 & 0.500 & 0.248 \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:extrap
-\end{table}
+\end{tableorg}
 
 \section{Extrapolation with a widening gap}
-Main-text Section~4.2 and Figure~5 discuss this table.
-\begin{table}[t]
-\centering
+Main-text Section~\ref{M-sec:extrap} and Figure~\ref{M-fig:gap} discuss this table.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
 \caption{Extrapolation with a widening gap: train on $n\le k$, test on all
 $n>k$.}
 \label{tab:gap}
 %%BEGIN-TABLE:gap
+\fittable{%
 \begin{tabular}{crrcccc}
 \toprule
 Train $n\le k$ & Train rows & Test rows & HGB & MLP (10 seeds, mean $\pm$ sd [min, max]) & Structured linear & Physics-linear \\
@@ -540,13 +556,14 @@ $k=8$ & 12572 & 7286 & 0.541 & $0.906 \pm 0.017$ [0.88, 0.93] & 0.902 & 0.324 \\
 $k=9$ & 14448 & 5410 & 0.729 & $0.949 \pm 0.006$ [0.94, 0.96] & 0.920 & 0.324 \\
 $k=10$ & 16278 & 3580 & 0.860 & $0.961 \pm 0.003$ [0.95, 0.96] & 0.935 & 0.326 \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:gap
-\end{table}
+\end{tableorg}
 
 \section{Learning curve}
-Main-text Section~4.7 discusses this figure.
-\begin{figure}[t]
+Main-text Section~\ref{M-sec:learningcurve} discusses this figure.
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.6\textwidth]{figs/learning_curve.pdf}
 \caption{Learning curve: architecture-grouped CV $R^2$ against the number
@@ -556,15 +573,16 @@ of training rows. Error bars: standard deviation over the five folds.}
 
 
 \section{Extrapolation error by subset of the 11- and 12-qubit test set}
-Main-text Section~4.2 discusses this table.
-\begin{table}[t]
-\centering
+Main-text Section~\ref{M-sec:extrap} discusses this table.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
 \caption{Extrapolation error by subset of the $n\in\{11,12\}$ test set. MAE in
 $\log_{10}$ units, with 95\% bootstrap confidence intervals for HGB. The
 physics-informed linear model and the cost-locality subgroup mean are fitted
 on the same $n\le\ExtrapCut$ training set.}
 \label{tab:extrapbreak}
 %%BEGIN-TABLE:extrap_breakdown
+\fittable{%
 \begin{tabular}{lrrcccc}
 \toprule
 Subset & Rows & Label mean (std) & HGB MAE [95\% CI] & MLP MAE [95\% CI] & Structured linear MAE & Physics-linear MAE \\
@@ -575,22 +593,24 @@ $n=$12 local & 930 & $-2.40$ ($1.13$) & 0.309 [0.294, 0.326] & 0.164 [0.154, 0.1
 $n=$12 global & 910 & $-3.29$ ($0.86$) & 0.494 [0.479, 0.506] & 0.142 [0.129, 0.155] & 0.156 & 0.516 \\
 all & 3580 & $-2.78$ ($1.04$) & 0.320 [0.312, 0.327] & 0.133 [0.128, 0.139] & 0.169 & 0.665 \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:extrap_breakdown
-\end{table}
+\end{tableorg}
 
 \section{Clifford-label extrapolation: all models, pooled over cost locality}
-Main-text Section~4.3 reports this experiment split by cost locality. The
+Main-text Section~\ref{M-sec:clifford} reports this experiment split by cost locality. The
 pooled scores below are computed on resolved circuits only; beyond 24 qubits
 most global-cost circuits are censored, so the pooled $R^2$ there mixes
 extrapolation with survivorship and is shown for completeness.
-\begin{table}[t]
-\centering
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
 \caption{Models trained on $n\le12$ with Clifford labels, tested on resolved
 circuits with $13\le n\le32$, pooled over cost locality. MLP: mean $\pm$
 standard deviation over ten seeds.}
 \label{tab:cliffordpooled}
 %%BEGIN-TABLE:clifford
+\fittable{%
 \begin{tabular}{lrrcccccc}
 \toprule
  & & & \multicolumn{2}{c}{Structured linear} & \multicolumn{2}{c}{MLP (10 seeds)} & \multicolumn{2}{c}{HGB} \\
@@ -605,12 +625,13 @@ Qubits & Resolved & Censored & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
 \midrule
 13--32 & 4370 & 1630 & 0.711 & 0.516 & $-0.152 \pm 0.616$ & $0.870 \pm 0.246$ & 0.435 & 0.750 \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:clifford
-\end{table}
+\end{tableorg}
 
 \section{Additional figures}
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.58\textwidth]{figs/structural.pdf}
 \caption{Mean percentage of parameters that are structural zeros, as a
@@ -620,7 +641,7 @@ the observable.}
 \label{fig:structural}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.58\textwidth]{figs/label_compare.pdf}
 \caption{All-parameter label versus the single-parameter label, for the same
@@ -632,7 +653,7 @@ have all-parameter labels above the cutoff.}
 \label{fig:labelcompare}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=\textwidth]{figs/large.pdf}
 \caption{Predicted versus true label on the held-out 13- and 14-qubit
@@ -649,7 +670,7 @@ label across the heterogeneous circuits at each $n$, not the uncertainty of
 the mean, which is much smaller. The dataset therefore contains the
 qubit-scaling behavior that the predictor must learn, within the finite range
 $n\le12$ where it can be measured exactly.
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.58\textwidth]{figs/qubit_trend.pdf}
 \caption{Mean $\log_{10}\Vbar$ versus qubit count for local and global cost
@@ -658,7 +679,7 @@ observables. Shaded: $\pm1$ standard deviation across circuits at each $n$
 \label{fig:qubittrend}
 \end{figure}
 
-\begin{figure}[t]
+\begin{figure}[!htbp]
 \centering
 \includegraphics[width=0.7\textwidth]{figs/lopo.pdf}
 \caption{$R^2$ on each entanglement pattern when it is seen in training

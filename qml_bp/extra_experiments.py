@@ -204,29 +204,31 @@ def draw_figures(args, gap, sizes, lc, lc_sd):
     import matplotlib.pyplot as plt
     BLUE, RED, GREY, ORANGE = "#3b6ea5", "#c0392b", "#7f8c8d", "#e67e22"
 
-    fig, ax = plt.subplots(1, 2, figsize=(6.8, 2.7))
+    fig, ax = plt.subplots(1, 2, figsize=(7.0, 3.3))
     ks = list(range(6, 11))
     GREEN = "#27ae60"
     for name, c, mk in [("HGB", BLUE, "o"), ("Structured linear", GREEN, "D"), ("Physics-informed linear", GREY, "^")]:
         ax[0].plot(ks, [gap[str(k)][name]["r2"] for k in ks], marker=mk, color=c, label=name, ms=4, lw=1.4)
     mu = np.array([gap[str(k)]["MLP_seeds"]["mean"] for k in ks])
     lo_ = np.array([gap[str(k)]["MLP_seeds"]["min"] for k in ks]); hi_ = np.array([gap[str(k)]["MLP_seeds"]["max"] for k in ks])
-    ax[0].plot(ks, mu, marker="s", color=ORANGE, label="MLP (mean, min-max of 10 seeds)", ms=4, lw=1.4)
+    ax[0].plot(ks, mu, marker="s", color=ORANGE, label="MLP (10 seeds)", ms=4, lw=1.4)
     ax[0].fill_between(ks, lo_, hi_, color=ORANGE, alpha=0.18)
-    ax[0].set_xlabel("largest training qubit count $k$ (test: $n>k$)", fontsize=8)
-    ax[0].set_ylabel("$R^2$ on all $n>k$", fontsize=8); ax[0].tick_params(labelsize=8)
-    ax[0].legend(fontsize=6.5, frameon=False); ax[0].axhline(0, color="k", lw=0.5)
+    ax[0].set_xlabel("largest training qubit count $k$ (test: $n>k$)", fontsize=10)
+    ax[0].set_ylabel("$R^2$ on all $n>k$", fontsize=10); ax[0].tick_params(labelsize=9)
+    ax[0].axhline(0, color="k", lw=0.5)
     ns = sorted(int(n) for n in gap["8"]["HGB"]["per_n"])
     for name, c, mk in [("HGB", BLUE, "o"), ("MLP", ORANGE, "s"), ("Structured linear", "#27ae60", "D"),
                         ("Physics-informed linear", GREY, "^")]:
         pn = gap["8"][name]["per_n"]
         ax[1].plot(ns, [pn[n]["r2"] if n in pn else pn[str(n)]["r2"] for n in ns],
                    marker=mk, color=c, label=name, ms=4, lw=1.4)
-    ax[1].set_xlabel("test qubit count $n$ (trained on $n \\leq 8$)", fontsize=8)
-    ax[1].set_ylabel("$R^2$ at that $n$", fontsize=8); ax[1].tick_params(labelsize=8)
+    ax[1].set_xlabel("test qubit count $n$ (trained on $n \\leq 8$)", fontsize=10)
+    ax[1].set_ylabel("$R^2$ at that $n$", fontsize=10); ax[1].tick_params(labelsize=9)
     ax[1].set_xticks(ns)
     ax[1].axhline(0, color="k", lw=0.5)
-    plt.tight_layout(); plt.savefig(os.path.join(args.figdir, "gap.pdf")); plt.close()
+    h, l = ax[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=4, fontsize=9, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    plt.tight_layout(rect=(0, 0, 1, 0.9)); plt.savefig(os.path.join(args.figdir, "gap.pdf"), bbox_inches="tight"); plt.close()
 
     plt.figure(figsize=(3.6, 2.7))
     for name, c, mk in [("HGB", BLUE, "o"), ("MLP", ORANGE, "s")]:

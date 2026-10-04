@@ -524,6 +524,19 @@ def main():
         v = cv_r2(keep)
         drops[gname] = {"r2": ms(v), "delta": ms(np.array(full) - np.array(v))}
     R["ablation"] = {"reference": abl, "drop": drops}
+    # primitive-feature ablation: what the derived features add to the six
+    # design parameters, and what removing each design parameter costs
+    NICE_P = {"n_qubits": "qubit count $n$", "n_layers": "layers $L$", "ansatz_type": "rotation scheme",
+              "entangle_pattern": "entanglement pattern", "entangler_gate": "entangler gate",
+              "cost_global": "cost locality"}
+    ap_add = {"+ effective weight": cv_r2(PRIMITIVE + ["cost_weight_eff"]),
+              "+ causal cone": cv_r2(PRIMITIVE + ["cone_qubits", "cone_frac"]),
+              "+ effective weight + causal cone": cv_r2(PRIMITIVE + ["cost_weight_eff", "cone_qubits", "cone_frac"])}
+    ap_drop = {c: cv_r2([q for q in PRIMITIVE if q != c]) for c in PRIMITIVE}
+    R["ablation_primitive"] = {
+        "full": ms(full), "primitive": ms(prim),
+        "add": {k: {"r2": ms(v), "delta": ms(np.array(v) - np.array(prim))} for k, v in ap_add.items()},
+        "drop": {NICE_P[c]: {"r2": ms(v), "delta": ms(np.array(prim) - np.array(v))} for c, v in ap_drop.items()}}
 
     # ---- 6. nominal vs effective observable weight (n >= 10) -----------
     R["gate_gap"] = float(abs(df[df.entangler_gate == 1].log_var.mean() - df[df.entangler_gate == 0].log_var.mean()))
@@ -594,14 +607,14 @@ def main():
     lines += ["\\botrule", "\\end{tabular}"]
     write(os.path.join(args.outdir, "table_extrap_breakdown.tex"), lines)
 
-    lines = ["\\begin{tabular}{lcc}", "\\toprule",
-             "Features removed & $R^2$ (grouped CV) & $\\Delta R^2$ \\\\", "\\midrule",
-             "none (all %d features) & %s & -- \\\\" % (len(FEATURE_COLUMNS), fmt_ms(full)),
-             "derived features (keep 6 primitives) & %s & %s \\\\" % (
-                 fmt_ms(prim), fmt_ms(np.array(full) - np.array(prim)))]
-    for gname, d in drops.items():
-        lines.append("%s & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ \\\\" % (
-            gname, d["r2"][0], d["r2"][1], d["delta"][0], d["delta"][1]))
+    lines = ["\\begin{tabular}{lcc}", "\\toprule", "Feature set & $R^2$ (grouped CV) & $\\Delta R^2$ \\\\", "\\midrule",
+             "six primitive features & %s & -- \\\\" % fmt_ms(prim)]
+    for k, v in ap_add.items():
+        lines.append("\\quad %s & %s & %s \\\\" % (k, fmt_ms(v), fmt_ms(np.array(v) - np.array(prim))))
+    lines.append("all %d features & %s & %s \\\\" % (len(FEATURE_COLUMNS), fmt_ms(full), fmt_ms(np.array(full) - np.array(prim))))
+    lines.append("\\midrule")
+    for c in PRIMITIVE:
+        lines.append("primitive minus %s & %s & %s \\\\" % (NICE_P[c], fmt_ms(ap_drop[c]), fmt_ms(np.array(prim) - np.array(ap_drop[c]))))
     lines += ["\\botrule", "\\end{tabular}"]
     write(os.path.join(args.outdir, "table_ablation.tex"), lines)
 
@@ -690,16 +703,17 @@ def main():
     plt.legend(fontsize=8, frameon=False); plt.xticks(fontsize=8); plt.yticks(fontsize=8)
     plt.tight_layout(); plt.savefig(os.path.join(args.figdir, "qubit_trend.pdf")); plt.close()
 
-    names = list(drops); deltas = [drops[g]["delta"][0] for g in names]
-    errs = [drops[g]["delta"][1] for g in names]
+    names = [NICE_P[c] for c in PRIMITIVE]
+    deltas = [ms(np.array(prim) - np.array(ap_drop[c]))[0] for c in PRIMITIVE]
+    errs = [ms(np.array(prim) - np.array(ap_drop[c]))[1] for c in PRIMITIVE]
     order_i = np.argsort(deltas)
-    plt.figure(figsize=(3.8, 2.8))
+    plt.figure(figsize=(4.2, 2.6))
     plt.barh(range(len(names)), np.array(deltas)[order_i], xerr=np.array(errs)[order_i],
              color=BLUE, height=0.7)
-    plt.yticks(range(len(names)), [names[i] for i in order_i], fontsize=7)
-    plt.xlabel("$\\Delta R^2$ when feature group is removed", fontsize=8)
+    plt.yticks(range(len(names)), [names[i] for i in order_i], fontsize=8)
+    plt.xlabel("$\\Delta R^2$ when the primitive feature is removed", fontsize=8)
     plt.xticks(fontsize=8); plt.tight_layout()
-    plt.savefig(os.path.join(args.figdir, "ablation.pdf")); plt.close()
+    plt.savefig(os.path.join(args.figdir, "ablation.pdf"), bbox_inches="tight"); plt.close()
 
     plt.figure(figsize=(3.6, 2.8))
     for cost, label, color, marker in [(0, "local $Z_0$", BLUE, "o"),
@@ -714,10 +728,10 @@ def main():
 
     plt.figure(figsize=(3.4, 2.9))
     plt.scatter(raw.log_var[ok], leg[ok], s=4, alpha=0.25, color=BLUE, edgecolors="none",
-                label="non-zero legacy gradient")
+                label="single parameter: non-zero gradient")
     fl = legacy_floor & raw.log_var.notna().to_numpy()
     plt.scatter(raw.log_var[fl], np.full(fl.sum(), -6.5), s=4, alpha=0.4, color=RED,
-                edgecolors="none", marker="v", label="legacy structural zero")
+                edgecolors="none", marker="v", label="single parameter: structural zero")
     plt.plot([-5, 0], [-5, 0], "k--", lw=1)
     plt.xlabel("all-parameter label $\\log_{10}\\overline{\\mathrm{Var}}$", fontsize=8)
     plt.ylabel("single-parameter label", fontsize=8)

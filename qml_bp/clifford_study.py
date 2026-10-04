@@ -202,7 +202,7 @@ def main():
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     BLUE, ORANGE, GREEN, GREY = "#3b6ea5", "#e67e22", "#27ae60", "#7f8c8d"
-    fig, ax = plt.subplots(1, 3, figsize=(7.4, 2.7))
+    fig, ax = plt.subplots(1, 3, figsize=(8.2, 3.3))
     ns = sorted(set(nq))
     def per_n(p, fn):
         return [fn(yte[nq == n], p[nq == n]) for n in ns]
@@ -213,18 +213,21 @@ def main():
     mm = np.array([per_n(p, mean_absolute_error) for p in mlp_seed])
     ax[0].plot(ns, mm.mean(0), marker="s", color=ORANGE, ms=3, lw=1.2, label="MLP (10 seeds)")
     ax[0].fill_between(ns, mm.min(0), mm.max(0), color=ORANGE, alpha=0.18)
-    ax[0].set_xlabel("test qubit count $n$ (trained on $n \\leq 12$)", fontsize=8)
-    ax[0].set_ylabel("MAE ($\\log_{10}$ units)", fontsize=8); ax[0].legend(fontsize=6, frameon=False)
-    ax[0].tick_params(labelsize=7)
+    ax[0].set_xlabel("test qubit count $n$ (trained on $n \\leq 12$)", fontsize=10)
+    ax[0].set_ylabel("MAE ($\\log_{10}$ units)", fontsize=10)
+    ax[0].tick_params(labelsize=9)
     for a, name, c in [(ax[1], "Structured linear", GREEN), (ax[2], "MLP", ORANGE)]:
         sc = a.scatter(yte, pred[name], s=4, c=nq, cmap="viridis", alpha=0.5, edgecolors="none")
         lo_, hi_ = yte.min() - 0.3, 0.2
         a.plot([lo_, hi_], [lo_, hi_], "k--", lw=0.7)
-        a.set_title("%s: $R^2=%.2f$" % (name, R["overall"][name]["r2"]), fontsize=8)
-        a.set_xlabel("true label, $13 \\leq n \\leq 32$", fontsize=8); a.tick_params(labelsize=7)
-    ax[1].set_ylabel("predicted", fontsize=8)
-    cb = fig.colorbar(sc, ax=ax[2], fraction=0.046, pad=0.04); cb.set_label("$n$", fontsize=7); cb.ax.tick_params(labelsize=6)
-    plt.tight_layout(); plt.savefig(os.path.join(args.figdir, "clifford.pdf")); plt.close()
+        a.set_title(name, fontsize=10)
+        a.set_xlabel("true label, $13 \\leq n \\leq 32$", fontsize=10); a.tick_params(labelsize=9)
+    ax[1].set_ylabel("predicted", fontsize=10)
+    cb = fig.colorbar(sc, ax=ax[2], fraction=0.046, pad=0.04, ticks=[13, 16, 20, 24, 28, 32])
+    cb.set_label("qubits $n$", fontsize=9); cb.ax.tick_params(labelsize=8)
+    h, l = ax[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=4, fontsize=9, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    plt.tight_layout(rect=(0, 0, 1, 0.9)); plt.savefig(os.path.join(args.figdir, "clifford.pdf"), bbox_inches="tight"); plt.close()
     print("wrote clifford_study.json, table_clifford.tex, figs/clifford.pdf")
 
 

@@ -14,6 +14,12 @@
 \usepackage{graphicx}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{booktabs}
+\newsavebox{\tblbox}
+% typeset a table at natural size, or scaled down to the text width if wider.
+% Tables use the class's underlying float (tableorg) because its threeparttable
+% wrapper does not accept a boxed tabular.
+\newcommand{\fittable}[1]{\sbox{\tblbox}{#1}\ifdim\wd\tblbox>\textwidth
+  \resizebox{\textwidth}{!}{\usebox{\tblbox}}\else\usebox{\tblbox}\fi}
 \usepackage{multirow}
 
 \theoremstyle{thmstyleone}
@@ -708,12 +714,13 @@ of these, the effective observable weight and the causal cone, encode
 physics that the primitive features carry only implicitly. No quantum simulation
 is needed to obtain any feature.
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Architectural features used to predict trainability. The first six
 are the sampled design parameters; the last six are deterministic functions
 of them.}
 \label{tab:features}
+\fittable{%
 \begin{tabular}{@{}lll@{}}
 \toprule
 \textbf{Feature} & \textbf{Meaning} & \textbf{Type}\\
@@ -731,8 +738,9 @@ of them.}
 \texttt{cone\_qubits}      & qubits in the backward causal cone of the observable & derived\\
 \texttt{cone\_frac}        & fraction of rotations inside the causal cone & derived\\
 \botrule
-\end{tabular}
-\end{table}
+\end{tabular}%
+}
+\end{tableorg}
 
 \paragraph{Rotation scheme.} With the fixed-\texttt{ry} scheme every rotation
 in Eq.~\eqref{eq:ansatz} is $R_y$. With the random-Pauli scheme the axis
@@ -883,12 +891,13 @@ gradient samples. Generation is embarrassingly parallel; every spec is seeded
 reproducibly from a root seed, and completed rows are appended to a
 comma-separated text file (CSV) as they finish, so a long run can be resumed.
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Sampled design space. Each spec draws these parameters independently
 and uniformly. The six parameters admit $11\times20\times2\times3\times2\times2=\DesignSpace$
 distinct combinations.}
 \label{tab:designspace}
+\fittable{%
 \begin{tabular}{lll}
 \toprule
 \textbf{Design parameter} & \textbf{Type} & \textbf{Sampled values}\\
@@ -900,8 +909,9 @@ distinct combinations.}
 \texttt{entangler\_gate} & categorical (2) & CZ, CX\\
 \texttt{cost\_global} & binary & local $Z_0$, global $Z^{\otimes n}$\\
 \botrule
-\end{tabular}
-\end{table}
+\end{tabular}%
+}
+\end{tableorg}
 
 \paragraph{Architectures versus rows.} The design space has only
 \DesignSpace{} distinct feature vectors, and the \Nrows{} rows cover
@@ -923,7 +933,7 @@ circuits, whose hidden axis pattern adds real variation.
 
 \paragraph{Descriptive statistics.} Supplementary Table~S2 summarizes the
 numeric features and the label over the \Nused{} labeled rows. The label
-spans from \LabelMin{} to \LabelMax{} with mean \LabelMean{} and standard
+spans from $\LabelMin$ to $\LabelMax$ with mean $\LabelMean$ and standard
 deviation \LabelStd. Structural zeros are common: \StructFracParams\% of all
 parameters are structural zeros, and \StructRowsAny\% of circuits contain at
 least one. Supplementary Figure~S2 shows that they concentrate in shallow
@@ -940,8 +950,8 @@ entanglement and the CX entangler lower it further. This structure is what
 makes the prediction task learnable.
 
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Dataset statistics broken down by design choice. Lower mean
 $\log_{10}\Vbar$ and higher barren fraction indicate less trainable
 families; the last column is the mean fraction of parameters that are
@@ -949,6 +959,7 @@ structural zeros. These are properties of the labeled data, not model
 outputs.}
 \label{tab:labelbydesign}
 %%BEGIN-TABLE:labelbydesign
+\fittable{%
 \begin{tabular}{lrrrr}
 \toprule
 \textbf{Design choice} & \textbf{Count} & \textbf{Mean} $\boldsymbol{\log_{10}\overline{\mathrm{Var}}}$ & \textbf{Barren \%} & \textbf{Structural-zero \%}\\
@@ -970,9 +981,10 @@ outputs.}
 \quad fixed-\texttt{ry} & 9878 & $-1.77$ & 39.5 & 15.8\\
 \quad random-Pauli & 9980 & $-1.99$ & 45.8 & 28.4\\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:labelbydesign
-\end{table}
+\end{tableorg}
 
 
 
@@ -1156,13 +1168,14 @@ across a dense design space, not extrapolation;
 Sections~\ref{sec:extrap}, \ref{sec:clifford} and \ref{sec:lopo} probe
 beyond it.
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Architecture-grouped cross-validation (mean $\pm$ standard deviation
 over \NFolds{} folds). Regression predicts $\log_{10}\Vbar$; classification
 predicts $y<-2$. The controls below the rule are ordered from strongest to weakest. The selected model is shown in bold.}
 \label{tab:models}
 %%BEGIN-TABLE:grouped_cv
+\fittable{%
 \begin{tabular}{lcccc}
 \toprule
  & \multicolumn{2}{c}{Regression} & \multicolumn{2}{c}{Classification} \\
@@ -1182,9 +1195,10 @@ Physics-informed linear & $0.682 \pm 0.016$ & $0.392 \pm 0.008$ & $0.927 \pm 0.0
 Cost-locality subgroup mean & $0.043 \pm 0.011$ & $0.771 \pm 0.011$ & $0.593 \pm 0.012$ & $0.591 \pm 0.012$ \\
 Training mean & $-0.002 \pm 0.002$ & $0.794 \pm 0.011$ & $0.500 \pm 0.000$ & $0.574 \pm 0.021$ \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:grouped_cv
-\end{table}
+\end{tableorg}
 
 \begin{figure}[t]
 \centering
@@ -1261,13 +1275,14 @@ the first seed), the structured linear model \LargeRsqStruct, HGB
 are two to four times more expensive to label by statevector simulation
 than the largest training circuits.
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Held-out 13- and 14-qubit circuits (\LargeN{} circuits, labeled as
 the main dataset), predicted by models trained on all $n\le12$ circuits.
 95\% bootstrap confidence intervals over test rows.}
 \label{tab:large}
 %%BEGIN-TABLE:large
+\fittable{%
 \begin{tabular}{lcccccc}
 \toprule
 Model & $R^2$ [95\% CI] & MAE & $R^2$, $n=13$ & $R^2$, $n=14$ & $R^2$, local & $R^2$, global \\
@@ -1283,9 +1298,10 @@ Physics-informed linear (effective weight) & 0.561 [0.544, 0.576] & 0.694 & 0.54
 Physics-informed linear & 0.350 [0.326, 0.375] & 0.815 & 0.354 & 0.345 & 0.187 & 0.157 \\
 Cost-locality subgroup mean & -0.889 [-1.024, -0.776] & 1.549 & -0.902 & -0.884 & -0.442 & -3.400 \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:large
-\end{table}
+\end{tableorg}
 
 
 
@@ -1344,8 +1360,8 @@ $R^2=\ClLeTwentyStruct$ (structured linear), $\ClLeTwentyMLP$ (neural
 network, five seeds) and \ClLeTwentyHGB{} (HGB), because the resolved
 large-$n$ circuits are then within the range of behavior seen in training.
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Extrapolation with exact Clifford labels, by cost locality. Models
 are trained on $n\le12$ (\ClTrainRows{} circuits). ``Resolved'' is the
 fraction of test circuits above the sampling resolution; $R^2$ and bias
@@ -1356,6 +1372,7 @@ respects the measured upper bound. MLP: mean $\pm$ standard deviation over
 ten seeds.}
 \label{tab:clifford}
 %%BEGIN-TABLE:clifford_cost
+\fittable{%
 \begin{tabular}{lcccccccc}
 \toprule
  & \multicolumn{4}{c}{Local cost} & \multicolumn{4}{c}{Global cost} \\
@@ -1368,9 +1385,10 @@ Qubits & Resolved & Struct.~$R^2$ & MLP $R^2$ & Bias & Resolved & Struct.~$R^2$ 
 25--28 & 82\% & 0.43 & $-1.51 \pm 1.29$ & $-0.66$ & 25\% & -- & -- & 60\% \\
 29--32 & 81\% & 0.23 & $-4.04 \pm 2.70$ & $-0.77$ & 22\% & -- & -- & 98\% \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:clifford_cost
-\end{table}
+\end{tableorg}
 
 \begin{figure}[t]
 \centering
@@ -1420,13 +1438,14 @@ nominal indicator is replaced by the effective weight. The ablation is a
 consistency check on the model, not an independent discovery: the features
 were chosen with the theory in mind.
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Nominal and effective observable weight for circuits with
 $n\ge10$, with the mean label of each family. CZ leaves the observable
 unchanged; CX maps it to a different $Z$-string.}
 \label{tab:effweight}
 %%BEGIN-TABLE:effweight
+\fittable{%
 \begin{tabular}{lllcrr}
 \toprule
 Gate & Pattern & Nominal cost & Effective weight & Mean $\log_{10}\overline{\mathrm{Var}}$ & Circuits \\
@@ -1445,18 +1464,20 @@ CX & circular & global & $\approx n/2$ & $-3.26$ & 413 \\
 CX & all-to-all & local & $1$ & $-2.70$ & 455 \\
 CX & all-to-all & global & $1$ & $-2.13$ & 443 \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:effweight
-\end{table}
+\end{tableorg}
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Feature ablation under architecture-grouped cross-validation
 (HGB; mean $\pm$ standard deviation over \NFolds{} folds). Upper part:
 what the derived features add to the six primitive features. Lower part:
 the drop when one primitive feature is removed from the six.}
 \label{tab:ablation}
 %%BEGIN-TABLE:ablation
+\fittable{%
 \begin{tabular}{lcc}
 \toprule
 Feature set & $R^2$ (grouped CV) & $\Delta R^2$ \\
@@ -1474,9 +1495,10 @@ primitive minus entanglement pattern & $0.795 \pm 0.020$ & $0.184 \pm 0.019$ \\
 primitive minus entangler gate & $0.825 \pm 0.017$ & $0.155 \pm 0.018$ \\
 primitive minus cost locality & $0.676 \pm 0.028$ & $0.304 \pm 0.027$ \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:ablation
-\end{table}
+\end{tableorg}
 
 \begin{figure}[t]
 \centering
@@ -1520,8 +1542,8 @@ extreme pattern loses the most. A user who needs the best accuracy for a new
 gate pattern should add a modest number of labeled circuits of that pattern
 to the training set, which the released pipeline does from one command.
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Leave-one-pattern-out transfer. For each row, HGB is trained on the
 other four patterns and tested on the held-out one (``unseen''), with the
 full pattern-agnostic feature set or with graph descriptors only (``graph
@@ -1531,6 +1553,7 @@ physics-informed linear control (effective-weight variant) is fitted on the
 same training rows.}
 \label{tab:lopo}
 %%BEGIN-TABLE:lopo
+\fittable{%
 \begin{tabular}{lrccccccc}
 \toprule
  & & \multicolumn{3}{c}{Pattern unseen} & \multicolumn{2}{c}{Pattern seen} & \multicolumn{2}{c}{Physics-linear} \\
@@ -1543,9 +1566,10 @@ all-to-all & 6541 & 0.753 & 0.414 & 0.241 & 0.972 & 0.076 & 0.621 & 0.442 \\
 brickwork & 4998 & 0.930 & 0.925 & 0.141 & 0.978 & 0.074 & 0.669 & 0.409 \\
 star & 4928 & 0.924 & 0.742 & 0.156 & 0.968 & 0.083 & 0.726 & 0.391 \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:lopo
-\end{table}
+\end{tableorg}
 
 
 \subsection{How much data is needed}\label{sec:learningcurve}
@@ -1580,14 +1604,15 @@ top fifth of the HGB ranking are. The top fifth is a shortlist, not a
 complete list: by construction it contains at most a fifth of the circuits
 and so misses the remaining ones above the cutoff.
 
-\begin{table}[t]
-\centering
+\begin{tableorg}[t]
+\centering\tablebodyfont
 \caption{Ranking within a fixed qubit count, from out-of-fold predictions.
 Spearman correlation between predicted and true label, and the percentage
 of the top 20\% of each ranking that lies above the cutoff $y\ge-2$. Qubit
 counts at which every circuit is above the cutoff are omitted.}
 \label{tab:screening}
 %%BEGIN-TABLE:screening_within
+\fittable{%
 \begin{tabular}{rrccccccc}
 \toprule
  & & & \multicolumn{3}{c}{Spearman $\rho$ with true label} & \multicolumn{3}{c}{Above cutoff in top 20\% (\%)} \\
@@ -1603,9 +1628,10 @@ $n$ & Circuits & Above cutoff (\%) & HGB & Struct.~linear & Physics-linear & HGB
 11 & 1740 & 24 & 0.977 & 0.964 & 0.610 & 99.7 & 99.4 & 67.0 \\
 12 & 1840 & 26 & 0.978 & 0.968 & 0.605 & 99.5 & 99.7 & 64.9 \\
 \botrule
-\end{tabular}
+\end{tabular}%
+}
 %%END-TABLE:screening_within
-\end{table}
+\end{tableorg}
 
 %=================================================================
 \section{Discussion}\label{sec:discussion}

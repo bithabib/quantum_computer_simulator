@@ -262,7 +262,9 @@ def main():
               "ablation", "cutoff", "lopo", "gap", "screening_within", "large", "effweight",
               "clifford", "clifford_cost"]:
         tp = os.path.join(RES, "table_%s.tex" % t)
-        tables[t] = open(tp).read().strip() if os.path.exists(tp) else "% (pending)"
+        body = open(tp).read().strip() if os.path.exists(tp) else "% (pending)"
+        # never let a generated table exceed the text width
+        tables[t] = "\\fittable{%\n" + body + "%\n}"
 
     for fname in ["main.tex", "response_to_reviewers.tex", "cover_letter.tex", "supplement.tex"]:
         path = os.path.join(HERE, fname)

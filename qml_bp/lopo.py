@@ -129,15 +129,16 @@ def main():
     import matplotlib.pyplot as plt
     names = [NICE[p] for p in ENTANGLE_PATTERNS]
     x = np.arange(5); w = 0.27
-    plt.figure(figsize=(4.2, 2.7))
+    plt.figure(figsize=(5.2, 2.9))
     plt.bar(x - w, [lopo[p]["seen_r2"] for p in ENTANGLE_PATTERNS], w, color="#3b6ea5", label="pattern seen (grouped CV)")
     plt.bar(x, [lopo[p]["unseen_r2"] for p in ENTANGLE_PATTERNS], w, color="#e67e22", label="pattern unseen (LOPO)")
     plt.bar(x + w, [lopo[p]["phys_r2"] for p in ENTANGLE_PATTERNS], w, color="#7f8c8d", label="physics-informed linear")
     plt.xticks(x, names, fontsize=8); plt.yticks(fontsize=8)
     plt.ylabel("$R^2$ on held-out pattern", fontsize=8)
     plt.axhline(0, color="k", lw=0.6)
-    plt.legend(fontsize=6.5, frameon=False, loc="lower left")
-    plt.tight_layout(); plt.savefig(os.path.join(args.figdir, "lopo.pdf")); plt.close()
+    plt.legend(fontsize=7, frameon=False, loc="upper center", bbox_to_anchor=(0.5, 1.22), ncol=3)
+    plt.ylim(0, 1.05)
+    plt.tight_layout(); plt.savefig(os.path.join(args.figdir, "lopo.pdf"), bbox_inches="tight"); plt.close()
     print("wrote", os.path.join(args.outdir, "lopo.json"), "and figs/lopo.pdf")
 
 
