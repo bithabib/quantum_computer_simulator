@@ -1,0 +1,121 @@
+{
+ "tied": {
+  "rows_generated": 10000,
+  "rows": 9929,
+  "label_mean": -0.94575481886565,
+  "label_std": 0.7301380621106979,
+  "below_cutoff_frac": 0.10293080874206868,
+  "n_unique_arch": 4435,
+  "r2_ceiling": 0.9886008473686128,
+  "cv": {
+   "Hist Gradient Boosting": [
+    0.9825380013991023,
+    0.0016842810116369784
+   ],
+   "MLP": [
+    0.9805895880863712,
+    0.0021637154991492927
+   ],
+   "Structured linear": [
+    0.957571502345268,
+    0.004501890355246386
+   ],
+   "Physics-informed linear (effective weight)": [
+    0.3103271075628465,
+    0.036289185351893155
+   ],
+   "Physics-informed linear": [
+    0.30949978038432846,
+    0.03897220562803596
+   ]
+  },
+  "extrap": {
+   "train_rows": 8127,
+   "test_rows": 1802,
+   "Hist Gradient Boosting": {
+    "mean": 0.9423066848354448
+   },
+   "MLP": {
+    "mean": 0.968565788522332,
+    "sd": 0.0028337604557401174,
+    "min": 0.964046280401298,
+    "max": 0.9740418780311983
+   },
+   "Structured linear": {
+    "mean": 0.9337548402958137
+   },
+   "Physics-informed linear (effective weight)": {
+    "mean": 0.17392587060118692
+   },
+   "Physics-informed linear": {
+    "mean": 0.17702364348834376
+   }
+  },
+  "transfer_from_main": {
+   "r2": -1.5690703661900245,
+   "bias": -0.943448987351252
+  },
+  "offset_vs_main": {
+   "mean": 0.9348029918747492,
+   "sd": 0.6980869167798825,
+   "corr": 0.6694501389252618,
+   "n_arch": 4340
+  },
+  "clifford_shortcut": {
+   "n_circuits": 100,
+   "median_abs_log10_diff": 0.0997468853548438,
+   "frac_circuits_off_by_factor_two": 0.27,
+   "frac_params_grid_zero_but_true_nonzero": 0.2747524752475248
+  }
+ },
+ "graph": {
+  "rows_generated": 10000,
+  "rows": 9949,
+  "label_mean": -2.139307816404472,
+  "label_std": 0.9575282548470687,
+  "below_cutoff_frac": 0.5453814453713941,
+  "cone_vs_structural": {
+   "mad": 0.06342276933900091,
+   "mad_fixed_ry": 0.002291422975061725,
+   "exact_frac_fixed_ry": 0.9175114291393361
+  },
+  "cv": {
+   "Hist Gradient Boosting": [
+    0.9745617408434365,
+    0.002424245126451274
+   ],
+   "MLP": [
+    0.9744803095902125,
+    0.0023330021570620394
+   ],
+   "Descriptor rule (linear)": [
+    0.9657390684514044,
+    0.002767453423854289
+   ],
+   "HGB, design parameters only": [
+    0.9359876921661436,
+    0.006128334211130879
+   ]
+  },
+  "rule_n_coef": 96,
+  "extrap": {
+   "train_rows": 7911,
+   "test_rows": 2038,
+   "Hist Gradient Boosting": {
+    "mean": 0.6840356498502594
+   },
+   "MLP": {
+    "mean": 0.9228999988256581,
+    "sd": 0.005927484066132806,
+    "min": 0.9127622338165788,
+    "max": 0.9321207971506899
+   },
+   "Descriptor rule (linear)": {
+    "mean": 0.9022251109179795
+   },
+   "HGB, design parameters only": {
+    "mean": 0.5671840483103716
+   }
+  }
+ }
+}

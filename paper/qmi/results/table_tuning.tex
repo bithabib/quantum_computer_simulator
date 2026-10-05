@@ -1,0 +1,18 @@
+\begin{tabular}{lcc}
+\toprule
+Model & Named patterns & Shared parameters \\
+\midrule
+Fitted linear rule (structured linear) & $0.969 \pm 0.002$ & $0.958 \pm 0.003$ \\
+\midrule
+HGB, paper settings & $0.980 \pm 0.001$ & $0.982 \pm 0.003$ \\
+HGB, nested randomized search (20 configurations) & $0.981 \pm 0.001$ & $0.984 \pm 0.003$ \\
+Extra trees, 1000 trees & $0.979 \pm 0.002$ & $0.984 \pm 0.002$ \\
+MLP (256, 256, 128), early stopping & $0.981 \pm 0.002$ & $0.984 \pm 0.003$ \\
+Ensemble of 5 MLPs (128, 64) & $0.982 \pm 0.001$ & $0.983 \pm 0.003$ \\
+Blend of HGB and the MLP ensemble & $0.982 \pm 0.001$ & $0.984 \pm 0.003$ \\
+SVR, RBF kernel & $0.979 \pm 0.002$ & $0.982 \pm 0.003$ \\
+Kernel ridge, RBF kernel & $0.979 \pm 0.002$ & $0.982 \pm 0.003$ \\
+\midrule
+Noise ceiling & 0.985 & 0.989 \\
+\botrule
+\end{tabular}

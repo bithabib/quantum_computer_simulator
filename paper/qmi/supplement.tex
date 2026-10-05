@@ -427,6 +427,39 @@
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
 \newcommand{\ClQmax}{32}
+\newcommand{\TiedRows}{10\,000}
+\newcommand{\TiedCeil}{0.989}
+\newcommand{\TiedHGB}{0.983}
+\newcommand{\TiedMLP}{0.981}
+\newcommand{\TiedRule}{0.958}
+\newcommand{\TiedPhys}{0.309}
+\newcommand{\TiedExMLP}{0.969}
+\newcommand{\TiedExHGB}{0.942}
+\newcommand{\TiedExRule}{0.934}
+\newcommand{\TiedTransfer}{-1.57}
+\newcommand{\TiedOffset}{0.93}
+\newcommand{\TiedCorr}{0.67}
+\newcommand{\TiedShortN}{100}
+\newcommand{\TiedShortZero}{27}
+\newcommand{\TiedShortOff}{27}
+\newcommand{\GraphRows}{10\,000}
+\newcommand{\GraphHGB}{0.975}
+\newcommand{\GraphMLP}{0.974}
+\newcommand{\GraphRule}{0.966}
+\newcommand{\GraphDesignOnly}{0.936}
+\newcommand{\GraphRuleCoef}{96}
+\newcommand{\GraphExMLP}{0.923}
+\newcommand{\GraphExHGB}{0.684}
+\newcommand{\GraphExRule}{0.902}
+\newcommand{\GraphConeMadRy}{0.002}
+\newcommand{\GraphConeExactRy}{92}
+\newcommand{\GraphNFeat}{19}
+\newcommand{\TuneBest}{0.982}
+\newcommand{\TuneSpread}{0.003}
+\newcommand{\TuneGap}{0.013}
+\newcommand{\TuneHeadroom}{0.003}
+\newcommand{\TuneBestTied}{0.984}
+\newcommand{\TuneGapTied}{0.026}
 \newcommand{\LopoExtraRows}{9\,926}
 \newcommand{\LopoDescRsq}{0.978}
 \newcommand{\LopoIndexRsq}{0.978}
@@ -478,7 +511,8 @@ text: model hyperparameters (Table~S1), descriptive statistics of the dataset
 comparison on the qubit-count extrapolation split (Table~S4), the
 widening-gap extrapolation table (Table~S5), the extrapolation error by
 subset of the 11- and 12-qubit test set (Table~S6), the pooled
-Clifford-label extrapolation table (Table~S7), the learning curve
+Clifford-label extrapolation table (Table~S7), the robustness of the
+results to model choice and tuning (Table~S8), the learning curve
 (Figure~S1), and six further figures (Figures~S2--S7). Every number is produced by the released analysis scripts.}
 \maketitle
 
@@ -682,6 +716,41 @@ Qubits & Resolved & Censored & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
 \end{tabular}%
 }
 %%END-TABLE:clifford
+\end{tableorg}
+
+\section{Robustness to model choice and tuning}
+Main-text Section~\ref{M-sec:cv} discusses this table. The hyperparameter
+search is nested: it is run inside each training fold, with a three-fold
+architecture-grouped inner split, so the test folds are never used for
+selection.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Unseen architectures ($R^2$, mean $\pm$ standard deviation over five
+architecture-grouped folds) for eight learner configurations and the fitted
+linear rule. The kernel methods are trained on at most 6\,000 rows.}
+\label{tab:tuning}
+%%BEGIN-TABLE:tuning
+\fittable{%
+\begin{tabular}{lcc}
+\toprule
+Model & Named patterns & Shared parameters \\
+\midrule
+Fitted linear rule (structured linear) & $0.969 \pm 0.002$ & $0.958 \pm 0.003$ \\
+\midrule
+HGB, paper settings & $0.980 \pm 0.001$ & $0.982 \pm 0.003$ \\
+HGB, nested randomized search (20 configurations) & $0.981 \pm 0.001$ & $0.984 \pm 0.003$ \\
+Extra trees, 1000 trees & $0.979 \pm 0.002$ & $0.984 \pm 0.002$ \\
+MLP (256, 256, 128), early stopping & $0.981 \pm 0.002$ & $0.984 \pm 0.003$ \\
+Ensemble of 5 MLPs (128, 64) & $0.982 \pm 0.001$ & $0.983 \pm 0.003$ \\
+Blend of HGB and the MLP ensemble & $0.982 \pm 0.001$ & $0.984 \pm 0.003$ \\
+SVR, RBF kernel & $0.979 \pm 0.002$ & $0.982 \pm 0.003$ \\
+Kernel ridge, RBF kernel & $0.979 \pm 0.002$ & $0.982 \pm 0.003$ \\
+\midrule
+Noise ceiling & 0.985 & 0.989 \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:tuning
 \end{tableorg}
 
 \section{Additional figures}

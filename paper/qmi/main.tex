@@ -440,6 +440,39 @@
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
 \newcommand{\ClQmax}{32}
+\newcommand{\TiedRows}{10\,000}
+\newcommand{\TiedCeil}{0.989}
+\newcommand{\TiedHGB}{0.983}
+\newcommand{\TiedMLP}{0.981}
+\newcommand{\TiedRule}{0.958}
+\newcommand{\TiedPhys}{0.309}
+\newcommand{\TiedExMLP}{0.969}
+\newcommand{\TiedExHGB}{0.942}
+\newcommand{\TiedExRule}{0.934}
+\newcommand{\TiedTransfer}{-1.57}
+\newcommand{\TiedOffset}{0.93}
+\newcommand{\TiedCorr}{0.67}
+\newcommand{\TiedShortN}{100}
+\newcommand{\TiedShortZero}{27}
+\newcommand{\TiedShortOff}{27}
+\newcommand{\GraphRows}{10\,000}
+\newcommand{\GraphHGB}{0.975}
+\newcommand{\GraphMLP}{0.974}
+\newcommand{\GraphRule}{0.966}
+\newcommand{\GraphDesignOnly}{0.936}
+\newcommand{\GraphRuleCoef}{96}
+\newcommand{\GraphExMLP}{0.923}
+\newcommand{\GraphExHGB}{0.684}
+\newcommand{\GraphExRule}{0.902}
+\newcommand{\GraphConeMadRy}{0.002}
+\newcommand{\GraphConeExactRy}{92}
+\newcommand{\GraphNFeat}{19}
+\newcommand{\TuneBest}{0.982}
+\newcommand{\TuneSpread}{0.003}
+\newcommand{\TuneGap}{0.013}
+\newcommand{\TuneHeadroom}{0.003}
+\newcommand{\TuneBestTied}{0.984}
+\newcommand{\TuneGapTied}{0.026}
 \newcommand{\LopoExtraRows}{9\,926}
 \newcommand{\LopoDescRsq}{0.978}
 \newcommand{\LopoIndexRsq}{0.978}
@@ -493,25 +526,23 @@ Data-Driven Model for Barren Plateaus}
 \abstract{Barren plateaus, the exponential decay of the cost-gradient
 variance with qubit number, are a central obstacle to training variational
 quantum circuits. We ask how well the gradient variance of a
-hardware-efficient circuit can be predicted from its architecture alone:
-qubit count, depth, rotation scheme, entanglement pattern, entangler gate,
-and cost observable. We simulate \Nrows{} random circuits with 2 to 12
-qubits and use the mean gradient variance over all parameters as the label,
-excluding parameters whose gradient vanishes identically. Under
-architecture-grouped cross-validation, gradient-boosted trees and a neural
-network reach $R^2=\RsqCV$ against a noise ceiling of \RsqCeiling. A
-structured linear model reaches \RsqStruct, so the map from architecture to
-gradient variance is simple, whereas a five-coefficient rule in qubit
-count, depth, and cost locality reaches \RsqPhys. Part of the difference is
-that the last entangling layer changes the weight of the measured
-observable. Models with a continuous dependence on qubit count, trained on
-at most 12 qubits, reach $R^2\approx\LargeRsqMLPmean$ on held-out 13- and
-14-qubit circuits; tree ensembles do not extrapolate.
-\ClAbstractSentence{} Describing an entanglement pattern by its effect on
-the observable and the causal cone allows transfer to patterns absent from
-training. The predicted quantity is a finite-size gradient-variance proxy
-for one circuit family, not optimization success and not a proof of
-scaling.}
+hardware-efficient circuit can be predicted from its architecture alone. We
+simulate \Nrows{} random circuits with 2 to 12 qubits and use the mean
+gradient variance over all parameters as the label, excluding parameters
+whose gradient vanishes identically. On architectures never seen in
+training, gradient-boosted trees and a neural network reach $R^2=\RsqCV$
+against a noise ceiling of \RsqCeiling, far above a five-coefficient rule in
+qubit count, depth, and cost locality (\RsqPhys) and slightly above a fitted
+linear table (\RsqStruct): the map from architecture to gradient variance is
+simple. Two closed-form quantities explain much of what the simple rule
+misses, the weight of the observable after the last entangling layer and
+the causal cone. The same accuracy is obtained for circuits with
+layer-shared parameters, for which no exact shortcut exists, and for random
+entangling graphs. \ClAbstractSentence{} Describing a pattern by its effect
+on the observable and the causal cone allows transfer to entanglement
+patterns absent from training. The predicted quantity is a finite-size
+gradient-variance proxy for hardware-efficient circuits, not optimization
+success and not a proof of scaling.}
 
 \keywords{Barren plateaus, Variational quantum circuits, Quantum machine
 learning, Trainability, Gradient variance, Statevector simulation, Gradient
@@ -611,7 +642,9 @@ up to 14 qubits and, using exact Clifford sampling, on circuits up to
 \ClQmax{} qubits, and we report where each model class fails.
 \item We test transfer to entanglement patterns absent from training, using
 closed-form descriptors of the entangling graph and a leave-one-pattern-out
-experiment over five patterns.
+experiment over five patterns, and we repeat the central measurements on
+two further families: circuits with layer-shared parameters, for which no
+exact shortcut exists, and circuits with random entangling graphs.
 \end{itemize}
 
 We also want to be clear about scope. We make no claim of quantum advantage.
@@ -1152,6 +1185,42 @@ All models use fixed random seeds, so the reported numbers reproduce exactly.
 All code, command lines, seeds, and software versions are released; see the
 data availability statement.
 
+\subsection{Two further circuit families}\label{sec:familiesmethod}
+To test whether the approach depends on the particular design space, we
+labeled two further families in the same way (exact adjoint gradients,
+\Samples{} parameter vectors, mean variance over non-structural
+parameters).
+
+\paragraph{Shared parameters.} The circuits of Section~\ref{sec:spec} with
+one angle per layer shared by all qubits, as in QAOA-type and
+Hamiltonian-variational ans\"atze. A circuit then has $L$ parameters, and
+the gradient with respect to a shared angle is the sum of the gradients of
+the $n$ gates that carry it. We generated \TiedRows{} such circuits with the
+design parameters sampled as in Table~\ref{tab:designspace}. This family
+matters for a second reason: an angle now appears $n$ times, the cost is no
+longer of degree one in each angle, and the four-point rule of
+Section~\ref{sec:cliffordmethod} is not exact. On \TiedShortN{} small
+circuits the Clifford grid assigns zero variance to \TiedShortZero\% of the
+shared parameters whose true variance is non-zero, and misestimates the
+label by more than a factor of two in \TiedShortOff\% of circuits. For
+shared parameters there is no cheap exact label beyond statevector reach.
+
+\paragraph{Random entangling graphs.} In place of a named pattern, every
+pair of qubits carries an entangling gate with probability $p$, drawn
+uniformly from $[0.1,1]$ for each circuit, with random orientation and
+order; the graph is either the same in every layer or drawn afresh in each
+layer. There is no finite list of patterns, so each circuit is described by
+its seven design parameters and by closed-form descriptors: the graph
+descriptors of Section~\ref{sec:eval}, the mean degree, the degree of the
+measured qubit, the effective observable weight, and the causal cone
+(\GraphNFeat{} features in all). We generated \GraphRows{} circuits with
+$n\in[3,12]$. Every circuit has its own graph, so every row is a distinct
+architecture and we use ordinary five-fold cross-validation, repeated
+twice. As a hand-built rule we use the analogue of the structured linear
+model: within each combination of rotation scheme, entangler gate, and cost,
+a linear model in the cone-based size terms of Eq.~\eqref{eq:struct} and in
+the descriptors (\GraphRuleCoef{} coefficients).
+
 \subsection{Exact labels beyond statevector reach}\label{sec:cliffordmethod}
 Statevector simulation limits the labeled circuits to $n\le14$. For this
 circuit family a second exact method has no such limit. Every angle appears
@@ -1219,14 +1288,19 @@ predictions.
 Three comparisons put these numbers in context. First, the controls. The
 five-coefficient physics-informed model of Eq.~\eqref{eq:phys} reaches
 $R^2=\RsqPhys$, and \RsqPhysEff{} when the nominal locality is replaced by
-the effective weight. The structured linear model reaches $R^2=\RsqStruct$,
-within \GainOverStruct{} of HGB. The flexible learners therefore do not
-find structure that a well-specified linear model misses; their accuracy
-shows that the label is predictable, and the structured model shows that
-the prediction rule is simple: within each categorical cell,
-$\log_{10}\Vbar$ falls linearly with qubit count and saturates with depth.
-What a flexible learner does add is convenience. It reaches the same
-accuracy without anyone choosing the terms of Eq.~\eqref{eq:struct}.
+the effective weight: against the rule one would write down from the
+literature, the learners are decisively better. The structured linear model
+reaches $R^2=\RsqStruct$, within \GainOverStruct{} of HGB: against the best
+linear table we could build, the learners are consistently but only
+modestly better. Their accuracy shows that the label is predictable, and
+the structured model shows that the prediction rule is simple: within each
+categorical cell, $\log_{10}\Vbar$ falls linearly with the relevant qubit
+count and saturates with depth. This conclusion does not depend on the
+choice or tuning of the learner. Eight learner configurations, including a nested
+hyperparameter search, larger and ensembled networks, and kernel methods,
+lie within \TuneSpread{} of one another; the best reaches
+$R^2=\TuneBest$, \TuneHeadroom{} below the noise ceiling (Supplementary
+Table~S8).
 Second, the ceiling. The within-architecture noise estimate of
 Section~\ref{sec:data} caps $R^2$ near \RsqCeiling, so both HGB and the
 structured model recover nearly all of the explainable variance. Third, the
@@ -1717,6 +1791,70 @@ star & 4928 & 0.924 & 0.742 & 0.156 & 0.968 & 0.083 & 0.726 & 0.391 \\
 \end{tableorg}
 
 
+\subsection{Other circuit families}\label{sec:families}
+Table~\ref{tab:families} repeats the central measurements on the two further
+families of Section~\ref{sec:familiesmethod}. The picture is the same in all
+three. On unseen architectures the learners reach $R^2=\TiedHGB$ and
+\TiedMLP{} for shared parameters and \GraphHGB{} and \GraphMLP{} for random
+graphs, against \RsqCV{} and \RsqCVMLP{} for the named patterns, and in
+each family a fitted linear rule comes within a few hundredths
+(\TiedRule{} and \GraphRule). Extrapolation from $n\le10$ to 11 and 12
+qubits also behaves alike: the neural network and the linear rule continue
+the trend, and tree ensembles do so only where the labels at larger $n$
+stay within the training range.
+
+Three family-specific observations are worth recording. First, shared
+parameters change the label substantially. A model trained on the
+independent-parameter family and applied to the shared-parameter family
+fails ($R^2=\TiedTransfer$): on identical architectures the shared-parameter
+label is higher by \TiedOffset{} $\log_{10}$ units on average, because the
+gradient of a shared angle sums the contributions of $n$ gates, and the two
+labels correlate only at \TiedCorr. A predictor must be fitted per family.
+Second, the shared-parameter family is the one for which a fitted predictor
+has no exact competitor, since the Clifford shortcut fails there
+(Section~\ref{sec:familiesmethod}). Third, on random graphs the physics
+descriptors are what make the problem tractable. HGB given only the seven
+design parameters reaches $R^2=\GraphDesignOnly$; given the descriptors it
+reaches \GraphHGB. The causal-cone fraction equals the exact non-structural
+fraction of parameters in \GraphConeExactRy\% of fixed-\texttt{ry} random-graph
+circuits (mean absolute difference \GraphConeMadRy), although no two
+circuits share a graph.
+
+\begin{tableorg}[t]
+\centering\tablebodyfont
+\caption{The central measurements on three circuit families. ``Fitted
+linear rule'' is the structured linear model for the first two families and
+its descriptor analogue for random graphs. Unseen architectures: grouped
+cross-validation for the first two families, repeated five-fold
+cross-validation for random graphs, where every circuit is a distinct
+architecture (mean $\pm$ standard deviation over ten folds).}
+\label{tab:families}
+%%BEGIN-TABLE:families
+\fittable{%
+\begin{tabular}{lccc}
+\toprule
+ & Named patterns & Shared parameters & Random graphs \\
+\midrule
+Circuits & 19858 & 9929 & 9949 \\
+Exact Clifford shortcut & yes & no & yes \\
+Noise ceiling on $R^2$ & 0.985 & 0.989 & -- \\
+\midrule
+\multicolumn{4}{l}{\emph{Unseen architectures, $R^2$}}\\
+\quad HGB & $0.980 \pm 0.003$ & $0.983 \pm 0.002$ & $0.975 \pm 0.002$ \\
+\quad MLP & $0.979 \pm 0.003$ & $0.981 \pm 0.002$ & $0.974 \pm 0.002$ \\
+\quad fitted linear rule & $0.969 \pm 0.002$ & $0.958 \pm 0.005$ & $0.966 \pm 0.003$ \\
+\quad five-coefficient rule & $0.682 \pm 0.016$ & $0.309 \pm 0.039$ & -- \\
+\midrule
+\multicolumn{4}{l}{\emph{Trained on $n\le10$, tested on $n=11,12$, $R^2$}}\\
+\quad MLP (10 seeds) & $0.961 \pm 0.003$ & $0.969 \pm 0.003$ & $0.923 \pm 0.006$ \\
+\quad HGB & 0.860 & 0.942 & 0.684 \\
+\quad fitted linear rule & 0.935 & 0.934 & 0.902 \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:families
+\end{tableorg}
+
 \subsection{How much data is needed}\label{sec:learningcurve}
 Supplementary Figure~S1 shows grouped-CV $R^2$ as a function of the
 number of training rows, with whole architectures added at a time. Both
@@ -1802,8 +1940,9 @@ qubit count. Within a QAS loop, the predictor could act as a zero-cost filter
 ahead of any training-free proxy or actual training.
 
 Several limitations scope these claims.
-(i)~\emph{One circuit family.} The design space is one hardware-efficient
-ansatz with five fixed entanglement patterns. Section~\ref{sec:lopo} shows
+(i)~\emph{Hardware-efficient circuits only.} The design spaces studied are
+variants of one hardware-efficient layout: five named entanglement patterns,
+random entangling graphs, and independent or layer-shared parameters. Section~\ref{sec:lopo} shows
 that a pattern the model has never seen can be predicted when it is
 described by its effect on the observable and on the causal cone, but with
 a measurable loss, so predictions for a new gate pattern should be
@@ -1844,9 +1983,10 @@ favor of a predictor: it costs microseconds per candidate, which matters
 when the design space is searched; sampling cannot resolve variances far
 below the reciprocal of the sample count, which is where barren plateaus
 live; and the quadrature property fails as soon as parameters are shared
-between gates or generators are not Paulis, as in problem-inspired
-ans\"atze, where a predictor trained on simulable sizes has no such
-substitute.
+between gates or generators are not Paulis. The shared-parameter family of
+Section~\ref{sec:families} is such a case: there a predictor fitted on
+simulable sizes has no exact substitute, and it is as accurate as for the
+independent-parameter family.
 (viii)~\emph{Gradient variance is not optimization outcome.} The label measures
 how flat the landscape is on average, not whether training succeeds. As a
 check we trained several hundred fresh circuits from the same design space
@@ -1896,7 +2036,10 @@ horizon is an open problem, for which the released circuits and the
 horizon metric provide a benchmark.
 Transfer to an entanglement pattern absent from training succeeds when the
 pattern is described by its effect on the observable and the causal cone
-($R^2$ between \LopoAllUnseen{} and \LopoCircularUnseen). The predictor is a cheap screening tool for one circuit family.
+($R^2$ between \LopoAllUnseen{} and \LopoCircularUnseen). The same holds, with the same accuracy, for circuits with layer-shared
+parameters, where no exact shortcut exists, and for random entangling
+graphs. The predictor is a cheap screening tool for hardware-efficient
+circuits.
 Extending it to families with shared parameters, where no exact shortcut
 exists, and to noisy circuits are natural next steps.
 
@@ -1922,7 +2065,8 @@ available in Zenodo at \url{https://doi.org/10.5281/zenodo.21446194} and in the
 repository at \url{https://github.com/bithabib/quantum_computer_simulator}. It
 contains the full labeled dataset of \Nrows{} variational circuits, including
 the per-circuit gradient-variance statistics, the datasets for the
-unseen-pattern, 13--14-qubit and Clifford-sampling experiments, and
+unseen-pattern, 13--14-qubit, Clifford-sampling, shared-parameter and
+random-graph experiments, and
 regenerates end-to-end from a single command with
 fixed random seeds (root seed 12345 for data generation, seed 0 for all
 models). Software: Python \PythonVersion, NumPy \NumpyVersion, scikit-learn

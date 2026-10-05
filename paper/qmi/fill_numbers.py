@@ -258,6 +258,34 @@ def main():
             M["HzMaeTwelveDOne"] = f(m12["1"], 2); M["HzMaeTwelveDFour"] = f(m12["4"], 2); M["HzMaeTwelveDSix"] = f(m12["6"], 2)
     M["ClTargetHits"] = "2\\,000"; M["ClMaxSamples"] = "$2^{20}$"; M["ClResolvedHits"] = "100"
     M.setdefault("ClQmax", "32"); M.setdefault("ClAbstractSentence", "")
+    fam_path = os.path.join(RES, "families.json")
+    if os.path.exists(fam_path):
+        FA = json.load(open(fam_path)); T_, G_ = FA["tied"], FA["graph"]
+        M.update({
+            "TiedRows": big(T_["rows_generated"]), "TiedCeil": f(T_["r2_ceiling"]),
+            "TiedHGB": f(T_["cv"]["Hist Gradient Boosting"][0]), "TiedMLP": f(T_["cv"]["MLP"][0]),
+            "TiedRule": f(T_["cv"]["Structured linear"][0]), "TiedPhys": f(T_["cv"]["Physics-informed linear"][0]),
+            "TiedExMLP": f(T_["extrap"]["MLP"]["mean"]), "TiedExHGB": f(T_["extrap"]["Hist Gradient Boosting"]["mean"]),
+            "TiedExRule": f(T_["extrap"]["Structured linear"]["mean"]),
+            "TiedTransfer": f(T_["transfer_from_main"]["r2"], 2), "TiedOffset": f(T_["offset_vs_main"]["mean"], 2),
+            "TiedCorr": f(T_["offset_vs_main"]["corr"], 2),
+            "TiedShortN": str(T_["clifford_shortcut"]["n_circuits"]),
+            "TiedShortZero": pct(T_["clifford_shortcut"]["frac_params_grid_zero_but_true_nonzero"], 0),
+            "TiedShortOff": pct(T_["clifford_shortcut"]["frac_circuits_off_by_factor_two"], 0),
+            "GraphRows": big(G_["rows_generated"]), "GraphHGB": f(G_["cv"]["Hist Gradient Boosting"][0]),
+            "GraphMLP": f(G_["cv"]["MLP"][0]), "GraphRule": f(G_["cv"]["Descriptor rule (linear)"][0]),
+            "GraphDesignOnly": f(G_["cv"]["HGB, design parameters only"][0]), "GraphRuleCoef": str(G_["rule_n_coef"]),
+            "GraphExMLP": f(G_["extrap"]["MLP"]["mean"]), "GraphExHGB": f(G_["extrap"]["Hist Gradient Boosting"]["mean"]),
+            "GraphExRule": f(G_["extrap"]["Descriptor rule (linear)"]["mean"]),
+            "GraphConeMadRy": f(G_["cone_vs_structural"]["mad_fixed_ry"], 3),
+            "GraphConeExactRy": pct(G_["cone_vs_structural"]["exact_frac_fixed_ry"], 0), "GraphNFeat": "19",
+        })
+    tune_path = os.path.join(RES, "tuning.json")
+    if os.path.exists(tune_path):
+        TU = json.load(open(tune_path))
+        M.update({"TuneBest": f(TU["main"]["best_r2"]), "TuneSpread": f(TU["main"]["spread_learners"]),
+                  "TuneGap": f(TU["main"]["gap_to_rule"]), "TuneHeadroom": f(TU["main"]["headroom"]),
+                  "TuneBestTied": f(TU["tied"]["best_r2"]), "TuneGapTied": f(TU["tied"]["gap_to_rule"])})
     lopo_path = os.path.join(RES, "lopo.json")
     if os.path.exists(lopo_path):
         Lp = json.load(open(lopo_path)); lo = Lp["lopo"]
@@ -291,7 +319,7 @@ def main():
     tables = {}
     for t in ["datastats", "labelbydesign", "grouped_cv", "extrap", "extrap_breakdown",
               "ablation", "cutoff", "lopo", "gap", "screening_within", "large", "effweight",
-              "clifford", "clifford_cost", "horizon"]:
+              "clifford", "clifford_cost", "horizon", "families", "tuning"]:
         tp = os.path.join(RES, "table_%s.tex" % t)
         body = open(tp).read().strip() if os.path.exists(tp) else "% (pending)"
         # never let a generated table exceed the text width

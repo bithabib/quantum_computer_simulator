@@ -62,6 +62,11 @@ python -m qml_bp.validate_clifford --n-circuits 200 --workers 9 --json paper/qmi
 python -m qml_bp.generate_clifford --n-specs 8000 --qubit-min 2 --qubit-max 12 --workers 9 --seed 2026 --out data_bp/bp_clifford_train.csv
 python -m qml_bp.generate_clifford --n-specs 6000 --qubit-min 13 --qubit-max 32 --workers 9 --seed 2027 --out data_bp/bp_clifford_test.csv
 python -m qml_bp.clifford_study --train data_bp/bp_clifford_train.csv --test data_bp/bp_clifford_test.csv
+# two further families and the model-robustness study
+python -m qml_bp.generate_families --family tied  --n-specs 10000 --seed 31337 --workers 9 --out data_bp/bp_tied_v2.csv
+python -m qml_bp.generate_families --family graph --n-specs 10000 --seed 27182 --workers 9 --out data_bp/bp_graph_v2.csv
+python -m qml_bp.families_study --main data_bp/bp_dataset_v2.csv --tied data_bp/bp_tied_v2.csv --graph data_bp/bp_graph_v2.csv
+python -m qml_bp.tuning_study --main data_bp/bp_dataset_v2.csv --tied data_bp/bp_tied_v2.csv
 # optimization check quoted in the limitations (four budgets)
 python -m qml_bp.training_outcome --data data_bp/bp_dataset_v2.csv --n-circuits 300 --optimizer adam --shots 1000 --workers 9
 python -m qml_bp.training_outcome --data data_bp/bp_dataset_v2.csv --n-circuits 200 --optimizer gd --lr 0.5 --shots 0 --tag _gd_exact --workers 9
@@ -93,6 +98,9 @@ cd paper/qmi && tectonic main.tex && tectonic response_to_reviewers.tex
   (Pauli-propagation) sampling; `validate_clifford.py` checks it against
   adjoint gradients; `generate_clifford.py` builds datasets with it;
   `clifford_study.py` is the 13-32-qubit extrapolation study.
+- `families.py`, `generate_families.py`, `families_study.py` — circuits with
+  layer-shared parameters and with random entangling graphs; `tuning_study.py`
+  — robustness of the results to model choice and tuning.
 - `lopo.py` (unseen entanglement patterns), `eval_large.py` (13-14-qubit
   statevector test set), `extra_experiments.py` (widening gap, learning curve,
   ranking at fixed n), `training_outcome.py` and `training_sweep_table.py`

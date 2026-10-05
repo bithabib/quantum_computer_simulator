@@ -1,0 +1,20 @@
+\begin{tabular}{lccc}
+\toprule
+ & Named patterns & Shared parameters & Random graphs \\
+\midrule
+Circuits & 19858 & 9929 & 9949 \\
+Exact Clifford shortcut & yes & no & yes \\
+Noise ceiling on $R^2$ & 0.985 & 0.989 & -- \\
+\midrule
+\multicolumn{4}{l}{\emph{Unseen architectures, $R^2$}}\\
+\quad HGB & $0.980 \pm 0.003$ & $0.983 \pm 0.002$ & $0.975 \pm 0.002$ \\
+\quad MLP & $0.979 \pm 0.003$ & $0.981 \pm 0.002$ & $0.974 \pm 0.002$ \\
+\quad fitted linear rule & $0.969 \pm 0.002$ & $0.958 \pm 0.005$ & $0.966 \pm 0.003$ \\
+\quad five-coefficient rule & $0.682 \pm 0.016$ & $0.309 \pm 0.039$ & -- \\
+\midrule
+\multicolumn{4}{l}{\emph{Trained on $n\le10$, tested on $n=11,12$, $R^2$}}\\
+\quad MLP (10 seeds) & $0.961 \pm 0.003$ & $0.969 \pm 0.003$ & $0.923 \pm 0.006$ \\
+\quad HGB & 0.860 & 0.942 & 0.684 \\
+\quad fitted linear rule & 0.935 & 0.934 & 0.902 \\
+\botrule
+\end{tabular}
