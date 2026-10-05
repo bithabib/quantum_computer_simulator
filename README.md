@@ -149,5 +149,7 @@ This formula accounts for the interference between the probability amplitudes an
 - [Quantum Computing Conference](https://quantum.technology/conf/index.html)
 
 ## License
-This project is licensed under the MIT License
+The code is licensed under the MIT License (see `LICENSE`). The datasets in
+`data_bp/` and the result files in `paper/qmi/results/` are licensed under
+Creative Commons Attribution 4.0 International (see `LICENSE-DATA`).
 
