@@ -247,7 +247,7 @@ def main():
         M["ClLeTwentyHGB"] = f(t20["Hist Gradient Boosting"]["r2"], 2)
         M["ClAbstractSentence"] = ("With exact Clifford-sampled labels up to 32 qubits we measure a prediction "
             "horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for "
-            "five to six qubits beyond its training range, for local costs. Prediction beyond that horizon is an open problem, "
+            "five to six qubits beyond a training range of 12 or more qubits, for local costs. Prediction beyond that horizon is an open problem, "
             "for which we release a benchmark.")
         if "horizon" in CS:
             HZ = CS["horizon"]; wk = {"8": "Eight", "12": "Twelve", "16": "Sixteen", "20": "Twenty", "24": "Twentyfour"}
@@ -298,8 +298,9 @@ def main():
                       "TiedLargeRule": f(TL["Structured linear"]["mean"]),
                       "TiedLargeHGB": f(TL["Hist Gradient Boosting"]["mean"]),
                       "TiedLargeBelowCut": pct(TL["below_cutoff_frac"], 0),
+                      "TiedLargeInRange": pct(TL["frac_within_train_range"], 0),
                       "TiedLargeLabelMin": f(TL["label_min"], 2)})
-    for k in ["TiedLargeN", "TiedLargeMLP", "TiedLargeRule", "TiedLargeHGB", "TiedLargeBelowCut", "TiedLargeLabelMin"]:
+    for k in ["TiedLargeN", "TiedLargeMLP", "TiedLargeRule", "TiedLargeHGB", "TiedLargeBelowCut", "TiedLargeLabelMin", "TiedLargeInRange"]:
         M.setdefault(k, "??")
     tune_path = os.path.join(RES, "tuning.json")
     if os.path.exists(tune_path):

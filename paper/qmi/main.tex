@@ -405,7 +405,7 @@
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for five to six qubits beyond its training range, for local costs. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for five to six qubits beyond a training range of 12 or more qubits, for local costs. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
 \newcommand{\HzEnsemble}{ten}
 \newcommand{\HzResGlobkEight}{100}
 \newcommand{\HzResLockEight}{99}
@@ -548,6 +548,7 @@
 \newcommand{\TiedLargeRule}{0.940}
 \newcommand{\TiedLargeHGB}{0.960}
 \newcommand{\TiedLargeBelowCut}{34}
+\newcommand{\TiedLargeInRange}{91}
 \newcommand{\TiedLargeLabelMin}{-3.74}
 \newcommand{\TuneBest}{0.982}
 \newcommand{\TuneSpread}{0.003}
@@ -605,28 +606,25 @@ Data-Driven Model for Barren Plateaus}
 \orgname{Gyeongsang National University}, \orgaddress{\city{Jinju},
 \country{Republic of Korea}}}
 
-\abstract{Barren plateaus, the exponential decay of the cost-gradient
-variance with qubit number, obstruct the training of variational quantum
-circuits. We study how well the gradient variance of hardware-efficient
+\abstract{Barren plateaus, the exponential decay of gradient variance with qubit
+number, obstruct the training of variational quantum circuits. We study how well the gradient variance of hardware-efficient
 circuits can be predicted from their architecture, and how far beyond the
 training range such predictions can be trusted. We
 simulate \Nrows{} circuits with 2 to 12 qubits; the label is the mean
 gradient variance over all parameters whose gradient does not vanish
-identically. Within the training range the label is predictable to within
-its noise: learners reach $R^2=\RsqCV$ on held-out
+identically. Within the training range the label is predictable close to its noise ceiling: learners reach $R^2=\RsqCV$ on held-out
 architectures against a ceiling of \RsqCeiling, a fitted linear table reaches
 \RsqStruct{} and a five-coefficient textbook rule \RsqPhys, and the same
 holds for layer-shared parameters and random entangling graphs. The last entangling layer changes the weight of the measured
 observable; this effective weight and the causal cone, both
-closed-form, let predictions transfer to entanglement patterns absent from
-training. With exact Clifford-sampled
+closed-form, let predictions transfer to unseen entanglement patterns. With exact Clifford-sampled
 labels up to 32 qubits we define and measure a prediction horizon: for
 local costs, an ensemble of neural networks stays on average within a
-factor of two of the true variance for five to six qubits beyond its training
-range. Beyond it the error grows quickly, and the models
+factor of two of the true variance for five to six qubits beyond a training
+range of 12 or more qubits, and three beyond a range of 8. Beyond the horizon the error keeps growing,
+and the models
 underestimate how flat the flattest global-cost circuits are, which limits
-their use for screening. We pose extending the horizon as an open problem
-and release a benchmark. The predicted quantity is a finite-size proxy,
+their use for screening. Extending the horizon is posed as an open problem, with a benchmark. The predicted quantity is a finite-size proxy,
 not optimization success or a proof of scaling.}
 
 \keywords{Barren plateaus, Variational quantum circuits, Quantum machine
@@ -706,7 +704,7 @@ The contributions are as follows.
 \item A labeled dataset of \Nrows{} hardware-efficient circuits with exact
 all-parameter gradient variances and structural zeros separated, with a
 reproducible pipeline, and the finding that on unseen architectures the
-label is predictable to within its noise ($R^2=\RsqCV$ against a ceiling of
+label is predictable close to its noise ceiling ($R^2=\RsqCV$ against a ceiling of
 \RsqCeiling) by flexible learners and, nearly as well, by a structured linear
 model.
 \item Two closed-form quantities, the weight of the observable after the
@@ -714,7 +712,8 @@ last entangling layer and the causal cone, which add little within the
 training range but let predictions transfer out of it.
 \item A measured prediction horizon. With exact Clifford-sampled labels up
 to \ClQmax{} qubits, predictions for local-cost circuits stay on average within a factor of two
-of the true variance for five to six qubits beyond the training range; prediction beyond
+of the true variance for five to six qubits beyond a training range of 12
+or more qubits (three beyond a range of 8); prediction beyond
 it is posed as an open problem with a released benchmark.
 \item Tests of generality: transfer to entanglement patterns absent from
 training, and the same measurements on circuits with layer-shared
@@ -1449,20 +1448,25 @@ local-cost circuits and training ranges of 12, 16 and 20 qubits the
 ensemble has $H(0.3)=\HzLocMLPkTwelve$, \HzLocMLPkSixteen{} and
 \HzLocMLPkTwenty{} qubits (90\% intervals \HzLocMLPIntkTwelve,
 \HzLocMLPIntkSixteen{} and \HzLocMLPIntkTwenty): the predictable range is
-the training range plus five to six qubits. The values for all resolved
+the training range plus five to six qubits. The horizon is shorter for the
+smallest training range, \HzLocMLPkEight{} qubits for $k=8$ (interval
+\HzLocMLPIntkEight): it grows with the training range before it levels
+off. The values for all resolved
 circuits are similar (\HzMLPkTwelve, \HzMLPkSixteen, \HzMLPkTwenty), but only
 the first is free of survivorship: within six qubits of the training range,
 \HzResGlobkTwelve\% of global-cost circuits are resolved for $k=12$, against
-\HzResGlobkSixteen\% and \HzResGlobkTwenty\% for $k=16$ and $k=20$. Inside
-the horizon the error grows smoothly; for $k=12$ it is \HzMaeTwelveDOne{}
-one qubit beyond training, \HzMaeTwelveDFour{} at four and
-\HzMaeTwelveDSix{} at six. Beyond the horizon it accelerates. The
+\HzResGlobkSixteen\% and \HzResGlobkTwenty\% for $k=16$ and $k=20$. The error grows steadily with distance; for local costs and $k=12$ it is
+\HzMaeTwelveDOne{} one qubit beyond training, \HzMaeTwelveDFour{} at four
+and \HzMaeTwelveDSix{} at six, just above the tolerance, and it keeps
+growing beyond the horizon without a sharp transition. The
 structured linear model is less accurate close to the training range, so
 its horizon at $\varepsilon=0.3$ is shorter (\HzLocTablekTwelve{} qubits for
 $k=12$, interval \HzLocTableIntkTwelve), but its error grows more slowly far
-out. Its interval is wide because its error stays close to the tolerance
-over several qubits, which is a property of any threshold metric and the
-reason we report intervals. HGB, whose prediction is constant beyond the
+out. Its intervals are wide (for local costs, \HzLocTableIntkSixteen{} at
+$k=16$ and \HzLocTableIntkTwenty{} at $k=20$) because its error stays close
+to the tolerance over several qubits, which is a property of any threshold
+metric and the reason we report intervals. At those training ranges the
+horizons of the two models cannot be ranked. HGB, whose prediction is constant beyond the
 training range, has a horizon of one to three qubits unless the training
 range already covers the labels that occur at larger $n$.
 
@@ -1560,7 +1564,8 @@ number measures: the resolved large-$n$ circuits then lie within the range
 of labels seen in training, so the task has become interpolation in label,
 and the censored circuits are not tested.
 
-Predicting reliably beyond five to six qubits from the training range is
+Predicting reliably beyond five to six qubits from a training range of 12
+or more qubits is
 therefore open, and within the horizon the statement holds for circuits
 whose variance can be resolved. Two ingredients are missing. One is a model whose
 dependence on qubit count saturates with the causal cone instead of
@@ -1791,7 +1796,12 @@ family is one to which the Clifford shortcut does not apply
 the held-out 13- and 14-qubit shared-parameter circuits with
 $R^2=\TiedLargeMLP$ (neural network, ten seeds), \TiedLargeRule{} (linear
 rule) and \TiedLargeHGB{} (HGB); \TiedLargeBelowCut\% of these circuits lie
-below the cutoff. We note that this family is not strongly
+below the cutoff. HGB scores above the linear rule here only because
+\TiedLargeInRange\% of the labels at these sizes lie within the range seen
+in training, so that little extrapolation of the label is needed; this is
+the same condition under which it does well in
+Section~\ref{sec:clifford}, and does not contradict its failure to
+extrapolate. We note that this family is not strongly
 flat at these sizes, so the test shows that the approach carries over, not
 that it resolves deep plateaus where no exact label exists. Third, on random graphs the physics
 descriptors are what make the problem tractable. HGB given only the seven
@@ -1901,7 +1911,7 @@ hardware-efficient family studied here, the mean gradient variance is a
 simple function of the architecture. Within each combination of categorical
 design choices it falls linearly in $\log_{10}$ with qubit count and
 saturates with depth, and a model of that form, or a flexible learner that
-knows nothing of the form, predicts it to within the label noise for
+knows nothing of the form, predicts it close to the noise ceiling of the label for
 architectures it has never seen. The effective weight of the measured observable lifts the
 five-coefficient rule from \RsqPhys{} to \RsqPhysEff, and together with the
 causal cone it is what lets predictions transfer outside the training
@@ -1929,7 +1939,8 @@ $100/(2^{20}nL)$, between about $10^{\ClFloorMinExp}$ and
 $10^{\ClFloorMaxExp}$ depending on the number of parameters. A barren
 plateau is a statement about scaling as $n\to\infty$; our label is a
 finite-size proxy, and the extrapolation results cover two additional
-qubits with statevector labels and five to six with Clifford labels, for
+qubits with statevector labels and five to six with Clifford labels (from training ranges of 12 or more
+qubits; three from a range of 8), for
 resolved circuits, not an asymptotic regime. For the flattest global-cost
 circuits just beyond the sampling resolution the models overestimate the
 variance, the costly direction for screening. Tree ensembles cannot continue a trend in $n$ beyond
@@ -1998,7 +2009,8 @@ for random entangling graphs. Two closed-form quantities, the effective
 weight of the observable and the causal cone, add little within the
 training range but allow transfer to entanglement patterns absent from
 training. With exact labels up to 32 qubits we measured a prediction
-horizon: for local costs, five to six qubits beyond the training range, on
+horizon: for local costs, five to six qubits beyond a training range of 12
+or more qubits and three beyond a range of 8, on
 average within a factor of two of the true variance. Beyond it, and for the
 flattest global-cost circuits, the models err in the direction that
 matters for screening, rating circuits as less flat than they are. Extending that horizon, and resolving the flattest circuits, are

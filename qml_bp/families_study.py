@@ -105,7 +105,8 @@ def tied_large(tied_path, large_path):
     y, yb = t.log_var.to_numpy(float), b.log_var.to_numpy(float)
     F = FEATURE_COLUMNS
     out.update({"train_rows": int(len(t)), "test_rows": int(len(b)), "label_mean": float(yb.mean()),
-                "label_min": float(yb.min()), "below_cutoff_frac": float((yb < -2).mean())})
+                "label_min": float(yb.min()), "below_cutoff_frac": float((yb < -2).mean()),
+                "frac_within_train_range": float(((yb >= y.min()) & (yb <= y.max())).mean())})
     out["MLP"] = seeds_extrap(lambda s=0: Cols(lambda: regressors(s)["MLP"], F), t, y, b, yb)
     for name, mk in [("Hist Gradient Boosting", lambda: Cols(lambda: hgb_reg(0), F)),
                      ("Structured linear", lambda: Cols(lambda: StructuredLinear("reg"), F)),
