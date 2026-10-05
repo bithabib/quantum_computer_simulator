@@ -3,7 +3,7 @@
   "rows": 19858,
   "r2_ceiling": 0.9849401683287289,
   "models": {
-   "Fitted linear rule (structured linear)": [
+   "Structured linear model": [
     0.9692234183158412,
     0.0017329275829041694
    ],
@@ -50,7 +50,7 @@
   "rows": 9929,
   "r2_ceiling": 0.9886008473686128,
   "models": {
-   "Fitted linear rule (structured linear)": [
+   "Structured linear model": [
     0.9582536104345779,
     0.0034311936782674794
    ],

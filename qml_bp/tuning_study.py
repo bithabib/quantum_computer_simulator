@@ -2,7 +2,7 @@
 
 Nine learner configurations (the paper's settings, a nested randomized
 hyperparameter search, larger and ensembled networks, kernel methods) against
-the fitted linear rule, on unseen architectures, with the noise ceiling.
+the structured linear model, on unseen architectures, with the noise ceiling.
 
     python -m qml_bp.tuning_study --main data_bp/bp_dataset_v2.csv \
         --tied data_bp/bp_tied_v2.csv --outdir paper/qmi/results
@@ -32,7 +32,7 @@ N_ITER = 20
 SPACE = {"learning_rate": [0.02, 0.04, 0.08, 0.15], "max_iter": [400, 800, 1500],
          "max_leaf_nodes": [15, 31, 63, 127], "min_samples_leaf": [5, 10, 20, 40],
          "l2_regularization": [0, 0.1, 1.0], "max_bins": [128, 255]}
-ORDER = ["Fitted linear rule (structured linear)", "HGB, paper settings",
+ORDER = ["Structured linear model", "HGB, paper settings",
          "HGB, nested randomized search (%d configurations)" % N_ITER, "Extra trees, 1000 trees",
          "MLP (256, 256, 128), early stopping", "Ensemble of 5 MLPs (128, 64)",
          "Blend of HGB and the MLP ensemble", "SVR, RBF kernel", "Kernel ridge, RBF kernel"]

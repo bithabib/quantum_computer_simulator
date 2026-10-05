@@ -393,7 +393,7 @@
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for five to six qubits beyond a training range of 12 or more qubits, for local costs. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
+\newcommand{\ClAbstractSentence}{With unbiased Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for five to six qubits beyond a training range of 12 or more qubits, for local costs. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
 \newcommand{\HzEnsemble}{ten}
 \newcommand{\HzResGlobkEight}{100}
 \newcommand{\HzResLockEight}{99}
@@ -418,13 +418,13 @@
 \newcommand{\HzResGlobkTwelve}{99}
 \newcommand{\HzResLockTwelve}{99}
 \newcommand{\HzMLPkTwelve}{6}
-\newcommand{\HzMLPIntkTwelve}{5--6}
+\newcommand{\HzMLPIntkTwelve}{4--6}
 \newcommand{\HzMLPWidekTwelve}{8}
 \newcommand{\HzLocMLPkTwelve}{5}
 \newcommand{\HzLocMLPIntkTwelve}{5--6}
 \newcommand{\HzLocMLPWidekTwelve}{8}
 \newcommand{\HzTablekTwelve}{4}
-\newcommand{\HzTableIntkTwelve}{4--4}
+\newcommand{\HzTableIntkTwelve}{3--5}
 \newcommand{\HzTableWidekTwelve}{10}
 \newcommand{\HzLocTablekTwelve}{4}
 \newcommand{\HzLocTableIntkTwelve}{3--5}
@@ -444,7 +444,7 @@
 \newcommand{\HzLocMLPIntkSixteen}{4--7}
 \newcommand{\HzLocMLPWidekSixteen}{9}
 \newcommand{\HzTablekSixteen}{3}
-\newcommand{\HzTableIntkSixteen}{3--5}
+\newcommand{\HzTableIntkSixteen}{3--6}
 \newcommand{\HzTableWidekSixteen}{10}
 \newcommand{\HzLocTablekSixteen}{3}
 \newcommand{\HzLocTableIntkSixteen}{2--5}
@@ -484,10 +484,10 @@
 \newcommand{\HzLocMLPIntkTwentyfour}{8--8}
 \newcommand{\HzLocMLPWidekTwentyfour}{8}
 \newcommand{\HzTablekTwentyfour}{$\ge$8}
-\newcommand{\HzTableIntkTwentyfour}{3--8}
+\newcommand{\HzTableIntkTwentyfour}{2--8}
 \newcommand{\HzTableWidekTwentyfour}{8}
 \newcommand{\HzLocTablekTwentyfour}{$\ge$8}
-\newcommand{\HzLocTableIntkTwentyfour}{8--8}
+\newcommand{\HzLocTableIntkTwentyfour}{7--8}
 \newcommand{\HzLocTableWidekTwentyfour}{8}
 \newcommand{\HzHGBkTwentyfour}{$\ge$8}
 \newcommand{\HzHGBIntkTwentyfour}{8--8}
@@ -871,8 +871,8 @@ selection.
 \begin{tableorg}[!htbp]
 \centering\tablebodyfont
 \caption{Unseen architectures ($R^2$, mean $\pm$ standard deviation over five
-architecture-grouped folds) for eight learner configurations and the fitted
-linear rule. The kernel methods are trained on at most 6\,000 rows.}
+architecture-grouped folds) for eight learner configurations and the structured
+linear model. The kernel methods are trained on at most 6\,000 rows.}
 \label{tab:tuning}
 %%BEGIN-TABLE:tuning
 \fittable{%
@@ -880,7 +880,7 @@ linear rule. The kernel methods are trained on at most 6\,000 rows.}
 \toprule
 Model & Named patterns & Shared parameters \\
 \midrule
-Fitted linear rule (structured linear) & $0.969 \pm 0.002$ & $0.958 \pm 0.003$ \\
+Structured linear model & $0.969 \pm 0.002$ & $0.958 \pm 0.003$ \\
 \midrule
 HGB, paper settings & $0.980 \pm 0.001$ & $0.982 \pm 0.003$ \\
 HGB, nested randomized search (20 configurations) & $0.981 \pm 0.001$ & $0.984 \pm 0.003$ \\

@@ -1,7 +1,7 @@
 """Generality study: shared-parameter circuits and random entangling graphs.
 
 For each family: accuracy on unseen architectures, extrapolation from
-n <= 10 to n = 11, 12, comparison with fitted linear rules, and family-specific
+n <= 10 to n = 11, 12, comparison with structured linear models, and family-specific
 checks (failure of the Clifford shortcut for shared parameters; accuracy of the
 causal-cone bound on random graphs; transfer from the main family).
 
@@ -134,14 +134,14 @@ def write_table(R, outdir):
              "\\midrule", "\\multicolumn{4}{l}{\\emph{Unseen architectures, $R^2$}}\\\\",
              "\\quad HGB & %s & %s & %s \\\\" % (pm(mcv["Hist Gradient Boosting"]["r2"]), pm(R_t["cv"]["Hist Gradient Boosting"]), pm(R_g["cv"]["Hist Gradient Boosting"])),
              "\\quad MLP & %s & %s & %s \\\\" % (pm(mcv["MLP"]["r2"]), pm(R_t["cv"]["MLP"]), pm(R_g["cv"]["MLP"])),
-             "\\quad fitted linear rule & %s & %s & %s \\\\" % (pm(mcv["Structured linear"]["r2"]), pm(R_t["cv"]["Structured linear"]), pm(R_g["cv"]["Descriptor rule (linear)"])),
-             "\\quad five-coefficient rule & %s & %s & -- \\\\" % (pm(mcv["Physics-informed linear"]["r2"]), pm(R_t["cv"]["Physics-informed linear"])),
+             "\\quad structured linear model & %s & %s & %s \\\\" % (pm(mcv["Structured linear"]["r2"]), pm(R_t["cv"]["Structured linear"]), pm(R_g["cv"]["Descriptor rule (linear)"])),
+             "\\quad five-coefficient model & %s & %s & -- \\\\" % (pm(mcv["Physics-informed linear"]["r2"]), pm(R_t["cv"]["Physics-informed linear"])),
              "\\midrule", "\\multicolumn{4}{l}{\\emph{Trained on $n\\le10$, tested on $n=11,12$, $R^2$}}\\\\",
              "\\quad MLP (10 seeds) & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ \\\\" % (
                  M["extrap_mlp_r2_seeds"]["mean"], M["extrap_mlp_r2_seeds"]["sd"], R_t["extrap"]["MLP"]["mean"], R_t["extrap"]["MLP"]["sd"],
                  R_g["extrap"]["MLP"]["mean"], R_g["extrap"]["MLP"]["sd"]),
              "\\quad HGB & %.3f & %.3f & %.3f \\\\" % (mex["Hist Gradient Boosting"]["r2"], R_t["extrap"]["Hist Gradient Boosting"]["mean"], R_g["extrap"]["Hist Gradient Boosting"]["mean"]),
-             "\\quad fitted linear rule & %.3f & %.3f & %.3f \\\\" % (mex["Structured linear"]["r2"], R_t["extrap"]["Structured linear"]["mean"], R_g["extrap"]["Descriptor rule (linear)"]["mean"]),
+             "\\quad structured linear model & %.3f & %.3f & %.3f \\\\" % (mex["Structured linear"]["r2"], R_t["extrap"]["Structured linear"]["mean"], R_g["extrap"]["Descriptor rule (linear)"]["mean"]),
              ]
     if "large" in R_t:
         LG = json.load(open(os.path.join(outdir, "large.json"))); tl = R_t["large"]
@@ -149,7 +149,7 @@ def write_table(R, outdir):
                   "\\quad MLP (10 seeds) & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ & -- \\\\" % (
                       LG["mlp_seeds"]["mean"], LG["mlp_seeds"]["sd"], tl["MLP"]["mean"], tl["MLP"]["sd"]),
                   "\\quad HGB & %.3f & %.3f & -- \\\\" % (LG["models"]["Hist Gradient Boosting"]["r2"], tl["Hist Gradient Boosting"]["mean"]),
-                  "\\quad fitted linear rule & %.3f & %.3f & -- \\\\" % (LG["models"]["Structured linear"]["r2"], tl["Structured linear"]["mean"])]
+                  "\\quad structured linear model & %.3f & %.3f & -- \\\\" % (LG["models"]["Structured linear"]["r2"], tl["Structured linear"]["mean"])]
     lines += ["\\botrule", "\\end{tabular}"]
     open(os.path.join(outdir, "table_families.tex"), "w").write("\n".join(lines) + "\n")
     print("wrote families.json, table_families.tex")

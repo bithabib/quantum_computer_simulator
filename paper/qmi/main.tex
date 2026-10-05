@@ -405,7 +405,7 @@
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for five to six qubits beyond a training range of 12 or more qubits, for local costs. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
+\newcommand{\ClAbstractSentence}{With unbiased Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for five to six qubits beyond a training range of 12 or more qubits, for local costs. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
 \newcommand{\HzEnsemble}{ten}
 \newcommand{\HzResGlobkEight}{100}
 \newcommand{\HzResLockEight}{99}
@@ -430,13 +430,13 @@
 \newcommand{\HzResGlobkTwelve}{99}
 \newcommand{\HzResLockTwelve}{99}
 \newcommand{\HzMLPkTwelve}{6}
-\newcommand{\HzMLPIntkTwelve}{5--6}
+\newcommand{\HzMLPIntkTwelve}{4--6}
 \newcommand{\HzMLPWidekTwelve}{8}
 \newcommand{\HzLocMLPkTwelve}{5}
 \newcommand{\HzLocMLPIntkTwelve}{5--6}
 \newcommand{\HzLocMLPWidekTwelve}{8}
 \newcommand{\HzTablekTwelve}{4}
-\newcommand{\HzTableIntkTwelve}{4--4}
+\newcommand{\HzTableIntkTwelve}{3--5}
 \newcommand{\HzTableWidekTwelve}{10}
 \newcommand{\HzLocTablekTwelve}{4}
 \newcommand{\HzLocTableIntkTwelve}{3--5}
@@ -456,7 +456,7 @@
 \newcommand{\HzLocMLPIntkSixteen}{4--7}
 \newcommand{\HzLocMLPWidekSixteen}{9}
 \newcommand{\HzTablekSixteen}{3}
-\newcommand{\HzTableIntkSixteen}{3--5}
+\newcommand{\HzTableIntkSixteen}{3--6}
 \newcommand{\HzTableWidekSixteen}{10}
 \newcommand{\HzLocTablekSixteen}{3}
 \newcommand{\HzLocTableIntkSixteen}{2--5}
@@ -496,10 +496,10 @@
 \newcommand{\HzLocMLPIntkTwentyfour}{8--8}
 \newcommand{\HzLocMLPWidekTwentyfour}{8}
 \newcommand{\HzTablekTwentyfour}{$\ge$8}
-\newcommand{\HzTableIntkTwentyfour}{3--8}
+\newcommand{\HzTableIntkTwentyfour}{2--8}
 \newcommand{\HzTableWidekTwentyfour}{8}
 \newcommand{\HzLocTablekTwentyfour}{$\ge$8}
-\newcommand{\HzLocTableIntkTwentyfour}{8--8}
+\newcommand{\HzLocTableIntkTwentyfour}{7--8}
 \newcommand{\HzLocTableWidekTwentyfour}{8}
 \newcommand{\HzHGBkTwentyfour}{$\ge$8}
 \newcommand{\HzHGBIntkTwentyfour}{8--8}
@@ -613,11 +613,10 @@ training range such predictions can be trusted. We
 simulate \Nrows{} circuits with 2 to 12 qubits; the label is the mean
 gradient variance over all parameters whose gradient does not vanish
 identically. Within the training range the label is predictable close to its noise ceiling: learners reach $R^2=\RsqCV$ on held-out
-architectures against a ceiling of \RsqCeiling, a fitted linear table reaches
-\RsqStruct{} and a five-coefficient textbook rule \RsqPhys, and the same
+architectures against a ceiling of \RsqCeiling, a structured linear model reaches \RsqStruct{} and a five-coefficient physics-informed model \RsqPhys, and the same
 holds for layer-shared parameters and random entangling graphs. The last entangling layer changes the weight of the measured
 observable; this effective weight and the causal cone, both
-closed-form, let predictions transfer to unseen entanglement patterns. With exact Clifford-sampled
+closed-form, let predictions transfer to unseen entanglement patterns. With Clifford-sampled
 labels up to 32 qubits we define and measure a prediction horizon: for
 local costs, an ensemble of neural networks stays on average within a
 factor of two of the true variance for five to six qubits beyond a training
@@ -674,8 +673,10 @@ features are cheap architectural descriptors: small integers and categories.
 The label is the gradient variance, computed once, offline, by exact
 statevector simulation. Throughout, we use two standard machine-learning
 scores. The coefficient of determination $R^2$ is the fraction of label
-variance a regressor explains; $R^2=1$ is perfect and $R^2=0$ is no better than
-predicting the mean. The area under the receiver operating characteristic
+variance a regressor explains; $R^2=1$ is perfect, $R^2=0$ is no better than
+predicting the mean of the test labels, and $R^2<0$ is worse than that,
+which occurs when a model is applied far outside its training
+distribution. The area under the receiver operating characteristic
 curve (AUC) is the probability that a classifier ranks a randomly chosen
 positive example above a randomly chosen negative one; $0.5$ is chance and
 $1$ is perfect. We also report the mean absolute error (MAE) of the
@@ -710,7 +711,8 @@ model.
 \item Two closed-form quantities, the weight of the observable after the
 last entangling layer and the causal cone, which add little within the
 training range but let predictions transfer out of it.
-\item A measured prediction horizon. With exact Clifford-sampled labels up
+\item A measured prediction horizon. With Clifford-sampled labels, which
+rest on an exact identity and are unbiased Monte Carlo estimates, up
 to \ClQmax{} qubits, predictions for local-cost circuits stay on average within a factor of two
 of the true variance for five to six qubits beyond a training range of 12
 or more qubits (three beyond a range of 8); prediction beyond
@@ -801,7 +803,11 @@ by sampling from a supernet~\cite{du2022qas}, or with training-free proxies
 that score candidate circuits without optimizing
 them~\cite{he2024tfqas}. Expressibility and entangling capability are
 classical descriptors that are estimated by sampling and used to compare
-ans\"atze~\cite{sim2019expressibility}. Lie-algebraic theory provides an
+ans\"atze~\cite{sim2019expressibility}. Learned predictors of circuit
+properties also exist: a neural predictor of task performance has been
+used to guide architecture search~\cite{zhang2021predictor}, and graph
+neural networks have been trained to estimate
+expressibility~\cite{aktar2024gnn}. Lie-algebraic theory provides an
 exact, closed-form trainability criterion for circuits whose generators are
 known~\cite{ragone2024lie,fontana2024adjoint}.
 
@@ -810,7 +816,7 @@ itself, not downstream task accuracy and not a proxy for it. The input is a
 handful of architectural integers and categories, not a sampled statistic
 such as expressibility, so a prediction costs microseconds. And the predictor
 is learned across a heterogeneous design space and tested on architectures it
-has never seen, including larger qubit counts. We are not aware of prior work
+has never seen, including larger qubit counts. These predictors are the closest prior art; we are not aware of prior work
 that casts barren-plateau severity as a directly predicted regression or
 classification target from cheap architectural features and that also tests
 extrapolation across qubit count. We regard the QAS proxies and the
@@ -1065,7 +1071,7 @@ $L=1$ a local observable on qubit $0$ sees only a handful of rotations.
 Supplementary Table~S9 breaks the label and the structural-zero rate
 down by each design choice, and Supplementary Figure~S5 shows the mean label
 against qubit count: a steep, monotone decay for global costs and a much
-slower one for local costs. (That table describes the dataset; it involves no trained model.) Global cost observables lower the mean label by
+slower one for local costs.  Global cost observables lower the mean label by
 \CostGap{} orders of magnitude relative to local costs, which is the
 cost-locality effect proved by Cerezo et al.~\cite{cerezo2021cost}. Denser
 entanglement and the CX entangler lower it further. This structure is what
@@ -1078,7 +1084,7 @@ makes the prediction task learnable.
 \subsection{Models and evaluation}\label{sec:eval}
 We compare six learner families spanning linear, instance-based, neural, and
 tree-ensemble inductive biases: a linear baseline (ridge regression or logistic
-regression), $k$-nearest neighbors, a multilayer perceptron with two hidden
+regression), $k$-nearest neighbors, a multilayer perceptron (MLP, also called the neural network below) with two hidden
 layers, random forests, extremely randomized trees, and histogram-based
 gradient-boosted trees (HGB). All are scikit-learn
 implementations~\cite{pedregosa2011scikit}; the histogram booster follows the
@@ -1111,11 +1117,14 @@ c,\qquad \min(L,c),\qquad e^{-L/c},\qquad 1/L,
 \end{equation}
 where $c$ is the number of qubits in the causal cone ($c=n$ whenever the
 cone covers the circuit): a linear decay in the relevant qubit count and a
-saturating dependence on depth, fitted by ridge regression with
-\StructNcoef{} coefficients in total.
-It has no interactions beyond the cell structure and can be read off as a
-table. All controls are fitted by least squares (logistic regression on the
-same design for classification).
+saturating dependence on depth. With 24 cells this gives 120 coefficients;
+four further slopes on the same terms are shared by all cells, so that a
+cell absent from training still receives a prediction, which makes
+\StructNcoef{} in total. It has no interactions beyond the cell structure
+and can be read off as a table. The two physics-informed controls are
+fitted by least squares and the structured linear model by ridge
+regression with a small penalty ($\alpha=10^{-3}$); for classification all
+three use logistic regression on the same design.
 
 \paragraph{Architecture-grouped cross-validation.} Our primary protocol is
 $K$-fold cross-validation with $K=\NFoldsK$ in which the folds are formed
@@ -1211,8 +1220,7 @@ $n\in[3,12]$. Every circuit has its own graph, so every row is a distinct
 architecture and we use ordinary five-fold cross-validation, repeated
 twice. Because the edge probability is continuous and the descriptors are
 features, a held-out circuit always has close neighbors in training; as
-for the main grid, this measures interpolation across the design space. As a hand-built rule we use the analogue of the structured linear
-model: within each combination of rotation scheme, entangler gate, and cost,
+for the main grid, this measures interpolation across the design space. As a control we use the analogue of the structured linear model: within each combination of rotation scheme, entangler gate, and cost,
 a linear model in the cone-based size terms of Eq.~\eqref{eq:struct} and in
 the descriptors (\GraphRuleCoef{} coefficients).
 
@@ -1239,6 +1247,8 @@ packing 64 samples per machine word and handling all $nL$ parameters in one
 backward sweep; the cost is independent of $2^n$, and the heaviest
 32-qubit circuit takes a fraction of a second per few thousand samples.
 Section~\ref{sec:validation} reports the agreement with exact gradients.
+The identity is exact; the resulting label is an unbiased Monte Carlo
+estimate, which we call a Clifford-sampled label.
 
 What the estimator cannot do is resolve a variance far below the reciprocal
 of the number of samples times parameters. Sampling is therefore adaptive:
@@ -1285,8 +1295,7 @@ five-coefficient physics-informed model of Eq.~\eqref{eq:phys} reaches
 $R^2=\RsqPhys$, and \RsqPhysEff{} when the nominal locality is replaced by
 the effective weight: against the rule one would write down from the
 literature, the learners are decisively better. The structured linear model
-reaches $R^2=\RsqStruct$, within \GainOverStruct{} of HGB: against the best
-linear table we could build, the learners are consistently but only
+reaches $R^2=\RsqStruct$, within \GainOverStruct{} of HGB: against the strongest linear control we could build, the learners are consistently but only
 modestly better. Their accuracy shows that the label is predictable, and
 the structured model shows that the prediction rule is simple: within each
 categorical cell, $\log_{10}\Vbar$ falls linearly with the relevant qubit
@@ -1311,7 +1320,7 @@ accuracy (Supplementary Figure~S1).
 \centering\tablebodyfont
 \caption{Architecture-grouped cross-validation (mean $\pm$ standard deviation
 over \NFolds{} folds). Regression predicts $\log_{10}\Vbar$; classification
-predicts $y<-2$. The controls below the rule are ordered from strongest to weakest. The selected model is shown in bold.}
+predicts $y<-2$. The controls below the midline are ordered from strongest to weakest. The selected model is shown in bold.}
 \label{tab:models}
 %%BEGIN-TABLE:grouped_cv
 \fittable{%
@@ -1368,10 +1377,11 @@ whereas a model with continuous dependence on $n$ can. In-family the model
 classes are equivalent; out of range the inductive bias decides.
 
 Supplementary Table~S6 breaks the result down by qubit count and cost
-locality. Error grows from $n=11$ to $n=12$ for both models, and global-cost
-circuits at $n=12$ are the hardest subset (HGB $R^2=\RsqENOneTwoglobal$, MLP
-\RsqEMNOneTwoglobal), as expected, since they are furthest from training in
-both $n$ and label value. Every subset is predicted far better than the
+locality. Error grows from $n=11$ to $n=12$ for both models. For HGB, global-cost
+circuits at $n=12$ are the hardest subset ($R^2=\RsqENOneTwoglobal$), as
+expected, since they are furthest from training in both $n$ and label
+value; the MLP shows no such pattern ($R^2$ between
+\RsqEMNOneOneglobal{} and \RsqEMNOneOnelocal{} in all four subsets). Every subset is predicted far better than the
 subgroup-mean and physics-informed controls. The result should still be read
 narrowly: in this split the test circuits are only two qubits beyond
 training. This is not evidence of
@@ -1383,8 +1393,7 @@ circuits, $k=6,\dots,10$; Supplementary Figure~S8 and Table~S5) separates
 the model classes further. At $k=6$ HGB falls to \GapHGBkSix, the structured
 linear model holds at \GapStructkSix, and the MLP gives
 $\GapMLPmeankSix\pm\GapMLPsdkSix$ over ten seeds, between \GapMLPminkSix{}
-and \GapMLPmaxkSix. Section~\ref{sec:clifford} measures the same effect
-with exact labels at larger sizes.
+and \GapMLPmaxkSix. Section~\ref{sec:clifford} measures the same effect with Clifford-sampled labels at larger sizes.
 
 
 \paragraph{Beyond the training range: 13 and 14 qubits.} As a final
@@ -1425,7 +1434,7 @@ Physics-informed linear & 0.350 [0.326, 0.375] & 0.815 & 0.354 & 0.345 & 0.187 &
 
 
 
-\subsection{The prediction horizon, measured with exact labels up to 32 qubits}\label{sec:clifford}
+\subsection{The prediction horizon, measured with Clifford-sampled labels up to 32 qubits}\label{sec:clifford}
 How far beyond its training range can a predictor be trusted? The
 Clifford-labeled circuits, which run from 2 to \ClQmax{} qubits, let us
 measure this directly. For a model trained on circuits with $n\le k$ we
@@ -1434,11 +1443,12 @@ the training range and define the \emph{prediction horizon} $H(\varepsilon)$
 as the largest $d$ up to which that error stays at or below $\varepsilon$.
 We use $\varepsilon=0.3$, which means that predictions are within a factor
 of two of the true variance on average, and $\varepsilon=0.5$, a factor of
-three on average, and vary $k$ from 8 to 24. A 90\% interval for the
+three on average, and vary $k$ from 8 to 24. A 95\% interval for the
 horizon comes from a bootstrap over the test circuits at each distance. The
 neural network is used as an ensemble of \HzEnsemble{} networks that differ
 only in their random seed; averaging removes the seed dependence noted in
-Section~\ref{sec:extrap}. Because censoring removes most global-cost
+Section~\ref{sec:extrap}. For $k>12$ the training set consists of the resolved circuits with $n\le k$
+from both Clifford-labeled sets. Because censoring removes most global-cost
 circuits at large $n$, we report the horizon separately for local-cost
 circuits, of which more than four fifths are resolved at every size, and
 for all resolved circuits.
@@ -1446,7 +1456,7 @@ for all resolved circuits.
 Figure~\ref{fig:horizon} and Table~\ref{tab:horizon} give the result. For
 local-cost circuits and training ranges of 12, 16 and 20 qubits the
 ensemble has $H(0.3)=\HzLocMLPkTwelve$, \HzLocMLPkSixteen{} and
-\HzLocMLPkTwenty{} qubits (90\% intervals \HzLocMLPIntkTwelve,
+\HzLocMLPkTwenty{} qubits (95\% intervals \HzLocMLPIntkTwelve,
 \HzLocMLPIntkSixteen{} and \HzLocMLPIntkTwenty): the predictable range is
 the training range plus five to six qubits. The horizon is shorter for the
 smallest training range, \HzLocMLPkEight{} qubits for $k=8$ (interval
@@ -1460,9 +1470,10 @@ the first is free of survivorship: within six qubits of the training range,
 and \HzMaeTwelveDSix{} at six, just above the tolerance, and it keeps
 growing beyond the horizon without a sharp transition. The
 structured linear model is less accurate close to the training range, so
-its horizon at $\varepsilon=0.3$ is shorter (\HzLocTablekTwelve{} qubits for
-$k=12$, interval \HzLocTableIntkTwelve), but its error grows more slowly far
-out. Its intervals are wide (for local costs, \HzLocTableIntkSixteen{} at
+its horizon at $\varepsilon=0.3$ is shorter for $k=12$ (\HzLocTablekTwelve{}
+qubits, interval \HzLocTableIntkTwelve), but its error grows more slowly
+far out, and for $k=8$ its horizon is the longer one (\HzLocTablekEight{}
+against \HzLocMLPkEight). Its intervals are wide (for local costs, \HzLocTableIntkSixteen{} at
 $k=16$ and \HzLocTableIntkTwenty{} at $k=20$) because its error stays close
 to the tolerance over several qubits, which is a property of any threshold
 metric and the reason we report intervals. At those training ranges the
@@ -1475,7 +1486,7 @@ range already covers the labels that occur at larger $n$.
 \caption{Prediction horizon $H(0.3)$ in qubits beyond the training range
 $n\le k$: the largest distance up to which the mean absolute error on
 resolved Clifford-labeled circuits stays at or below $0.3$ $\log_{10}$
-units, with 90\% bootstrap intervals, for local-cost circuits and for all
+units, with 95\% bootstrap intervals, for local-cost circuits and for all
 resolved circuits. ``Resolved'' is the fraction of test circuits within six
 qubits of the training range that are above the sampling resolution.
 ``$\ge$'' marks a horizon that reaches the largest circuits available
@@ -1487,13 +1498,13 @@ qubits of the training range that are above the sampling resolution.
 \toprule
  & & \multicolumn{2}{c}{Resolved within $d\le6$} & \multicolumn{2}{c}{MLP ensemble, $H(0.3)$} & \multicolumn{2}{c}{Structured linear, $H(0.3)$} \\
 \cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
-Train $n\le k$ & Circuits & local & global & local cost & all resolved & local cost & all resolved \\
+Train $n\le k$ & Training circuits & local & global & local cost & all resolved & local cost & all resolved \\
 \midrule
 $k=8$ & 5032 & 99\% & 100\% & $3$ [3, 4] & $4$ [3, 4] & $4$ [4, 4] & $5$ [4, 5] \\
-$k=12$ & 7941 & 99\% & 99\% & $5$ [5, 6] & $6$ [5, 6] & $4$ [3, 5] & $4$ [4, 4] \\
-$k=16$ & 9115 & 95\% & 81\% & $6$ [4, 7] & $6$ [5, 6] & $3$ [2, 5] & $3$ [3, 5] \\
+$k=12$ & 7941 & 99\% & 99\% & $5$ [5, 6] & $6$ [4, 6] & $4$ [3, 5] & $4$ [3, 5] \\
+$k=16$ & 9115 & 95\% & 81\% & $6$ [4, 7] & $6$ [5, 6] & $3$ [2, 5] & $3$ [3, 6] \\
 $k=20$ & 10266 & 84\% & 36\% & $6$ [6, 7] & $6$ [6, 6] & $6$ [3, 8] & $3$ [3, 6] \\
-$k=24$ & 11026 & 81\% & 24\% & $\ge8$ [8, 8] & $\ge8$ [7, 8] & $\ge8$ [8, 8] & $\ge8$ [3, 8] \\
+$k=24$ & 11026 & 81\% & 24\% & $\ge8$ [8, 8] & $\ge8$ [7, 8] & $\ge8$ [7, 8] & $\ge8$ [2, 8] \\
 \botrule
 \end{tabular}%
 }
@@ -1572,14 +1583,15 @@ dependence on qubit count saturates with the causal cone instead of
 continuing a decay, which would remove the bias for local costs. The other
 is a label for the flattest circuits, which sampling cannot resolve and
 for which the present models err in the costly direction. The released
-circuits with exact labels up to \ClQmax{} qubits, together with the metric
+circuits with Clifford-sampled labels up to \ClQmax{} qubits, together with the metric
 $H(\varepsilon)$, define a benchmark for this problem: a method that
-extends $H(0.3)$ beyond six qubits from a 12-qubit training range, on the
-same circuits, would be a clear improvement.
+extends the local-cost $H(0.3)$ beyond the \HzLocMLPkTwelve{} qubits measured
+here from a 12-qubit training range, on the same circuits, would be a clear
+improvement.
 
 \begin{tableorg}[t]
 \centering\tablebodyfont
-\caption{Extrapolation with exact Clifford labels, by cost locality. Models
+\caption{Extrapolation with Clifford-sampled labels, by cost locality. Models
 are trained on $n\le12$ (\ClTrainRows{} circuits). ``Resolved'' is the
 fraction of test circuits above the sampling resolution; $R^2$ and bias
 (mean prediction minus mean label, structured linear model) are computed on
@@ -1728,8 +1740,8 @@ receives, in closed form, the part of the pattern's effect that acts through
 the observable. Held-out linear is then predicted with $R^2=\LopoLinearUnseen$
 (\LopoLinearSeen{} when seen), circular with \LopoCircularUnseen{}
 (\LopoCircularSeen), brickwork with \LopoBrickUnseen{} (\LopoBrickSeen), star
-with \LopoStarUnseen{} (\LopoStarSeen), and even all-to-all with
-\LopoAllUnseen{} (\LopoAllSeen), far above the physics-informed control
+with \LopoStarUnseen{} (\LopoStarSeen), and all-to-all, the hardest case, with
+\LopoAllUnseen{} (\LopoAllSeen), above the physics-informed control
 (\LopoAllPhys). The classifier is more forgiving still: AUC is at least
 \LopoMinAuc{} for every held-out pattern.
 
@@ -1777,9 +1789,9 @@ families of Section~\ref{sec:familiesmethod}. The picture is the same in all
 three. On unseen architectures the learners reach $R^2=\TiedHGB$ and
 \TiedMLP{} for shared parameters and \GraphHGB{} and \GraphMLP{} for random
 graphs, against \RsqCV{} and \RsqCVMLP{} for the named patterns, and in
-each family a fitted linear rule comes within a few hundredths
+each family a structured linear model comes within a few hundredths
 (\TiedRule{} and \GraphRule). Extrapolation from $n\le10$ to 11 and 12
-qubits also behaves alike: the neural network and the linear rule continue
+qubits also behaves alike: the neural network and the structured linear model continue
 the trend, and tree ensembles do so only where the labels at larger $n$
 stay within the training range.
 
@@ -1796,7 +1808,7 @@ family is one to which the Clifford shortcut does not apply
 the held-out 13- and 14-qubit shared-parameter circuits with
 $R^2=\TiedLargeMLP$ (neural network, ten seeds), \TiedLargeRule{} (linear
 rule) and \TiedLargeHGB{} (HGB); \TiedLargeBelowCut\% of these circuits lie
-below the cutoff. HGB scores above the linear rule here only because
+below the cutoff. HGB scores above the structured linear model here only because
 \TiedLargeInRange\% of the labels at these sizes lie within the range seen
 in training, so that little extrapolation of the label is needed; this is
 the same condition under which it does well in
@@ -1813,9 +1825,8 @@ circuits share a graph.
 
 \begin{tableorg}[t]
 \centering\tablebodyfont
-\caption{The central measurements on three circuit families. ``Fitted
-linear rule'' is the structured linear model for the first two families and
-its descriptor analogue for random graphs. Unseen architectures: grouped
+\caption{The central measurements on three circuit families. For random graphs
+the structured linear model is its descriptor analogue. Unseen architectures: grouped
 cross-validation for the first two families, repeated five-fold
 cross-validation for random graphs, where every circuit is a distinct
 architecture (mean $\pm$ standard deviation over ten folds).}
@@ -1833,18 +1844,18 @@ Noise ceiling on $R^2$ & 0.985 & 0.989 & -- \\
 \multicolumn{4}{l}{\emph{Unseen architectures, $R^2$}}\\
 \quad HGB & $0.980 \pm 0.003$ & $0.983 \pm 0.002$ & $0.975 \pm 0.002$ \\
 \quad MLP & $0.979 \pm 0.003$ & $0.981 \pm 0.002$ & $0.974 \pm 0.002$ \\
-\quad fitted linear rule & $0.969 \pm 0.002$ & $0.958 \pm 0.005$ & $0.966 \pm 0.003$ \\
-\quad five-coefficient rule & $0.682 \pm 0.016$ & $0.309 \pm 0.039$ & -- \\
+\quad structured linear model & $0.969 \pm 0.002$ & $0.958 \pm 0.005$ & $0.966 \pm 0.003$ \\
+\quad five-coefficient model & $0.682 \pm 0.016$ & $0.309 \pm 0.039$ & -- \\
 \midrule
 \multicolumn{4}{l}{\emph{Trained on $n\le10$, tested on $n=11,12$, $R^2$}}\\
 \quad MLP (10 seeds) & $0.961 \pm 0.003$ & $0.969 \pm 0.003$ & $0.923 \pm 0.006$ \\
 \quad HGB & 0.860 & 0.942 & 0.684 \\
-\quad fitted linear rule & 0.935 & 0.934 & 0.902 \\
+\quad structured linear model & 0.935 & 0.934 & 0.902 \\
 \midrule
 \multicolumn{4}{l}{\emph{Trained on $n\le12$, tested on $n=13,14$, $R^2$}}\\
 \quad MLP (10 seeds) & $0.972 \pm 0.002$ & $0.980 \pm 0.001$ & -- \\
 \quad HGB & 0.905 & 0.960 & -- \\
-\quad fitted linear rule & 0.951 & 0.940 & -- \\
+\quad structured linear model & 0.951 & 0.940 & -- \\
 \botrule
 \end{tabular}%
 }
@@ -1909,11 +1920,11 @@ $n$ & Circuits & Above cutoff (\%) & HGB & Struct.~linear & Physics-linear & HGB
 Our results support one main claim, stated within its scope. For the
 hardware-efficient family studied here, the mean gradient variance is a
 simple function of the architecture. Within each combination of categorical
-design choices it falls linearly in $\log_{10}$ with qubit count and
-saturates with depth, and a model of that form, or a flexible learner that
+design choices, and within the simulated range, it falls linearly in
+$\log_{10}$ with qubit count and saturates with depth, and a model of that form, or a flexible learner that
 knows nothing of the form, predicts it close to the noise ceiling of the label for
 architectures it has never seen. The effective weight of the measured observable lifts the
-five-coefficient rule from \RsqPhys{} to \RsqPhysEff, and together with the
+five-coefficient model from \RsqPhys{} to \RsqPhysEff, and together with the
 causal cone it is what lets predictions transfer outside the training
 range; within it, a flexible learner reconstructs both.
 
@@ -1944,9 +1955,11 @@ qubits; three from a range of 8), for
 resolved circuits, not an asymptotic regime. For the flattest global-cost
 circuits just beyond the sampling resolution the models overestimate the
 variance, the costly direction for screening. Tree ensembles cannot continue a trend in $n$ beyond
-the training range, and the neural network is seed-dependent at large
-gaps, so a user who needs predictions at larger $n$ should prefer the
-structured model, or extend the training range with Clifford labels.
+the training range, and a single neural network is seed-dependent at large
+gaps. A user who needs predictions at larger $n$ should use an ensemble of
+networks within the horizon, prefer the structured linear model further
+out, where its error grows more slowly, or extend the training range with
+Clifford labels.
 (iii)~\emph{Ideal simulation.} We use a noiseless statevector simulator, so
 noise-induced plateaus~\cite{wang2021noise} are out of scope.
 (iv)~\emph{Label noise, hidden axes, and the cutoff.} Each variance is
@@ -1981,7 +1994,9 @@ label, and the rank correlation between the label and the loss decrease
 was between \TORhoTrueMin{} and \TORhoTrueMax{} (\TORhoPredMin{} to
 \TORhoPredMax{} for the predicted label). At these sizes even
 the smallest labels in the dataset correspond to typical gradient
-components between $10^{-3}$ and $10^{-2}$, which a modest shot budget resolves. The
+components between $10^{-3}$ and $10^{-2}$. These are below the shot noise
+of a single estimate at 100 or 1\,000 shots, but the estimates are
+unbiased and the optimizer still makes progress over 200 steps. The
 predictor should therefore be read as a screen for the gradient-variance
 scaling that becomes prohibitive at larger $n$, not as a forecast of
 optimization success at the sizes simulated here.
@@ -2000,20 +2015,21 @@ be studied.
 We studied how well the gradient variance of hardware-efficient
 variational circuits can be predicted from architecture alone. With the
 label defined as the mean over all parameters and structural zeros removed,
-the answer is: almost completely, and by a simple rule. Learners reach
+the answer is: within the simulated range, almost completely, and by a
+simple model. Learners reach
 $R^2\approx\RsqCV$ on unseen architectures against a noise ceiling of
 \RsqCeiling, a structured linear model reaches \RsqStruct, and a
-five-coefficient textbook rule \RsqPhys; the same holds for circuits with
+five-coefficient physics-informed model \RsqPhys; the same holds for circuits with
 layer-shared parameters, to which the Clifford shortcut does not apply, and
 for random entangling graphs. Two closed-form quantities, the effective
 weight of the observable and the causal cone, add little within the
 training range but allow transfer to entanglement patterns absent from
-training. With exact labels up to 32 qubits we measured a prediction
+training. With Clifford-sampled labels up to 32 qubits we measured a prediction
 horizon: for local costs, five to six qubits beyond a training range of 12
 or more qubits and three beyond a range of 8, on
-average within a factor of two of the true variance. Beyond it, and for the
-flattest global-cost circuits, the models err in the direction that
-matters for screening, rating circuits as less flat than they are. Extending that horizon, and resolving the flattest circuits, are
+average within a factor of two of the true variance. Beyond it the models overestimate the decay for local costs, and for the
+flattest global-cost circuits they err in the direction that matters for
+screening, rating circuits as less flat than they are. Extending that horizon, and resolving the flattest circuits, are
 open problems for which the released circuits and the horizon metric
 provide a benchmark. Noisy circuits and ans\"atze outside the
 hardware-efficient layout are natural next steps.
@@ -2045,8 +2061,9 @@ unseen-pattern, 13--14-qubit, Clifford-sampling, shared-parameter and
 random-graph experiments, and
 regenerates from the sequence of commands documented in the repository,
 with
-fixed random seeds (root seed 12345 for data generation, seed 0 for all
-models). Software: Python \PythonVersion, NumPy \NumpyVersion, scikit-learn
+fixed random seeds (root seed 12345 for data generation, seed 0 for
+single-model results and seeds 0 to 9 for results reported over several
+seeds). Software: Python \PythonVersion, NumPy \NumpyVersion, scikit-learn
 \SklearnVersion.
 \item \textbf{Materials availability.} Not applicable.
 \item \textbf{Code availability.} All code (the statevector simulator, the
