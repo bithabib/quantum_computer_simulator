@@ -607,24 +607,26 @@ Data-Driven Model for Barren Plateaus}
 \country{Republic of Korea}}}
 
 \abstract{Barren plateaus, the exponential decay of gradient variance with qubit
-number, obstruct the training of variational quantum circuits. We study how well the gradient variance of hardware-efficient
-circuits can be predicted from their architecture, and how far beyond the
-training range such predictions can be trusted. We
-simulate \Nrows{} circuits with 2 to 12 qubits; the label is the mean
-gradient variance over all parameters whose gradient does not vanish
-identically. Within the training range the label is predictable close to its noise ceiling: learners reach $R^2=\RsqCV$ on held-out
-architectures against a ceiling of \RsqCeiling, a structured linear model reaches \RsqStruct{} and a five-coefficient physics-informed model \RsqPhys, and the same
-holds for layer-shared parameters and random entangling graphs. The last entangling layer changes the weight of the measured
-observable; this effective weight and the causal cone, both
-closed-form, let predictions transfer to unseen entanglement patterns. With Clifford-sampled
+number, obstruct the training of variational quantum circuits. We study how
+well the gradient variance of hardware-efficient circuits can be predicted
+from their architecture, and how far beyond the training range such
+predictions can be trusted. We simulate \Nrows{} circuits with 2 to 12
+qubits; the label is the mean gradient variance over all parameters whose
+gradient does not vanish identically. Within the training range the label
+is predictable close to its noise ceiling: learners reach $R^2=\RsqCV$ on
+held-out architectures against a ceiling of \RsqCeiling{} and a structured
+linear model reaches \RsqStruct; the same holds for layer-shared parameters
+and random entangling graphs. Two closed-form quantities, the weight of the
+observable after the last entangling layer and its causal cone, let
+predictions transfer to unseen entanglement patterns. With Clifford-sampled
 labels up to 32 qubits we define and measure a prediction horizon: for
 local costs, an ensemble of neural networks stays on average within a
 factor of two of the true variance for five to six qubits beyond a training
-range of 12 or more qubits, and three beyond a range of 8. Beyond the horizon the error keeps growing,
-and the models
-underestimate how flat the flattest global-cost circuits are, which limits
-their use for screening. Extending the horizon is posed as an open problem, with a benchmark. The predicted quantity is a finite-size proxy,
-not optimization success or a proof of scaling.}
+range of 12 or more qubits. Beyond the horizon the error keeps growing, and
+the models underestimate how flat the flattest global-cost circuits are,
+which limits their use for screening. Extending the horizon is posed as an
+open problem, with a benchmark. The predicted quantity is a finite-size
+proxy, not optimization success or a proof of scaling.}
 
 \keywords{Barren plateaus, Variational quantum circuits, Quantum machine
 learning, Trainability, Gradient variance, Prediction horizon, Causal cone}
@@ -832,7 +834,7 @@ flatness of unstructured ans\"atze to a random walk and estimates it by
 Monte Carlo. Letcher et al.~\cite{letcher2024tight} derive tight and
 efficiently computable gradient bounds for a large class of circuits without
 design assumptions. The circuits studied here admit a particularly simple
-exact method. Every angle appears once with a Pauli generator, so the cost is
+method that rests on an exact identity. Every angle appears once with a Pauli generator, so the cost is
 a trigonometric polynomial of degree one in each angle, the squared gradient
 has degree two, and its uniform average equals its average over the four
 angles $\{0,\pi/2,\pi,3\pi/2\}$. At those angles every gate is Clifford and
@@ -1199,7 +1201,8 @@ circuits the Clifford grid assigns zero variance to \TiedShortZero\% of the
 shared parameters whose true variance is non-zero, and misestimates the
 label by more than a factor of two in \TiedShortOff\% of circuits. For
 shared parameters the Clifford shortcut therefore does not apply, and we
-know of no other cheap exact label beyond statevector reach. Two caveats
+know of no other cheap label of comparable accuracy beyond statevector
+reach. Two caveats
 limit what this family can show. It is less flat than the
 independent-parameter family at these sizes: only \TiedBelowCut\% of its
 circuits fall below the cutoff and its smallest label is $\TiedLabelMin$.
@@ -1226,7 +1229,8 @@ the descriptors (\GraphRuleCoef{} coefficients).
 
 \subsection{Exact labels beyond statevector reach}\label{sec:cliffordmethod}
 Statevector simulation limits the labeled circuits to $n\le14$. For this
-circuit family a second exact method has no such limit. Every angle appears
+circuit family a second method, based on an exact identity, has no such
+limit. Every angle appears
 once and every rotation generator is a Pauli, so $C(\theta)$ is a
 trigonometric polynomial of degree one in each angle and
 $(\partial C/\partial\theta_k)^2$ has degree at most two. The four-point
@@ -1806,8 +1810,7 @@ Second, the shared-parameter
 family is one to which the Clifford shortcut does not apply
 (Section~\ref{sec:familiesmethod}). Trained on $n\le12$, the models predict
 the held-out 13- and 14-qubit shared-parameter circuits with
-$R^2=\TiedLargeMLP$ (neural network, ten seeds), \TiedLargeRule{} (linear
-rule) and \TiedLargeHGB{} (HGB); \TiedLargeBelowCut\% of these circuits lie
+$R^2=\TiedLargeMLP$ (neural network, ten seeds), \TiedLargeRule{} (structured linear model) and \TiedLargeHGB{} (HGB); \TiedLargeBelowCut\% of these circuits lie
 below the cutoff. HGB scores above the structured linear model here only because
 \TiedLargeInRange\% of the labels at these sizes lie within the range seen
 in training, so that little extrapolation of the label is needed; this is
@@ -1815,7 +1818,7 @@ the same condition under which it does well in
 Section~\ref{sec:clifford}, and does not contradict its failure to
 extrapolate. We note that this family is not strongly
 flat at these sizes, so the test shows that the approach carries over, not
-that it resolves deep plateaus where no exact label exists. Third, on random graphs the physics
+that it resolves deep plateaus where no reference label exists. Third, on random graphs the physics
 descriptors are what make the problem tractable. HGB given only the seven
 design parameters reaches $R^2=\GraphDesignOnly$; given the descriptors it
 reaches \GraphHGB. The causal-cone fraction equals the exact non-structural
@@ -1970,7 +1973,8 @@ ceiling; and the barren cutoff $y<-2$ is a modeling choice that affects
 only the classification results (Supplementary Table~S3).
 (v)~\emph{Exact alternatives for this family.} Because every angle
 appears once with a Pauli generator, the gradient variance of these
-circuits can be estimated exactly by Clifford sampling at any qubit count
+circuits can be estimated without bias by Clifford sampling at any qubit
+count
 (Section~\ref{sec:clifford}), at a cost of seconds per circuit. This
 weakens the argument that labels are expensive. Three things remain in
 favor of a predictor: it costs microseconds per candidate, which matters
