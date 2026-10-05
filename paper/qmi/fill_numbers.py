@@ -242,10 +242,20 @@ def main():
         M["ClLeTwentyStruct"] = f(t20["Structured linear"]["r2"], 2)
         M["ClLeTwentyMLP"] = "%.2f \\pm %.2f" % (t20["MLP_seeds"]["r2_mean"], t20["MLP_seeds"]["r2_sd"])
         M["ClLeTwentyHGB"] = f(t20["Hist Gradient Boosting"]["r2"], 2)
-        M["ClAbstractSentence"] = ("With exact Clifford-sampled labels up to 32 qubits, such models stay "
-            "accurate on circuits whose variance is resolvable for about eight qubits beyond training; "
-            "further out they overestimate the decay for local costs, whose causal cone saturates, and "
-            "they overestimate the variance of the flattest global-cost circuits.")
+        M["ClAbstractSentence"] = ("With exact Clifford-sampled labels up to 32 qubits we measure a prediction "
+            "horizon: an ensemble of neural networks stays within a factor of two of the true variance for "
+            "about six qubits beyond its training range. Prediction beyond that horizon is an open problem, "
+            "for which we release a benchmark.")
+        if "horizon" in CS:
+            HZ = CS["horizon"]; wk = {"8": "Eight", "12": "Twelve", "16": "Sixteen", "20": "Twenty", "24": "Twentyfour"}
+            M["HzEnsemble"] = {10: "ten"}.get(HZ["n_ensemble"], str(HZ["n_ensemble"]))
+            for k, w_ in wk.items():
+                mm_ = HZ["cuts"][k]["models"]
+                for name, key in [("MLP ensemble", "MLP"), ("Structured linear", "Table"), ("Hist Gradient Boosting", "HGB")]:
+                    M["Hz%sk%s" % (key, w_)] = str(mm_[name]["horizon"]["0.3"]["h"])
+                    M["Hz%sWidek%s" % (key, w_)] = str(mm_[name]["horizon"]["0.5"]["h"])
+            m12 = HZ["cuts"]["12"]["models"]["MLP ensemble"]["mae_by_distance"]
+            M["HzMaeTwelveDOne"] = f(m12["1"], 2); M["HzMaeTwelveDFour"] = f(m12["4"], 2); M["HzMaeTwelveDSix"] = f(m12["6"], 2)
     M["ClTargetHits"] = "2\\,000"; M["ClMaxSamples"] = "$2^{20}$"; M["ClResolvedHits"] = "100"
     M.setdefault("ClQmax", "32"); M.setdefault("ClAbstractSentence", "")
     lopo_path = os.path.join(RES, "lopo.json")
@@ -281,7 +291,7 @@ def main():
     tables = {}
     for t in ["datastats", "labelbydesign", "grouped_cv", "extrap", "extrap_breakdown",
               "ablation", "cutoff", "lopo", "gap", "screening_within", "large", "effweight",
-              "clifford", "clifford_cost"]:
+              "clifford", "clifford_cost", "horizon"]:
         tp = os.path.join(RES, "table_%s.tex" % t)
         body = open(tp).read().strip() if os.path.exists(tp) else "% (pending)"
         # never let a generated table exceed the text width

@@ -388,7 +388,41 @@
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits, such models stay accurate on circuits whose variance is resolvable for about eight qubits beyond training; further out they overestimate the decay for local costs, whose causal cone saturates, and they overestimate the variance of the flattest global-cost circuits.}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays within a factor of two of the true variance for about six qubits beyond its training range. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
+\newcommand{\HzEnsemble}{ten}
+\newcommand{\HzMLPkEight}{4}
+\newcommand{\HzMLPWidekEight}{5}
+\newcommand{\HzTablekEight}{5}
+\newcommand{\HzTableWidekEight}{8}
+\newcommand{\HzHGBkEight}{1}
+\newcommand{\HzHGBWidekEight}{2}
+\newcommand{\HzMLPkTwelve}{6}
+\newcommand{\HzMLPWidekTwelve}{8}
+\newcommand{\HzTablekTwelve}{4}
+\newcommand{\HzTableWidekTwelve}{10}
+\newcommand{\HzHGBkTwelve}{1}
+\newcommand{\HzHGBWidekTwelve}{2}
+\newcommand{\HzMLPkSixteen}{6}
+\newcommand{\HzMLPWidekSixteen}{8}
+\newcommand{\HzTablekSixteen}{3}
+\newcommand{\HzTableWidekSixteen}{10}
+\newcommand{\HzHGBkSixteen}{1}
+\newcommand{\HzHGBWidekSixteen}{3}
+\newcommand{\HzMLPkTwenty}{6}
+\newcommand{\HzMLPWidekTwenty}{8}
+\newcommand{\HzTablekTwenty}{3}
+\newcommand{\HzTableWidekTwenty}{12}
+\newcommand{\HzHGBkTwenty}{12}
+\newcommand{\HzHGBWidekTwenty}{12}
+\newcommand{\HzMLPkTwentyfour}{8}
+\newcommand{\HzMLPWidekTwentyfour}{8}
+\newcommand{\HzTablekTwentyfour}{8}
+\newcommand{\HzTableWidekTwentyfour}{8}
+\newcommand{\HzHGBkTwentyfour}{8}
+\newcommand{\HzHGBWidekTwentyfour}{8}
+\newcommand{\HzMaeTwelveDOne}{0.08}
+\newcommand{\HzMaeTwelveDFour}{0.19}
+\newcommand{\HzMaeTwelveDSix}{0.27}
 \newcommand{\ClTargetHits}{2\,000}
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
@@ -445,7 +479,7 @@ comparison on the qubit-count extrapolation split (Table~S4), the
 widening-gap extrapolation table (Table~S5), the extrapolation error by
 subset of the 11- and 12-qubit test set (Table~S6), the pooled
 Clifford-label extrapolation table (Table~S7), the learning curve
-(Figure~S1), and five further figures (Figures~S2--S6). Every number is produced by the released analysis scripts.}
+(Figure~S1), and six further figures (Figures~S2--S7). Every number is produced by the released analysis scripts.}
 \maketitle
 
 \section{Model hyperparameters}
@@ -708,4 +742,13 @@ physics-informed linear control.}
 \label{fig:lopo}
 \end{figure}
 
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{figs/clifford.pdf}
+\caption{Left: mean absolute error against test qubit count for models
+trained on $n\le12$; the band is the range over ten MLP seeds. Middle and
+right: predicted versus true label for the structured linear model and the
+MLP, colored by qubit count.}
+\label{fig:clifford}
+\end{figure}
 \end{document}

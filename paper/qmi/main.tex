@@ -401,7 +401,41 @@
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits, such models stay accurate on circuits whose variance is resolvable for about eight qubits beyond training; further out they overestimate the decay for local costs, whose causal cone saturates, and they overestimate the variance of the flattest global-cost circuits.}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays within a factor of two of the true variance for about six qubits beyond its training range. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
+\newcommand{\HzEnsemble}{ten}
+\newcommand{\HzMLPkEight}{4}
+\newcommand{\HzMLPWidekEight}{5}
+\newcommand{\HzTablekEight}{5}
+\newcommand{\HzTableWidekEight}{8}
+\newcommand{\HzHGBkEight}{1}
+\newcommand{\HzHGBWidekEight}{2}
+\newcommand{\HzMLPkTwelve}{6}
+\newcommand{\HzMLPWidekTwelve}{8}
+\newcommand{\HzTablekTwelve}{4}
+\newcommand{\HzTableWidekTwelve}{10}
+\newcommand{\HzHGBkTwelve}{1}
+\newcommand{\HzHGBWidekTwelve}{2}
+\newcommand{\HzMLPkSixteen}{6}
+\newcommand{\HzMLPWidekSixteen}{8}
+\newcommand{\HzTablekSixteen}{3}
+\newcommand{\HzTableWidekSixteen}{10}
+\newcommand{\HzHGBkSixteen}{1}
+\newcommand{\HzHGBWidekSixteen}{3}
+\newcommand{\HzMLPkTwenty}{6}
+\newcommand{\HzMLPWidekTwenty}{8}
+\newcommand{\HzTablekTwenty}{3}
+\newcommand{\HzTableWidekTwenty}{12}
+\newcommand{\HzHGBkTwenty}{12}
+\newcommand{\HzHGBWidekTwenty}{12}
+\newcommand{\HzMLPkTwentyfour}{8}
+\newcommand{\HzMLPWidekTwentyfour}{8}
+\newcommand{\HzTablekTwentyfour}{8}
+\newcommand{\HzTableWidekTwentyfour}{8}
+\newcommand{\HzHGBkTwentyfour}{8}
+\newcommand{\HzHGBWidekTwentyfour}{8}
+\newcommand{\HzMaeTwelveDOne}{0.08}
+\newcommand{\HzMaeTwelveDFour}{0.19}
+\newcommand{\HzMaeTwelveDSix}{0.27}
 \newcommand{\ClTargetHits}{2\,000}
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
@@ -1347,18 +1381,82 @@ Cost-locality subgroup mean & -0.889 [-1.024, -0.776] & 1.549 & -0.902 & -0.884 
 
 
 
-\subsection{Extrapolation to 32 qubits with exact Clifford labels}\label{sec:clifford}
-Table~\ref{tab:clifford} and Figure~\ref{fig:clifford} report models trained
-on the \ClTrainRows{} Clifford-labeled circuits with $n\le12$ and tested on
-\ClTestRows{} circuits with $13\le n\le\ClQmax$, up to twenty qubits beyond
-the largest training circuit. The results must be read separately for local
-and global costs, because censoring differs sharply between them. Of the
-\ClCensored{} test circuits that fall below the sampling resolution, almost
-all have a global cost: beyond 24 qubits only about a quarter of
-global-cost circuits are resolved, against more than four fifths of
-local-cost ones (Table~\ref{tab:clifford}). An $R^2$ computed on the
-resolved global-cost circuits at those sizes would measure which circuits
-survive, not how well the model predicts, so we do not report it.
+\subsection{The prediction horizon, measured with exact labels up to 32 qubits}\label{sec:clifford}
+How far beyond its training range can a predictor be trusted? The
+Clifford-labeled circuits, which run from 2 to \ClQmax{} qubits, let us
+measure this directly. For a model trained on circuits with $n\le k$ we
+compute the mean absolute error at each distance $d=n_{\rm test}-k$ beyond
+the training range and define the \emph{prediction horizon} $H(\varepsilon)$
+as the largest $d$ up to which that error stays at or below $\varepsilon$.
+We use $\varepsilon=0.3$, a factor of two in variance, and
+$\varepsilon=0.5$, a factor of three, and vary $k$ from 8 to 24. The neural
+network is used as an ensemble of \HzEnsemble{} networks that differ only in
+their random seed; averaging removes the seed dependence noted in
+Section~\ref{sec:extrap}.
+
+Figure~\ref{fig:horizon} and Table~\ref{tab:horizon} give the result. For
+training ranges of 12, 16 and 20 qubits the ensemble has
+$H(0.3)=\HzMLPkTwelve$, \HzMLPkSixteen{} and \HzMLPkTwenty{} qubits: the
+predictable range is the training range plus about six qubits, and it does
+not shrink as the training range moves up. Inside the horizon the error
+grows smoothly; for $k=12$ it is \HzMaeTwelveDOne{} one qubit beyond
+training, \HzMaeTwelveDFour{} at four and \HzMaeTwelveDSix{} at six. Beyond
+the horizon it accelerates. The structured linear model is less accurate
+close to the training range, so its horizon at $\varepsilon=0.3$ is shorter
+(\HzTablekTwelve{} qubits for $k=12$), but its error grows more slowly far
+out, and at the looser tolerance $\varepsilon=0.5$ its horizon is the longer
+one (\HzTableWidekTwelve{} against \HzMLPWidekTwelve{} qubits for $k=12$).
+Which model is preferable therefore depends on the accuracy required: the
+ensemble inside six qubits, the structured model beyond. HGB, whose prediction
+is constant beyond the training range, has a horizon of one or two qubits
+unless the training range already covers the labels that occur at larger
+$n$, as it does for $k\ge20$ on the resolved circuits.
+
+\begin{tableorg}[t]
+\centering\tablebodyfont
+\caption{Prediction horizon $H(\varepsilon)$ in qubits beyond the training
+range $n\le k$: the largest distance up to which the mean absolute error on
+resolved Clifford-labeled circuits stays at or below $\varepsilon$
+$\log_{10}$ units. ``$\ge$'' marks a horizon that reaches the largest
+circuits available ($n=\ClQmax$).}
+\label{tab:horizon}
+%%BEGIN-TABLE:horizon
+\fittable{%
+\begin{tabular}{rrcccccc}
+\toprule
+ & & \multicolumn{2}{c}{MLP ensemble} & \multicolumn{2}{c}{Structured linear} & \multicolumn{2}{c}{HGB} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+Train $n\le k$ & Circuits & $H(0.3)$ & $H(0.5)$ & $H(0.3)$ & $H(0.5)$ & $H(0.3)$ & $H(0.5)$ \\
+\midrule
+$k=8$ & 5032 & $4$ & $5$ & $5$ & $8$ & $1$ & $2$ \\
+$k=12$ & 7941 & $6$ & $8$ & $4$ & $10$ & $1$ & $2$ \\
+$k=16$ & 9115 & $6$ & $8$ & $3$ & $10$ & $1$ & $3$ \\
+$k=20$ & 10266 & $6$ & $8$ & $3$ & $\ge12$ & $\ge12$ & $\ge12$ \\
+$k=24$ & 11026 & $\ge8$ & $\ge8$ & $\ge8$ & $\ge8$ & $\ge8$ & $\ge8$ \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:horizon
+\end{tableorg}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\textwidth]{figs/horizon.pdf}
+\caption{Mean absolute error against distance beyond the training range,
+for four training ranges. Dashed and dotted lines mark the tolerances
+$\varepsilon=0.3$ and $0.5$ that define the prediction horizon.}
+\label{fig:horizon}
+\end{figure}
+
+\paragraph{Why there is a horizon.} Table~\ref{tab:clifford} (Supplementary
+Figure~S7 and Table~S7) breaks the $k=12$ case down by cost locality, which
+is necessary because censoring differs sharply between the two: of the
+\ClCensored{} test circuits below the sampling resolution almost all have a
+global cost, and beyond 24 qubits only about a quarter of global-cost
+circuits are resolved, against more than four fifths of local-cost ones. An
+$R^2$ computed on the resolved global-cost circuits at those sizes would
+measure which circuits survive, not how well the model predicts, so we do
+not report it.
 
 %%CHECK-CL
 \paragraph{Local costs: a genuine horizon.} For local costs the structured
@@ -1394,18 +1492,27 @@ training range; their apparent scores on the resolved circuits at large $n$
 (Supplementary Table~S7) reflect the same survivorship and should not be
 read as extrapolation.
 
-The conclusion is a horizon. A predictor trained on circuits
-that a laptop can simulate exactly is reliable for roughly eight more
-qubits, which is the regime where labeling by statevector simulation
-becomes impractical, and is unreliable beyond that. The remedy is cheap for
-this family: when the training range is extended to $n\le20$ with Clifford
-labels, the same models predict 21- to 32-qubit circuits with
-$R^2=\ClLeTwentyStruct$ (structured linear), $\ClLeTwentyMLP$ (neural
-network, five seeds) and \ClLeTwentyHGB{} (HGB), computed on the \ClLeTwentyResolved{} resolved circuits of the
-\ClLeTwentyTotal{} with $n>20$. That HGB, which cannot extrapolate, scores
-highest shows what this number measures: the resolved large-$n$ circuits
-lie within the range of labels seen in training, so the task has become
-interpolation in label, and the censored circuits are not tested.
+\paragraph{Extending the horizon, and an open problem.} The horizon moves
+with the training range. When the training range is extended to $n\le20$
+with Clifford labels, the same models predict the resolved 21- to 32-qubit
+circuits with $R^2=\ClLeTwentyStruct$ (structured linear),
+$\ClLeTwentyMLP$ (neural network, five seeds) and \ClLeTwentyHGB{} (HGB),
+computed on the \ClLeTwentyResolved{} resolved circuits of the
+\ClLeTwentyTotal{} with $n>20$. That HGB scores highest shows what this
+number measures: the resolved large-$n$ circuits then lie within the range
+of labels seen in training, so the task has become interpolation in label,
+and the censored circuits are not tested.
+
+Predicting reliably beyond about six qubits from the training range is
+therefore open. Two ingredients are missing. One is a model whose
+dependence on qubit count saturates with the causal cone instead of
+continuing a decay, which would remove the bias for local costs. The other
+is a label for the flattest circuits, which sampling cannot resolve and
+for which the present models err in the costly direction. The released
+circuits with exact labels up to \ClQmax{} qubits, together with the metric
+$H(\varepsilon)$, define a benchmark for this problem: a method that
+extends $H(0.3)$ beyond six qubits from a 12-qubit training range, on the
+same circuits, would be a clear improvement.
 
 \begin{tableorg}[t]
 \centering\tablebodyfont
@@ -1437,15 +1544,6 @@ Qubits & Resolved & Struct.~$R^2$ & MLP $R^2$ & Bias & Resolved & Struct.~$R^2$ 
 %%END-TABLE:clifford_cost
 \end{tableorg}
 
-\begin{figure}[t]
-\centering
-\includegraphics[width=\textwidth]{figs/clifford.pdf}
-\caption{Left: mean absolute error against test qubit count for models
-trained on $n\le12$; the band is the range over ten MLP seeds. Middle and
-right: predicted versus true label for the structured linear model and the
-MLP, colored by qubit count.}
-\label{fig:clifford}
-\end{figure}
 
 \subsection{What drives trainability}\label{sec:ablation}
 Table~\ref{tab:ablation} and Figure~\ref{fig:ablation} report the feature
@@ -1789,10 +1887,13 @@ the effective weight of the observable after the last entangling layer.
 Models with a continuous dependence on qubit count extrapolate to 13- and
 14-qubit circuits with $R^2=\LargeRsqMLPmean$ (neural network) and
 \LargeRsqStruct{} (structured linear); tree ensembles do not extrapolate.
-With exact Clifford labels up to 32 qubits, a model trained on at most
-12 qubits remains accurate for about eight more qubits; for local costs it
-then overestimates the decay, because the causal cone saturates, and extending the training range to 20 qubits restores accuracy up to 32
-on the circuits whose variance can be resolved.
+With exact Clifford labels up to 32 qubits we measured a prediction
+horizon: an ensemble of neural networks stays within a factor of two of
+the true variance for about six qubits beyond its training range, for
+training ranges from 12 to 20 qubits. Beyond the horizon it overestimates
+the decay for local costs, because the causal cone saturates. Extending the
+horizon is an open problem, for which the released circuits and the
+horizon metric provide a benchmark.
 Transfer to an entanglement pattern absent from training succeeds when the
 pattern is described by its effect on the observable and the causal cone
 ($R^2$ between \LopoAllUnseen{} and \LopoCircularUnseen). The predictor is a cheap screening tool for one circuit family.

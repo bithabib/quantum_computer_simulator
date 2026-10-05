@@ -39,6 +39,88 @@ def fit_predict(models, Xtr, ytr, Xte):
     return {name: make().fit(Xtr, ytr).predict(Xte) for name, make in models.items()}
 
 
+HORIZON_CUTS = [8, 12, 16, 20, 24]
+HORIZON_EPS = [0.3, 0.5]
+N_ENSEMBLE = 10
+
+
+def mlp_ensemble(Xtr, ytr, Xte, k=N_ENSEMBLE):
+    """Mean prediction of k MLPs that differ only in their random seed."""
+    return np.mean([regressors(s)["MLP"].fit(Xtr, ytr).predict(Xte) for s in range(k)], axis=0)
+
+
+def horizon_study(tr_all, te_all, args):
+    """Prediction horizon: train on n <= k, measure the mean absolute error at
+    each distance d = n_test - k beyond the training range, and report the
+    largest d up to which the error stays at or below a tolerance eps (in
+    log10 units; eps = 0.3 is a factor of two in variance).  Uses all resolved
+    Clifford-labeled circuits, n = 2..32, pooled."""
+    d = pd.concat([tr_all, te_all], ignore_index=True)
+    r = d[d.resolved == 1].reset_index(drop=True)
+    X, y, nq = r[FEATURE_COLUMNS].to_numpy(float), r.log_var_all.to_numpy(float), r.n_qubits.to_numpy(int)
+    out = {"eps": HORIZON_EPS, "cuts": {}, "n_ensemble": N_ENSEMBLE, "n_max": int(nq.max())}
+    for k in HORIZON_CUTS:
+        tr = nq <= k; te = nq > k
+        preds = {"MLP ensemble": mlp_ensemble(X[tr], y[tr], X[te]),
+                 "Structured linear": StructuredLinear("reg", dilution=True).fit(X[tr], y[tr]).predict(X[te]),
+                 "Hist Gradient Boosting": hgb_reg().fit(X[tr], y[tr]).predict(X[te])}
+        nt, yt = nq[te], y[te]
+        entry = {"train_rows": int(tr.sum()), "max_distance": int(nq.max() - k), "models": {}}
+        for name, p in preds.items():
+            mae = {}
+            for dd in range(1, int(nq.max()) - k + 1):
+                m = nt == k + dd
+                if m.sum() >= 20:
+                    mae[dd] = float(mean_absolute_error(yt[m], p[m]))
+            hz = {}
+            for eps in HORIZON_EPS:
+                h = 0
+                for dd in sorted(mae):
+                    if mae[dd] <= eps:
+                        h = dd
+                    else:
+                        break
+                hz[str(eps)] = {"h": h, "censored_by_data": bool(h == max(mae))}
+            entry["models"][name] = {"mae_by_distance": {str(k_): v for k_, v in mae.items()}, "horizon": hz}
+        out["cuts"][str(k)] = entry
+        print("horizon k=%2d: " % k + "  ".join("%s %s" % (n_, {e: v["h"] for e, v in m_["horizon"].items()})
+                                                for n_, m_ in entry["models"].items()), flush=True)
+    # table
+    def cell(e):
+        return ("$\\ge%d$" if e["censored_by_data"] else "$%d$") % e["h"]
+    lines = ["\\begin{tabular}{rrcccccc}", "\\toprule",
+             " & & \\multicolumn{2}{c}{MLP ensemble} & \\multicolumn{2}{c}{Structured linear} & \\multicolumn{2}{c}{HGB} \\\\",
+             "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\\cmidrule(lr){7-8}",
+             "Train $n\\le k$ & Circuits & $H(0.3)$ & $H(0.5)$ & $H(0.3)$ & $H(0.5)$ & $H(0.3)$ & $H(0.5)$ \\\\", "\\midrule"]
+    for k in HORIZON_CUTS:
+        e = out["cuts"][str(k)]; m = e["models"]
+        lines.append("$k=%d$ & %d & %s & %s & %s & %s & %s & %s \\\\" % (
+            k, e["train_rows"], cell(m["MLP ensemble"]["horizon"]["0.3"]), cell(m["MLP ensemble"]["horizon"]["0.5"]),
+            cell(m["Structured linear"]["horizon"]["0.3"]), cell(m["Structured linear"]["horizon"]["0.5"]),
+            cell(m["Hist Gradient Boosting"]["horizon"]["0.3"]), cell(m["Hist Gradient Boosting"]["horizon"]["0.5"])))
+    lines += ["\\botrule", "\\end{tabular}"]
+    open(os.path.join(args.outdir, "table_horizon.tex"), "w").write("\n".join(lines) + "\n")
+    # figure
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(1, 2, figsize=(7.4, 3.2), sharey=True)
+    cols = {8: "#9ecae1", 12: "#4292c6", 16: "#2171b5", 20: "#08306b"}
+    for a, name in [(ax[0], "MLP ensemble"), (ax[1], "Structured linear")]:
+        for k in [8, 12, 16, 20]:
+            mae = out["cuts"][str(k)]["models"][name]["mae_by_distance"]
+            ds = sorted(int(x) for x in mae)
+            a.plot(ds, [mae[str(x)] for x in ds], marker="o", ms=3, lw=1.3, color=cols[k], label="train $n \\leq %d$" % k)
+        a.axhline(0.3, color="#c0392b", lw=0.9, ls="--"); a.axhline(0.5, color="#c0392b", lw=0.9, ls=":")
+        a.set_ylim(0, 1.6); a.set_xlim(0.5, 16.5)
+        a.set_title(name, fontsize=10); a.set_xlabel("qubits beyond the training range, $d$", fontsize=10); a.tick_params(labelsize=9)
+    ax[0].set_ylabel("MAE ($\\log_{10}$ units)", fontsize=10)
+    h, l = ax[0].get_legend_handles_labels()
+    fig.legend(h, l, loc="upper center", ncol=4, fontsize=9, frameon=False, bbox_to_anchor=(0.5, 1.0))
+    plt.tight_layout(rect=(0, 0, 1, 0.9)); plt.savefig(os.path.join(args.figdir, "horizon.pdf"), bbox_inches="tight"); plt.close()
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--train", required=True)
@@ -148,6 +230,8 @@ def main():
         R["train_le20"][name] = {"r2": float(r2_score(y2[m_te], p)), "mae": float(mean_absolute_error(y2[m_te], p))}
     sv = [r2_score(y2[m_te], regressors(s)["MLP"].fit(X2[m_tr], y2[m_tr]).predict(X2[m_te])) for s in range(5)]
     R["train_le20"]["MLP_seeds"] = {"r2_mean": float(np.mean(sv)), "r2_sd": float(np.std(sv, ddof=1))}
+
+    R["horizon"] = horizon_study(tr_all, te_all, args)
 
     for name in models:
         o = R["overall"][name]
