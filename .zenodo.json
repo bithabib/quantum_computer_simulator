@@ -1,0 +1,28 @@
+{
+  "title": "Code and data for \"Predicting the Trainability of Hardware-Efficient Variational Quantum Circuits: A Data-Driven Model for Barren Plateaus\"",
+  "upload_type": "dataset",
+  "version": "v2.1-qmi-revision",
+  "license": "cc-by-4.0",
+  "creators": [
+    {
+      "name": "Rahman, Md Habibur",
+      "affiliation": "Department of AI Convergence Engineering, Gyeongsang National University, Jinju, Republic of Korea"
+    }
+  ],
+  "keywords": [
+    "barren plateaus",
+    "variational quantum circuits",
+    "quantum machine learning",
+    "trainability",
+    "gradient variance",
+    "prediction horizon"
+  ],
+  "description": "<p>Code, datasets and results for the revised manuscript <em>Predicting the Trainability of Hardware-Efficient Variational Quantum Circuits: A Data-Driven Model for Barren Plateaus</em> (submitted to Quantum Machine Intelligence).</p><p>Version 2 replaces the version-1 label. The label is now the log10 of the mean cost-gradient variance over all parameters, computed by adjoint differentiation, with parameters whose gradient vanishes identically detected and excluded. The version-1 file is kept for comparison.</p><p>Datasets (<code>data_bp/</code>):</p><ul><li><code>bp_dataset_v2.csv</code>: 20,000 hardware-efficient circuits with 2 to 12 qubits (main dataset)</li><li><code>bp_patterns_v2.csv</code>: 10,000 circuits with brickwork and star entanglement, for the unseen-pattern test</li><li><code>bp_large_v2.csv</code>: 2,000 held-out circuits with 13 and 14 qubits</li><li><code>bp_clifford_train.csv</code>, <code>bp_clifford_test.csv</code>: 8,000 and 6,000 circuits with exact Clifford-sampled labels up to 32 qubits (the prediction-horizon benchmark)</li><li><code>bp_tied_v2.csv</code>, <code>bp_tied_large_v2.csv</code>: 10,000 circuits with layer-shared parameters (2 to 12 qubits) and 1,000 held-out circuits with 13 and 14 qubits</li><li><code>bp_graph_v2.csv</code>: 10,000 circuits with random entangling graphs</li><li><code>bp_dataset.csv</code>: the version-1 dataset (single-parameter label)</li></ul><p>Code: <code>qsim/</code> (NumPy statevector simulator), <code>qml_bp/</code> (circuit sampler, adjoint and Clifford-sampling gradient-variance estimators, dataset generators, all analyses). Results: <code>paper/qmi/results/</code> holds the JSON files and tables behind every number in the manuscript; <code>paper/qmi/</code> holds the manuscript source. The commands that regenerate everything, with fixed random seeds, are in <code>qml_bp/README.md</code>.</p>",
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/bithabib/quantum_computer_simulator/tree/v2.1-qmi-revision",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ]
+}
