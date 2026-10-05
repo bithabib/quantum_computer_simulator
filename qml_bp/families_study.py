@@ -94,13 +94,83 @@ def shortcut_check(n_circuits=100, seed=7):
             "frac_params_grid_zero_but_true_nonzero": float(zero_but_nonzero / total)}
 
 
+
+def tied_large(tied_path, large_path):
+    """Train on the shared-parameter circuits with n <= 12, test on held-out
+    circuits with more qubits (statevector labels)."""
+    t = load_dataset(tied_path).dropna(subset=["log_var"]).reset_index(drop=True)
+    b = load_dataset(large_path)
+    out = {"rows_generated": int(len(b))}
+    b = b.dropna(subset=["log_var"]).reset_index(drop=True)
+    y, yb = t.log_var.to_numpy(float), b.log_var.to_numpy(float)
+    F = FEATURE_COLUMNS
+    out.update({"train_rows": int(len(t)), "test_rows": int(len(b)), "label_mean": float(yb.mean()),
+                "label_min": float(yb.min()), "below_cutoff_frac": float((yb < -2).mean())})
+    out["MLP"] = seeds_extrap(lambda s=0: Cols(lambda: regressors(s)["MLP"], F), t, y, b, yb)
+    for name, mk in [("Hist Gradient Boosting", lambda: Cols(lambda: hgb_reg(0), F)),
+                     ("Structured linear", lambda: Cols(lambda: StructuredLinear("reg"), F)),
+                     ("Physics-informed linear", lambda: Cols(lambda: PhysicsLinear("reg"), F))]:
+        p = mk().fit(t, y).predict(b)
+        out[name] = {"mean": float(r2_score(yb, p)), "mae": float(np.mean(np.abs(p - yb))), "bias": float(np.mean(p - yb))}
+    p = np.mean([Cols(lambda: regressors(s)["MLP"], F).fit(t, y).predict(b) for s in range(N_SEEDS)], axis=0)
+    out["MLP"].update({"mae": float(np.mean(np.abs(p - yb))), "bias": float(np.mean(p - yb))})
+    for k, v in out.items():
+        print("tied 13-14 %-28s %s" % (k, v), flush=True)
+    return out
+
+
+def write_table(R, outdir):
+    R_t, R_g = R["tied"], R["graph"]
+    M = json.load(open(os.path.join(outdir, "results.json")))
+    mcv = M["grouped_cv_reg"]; mex = M["extrap_reg"]
+    def pm(v):
+        return "$%.3f \\pm %.3f$" % (v[0], v[1])
+    lines = ["\\begin{tabular}{lccc}", "\\toprule",
+             " & Named patterns & Shared parameters & Random graphs \\\\", "\\midrule",
+             "Circuits & %d & %d & %d \\\\" % (M["n_rows"], R_t["rows"], R_g["rows"]),
+             "Exact Clifford shortcut & yes & no & yes \\\\",
+             "Noise ceiling on $R^2$ & %.3f & %.3f & -- \\\\" % (M["r2_ceiling"], R_t["r2_ceiling"]),
+             "\\midrule", "\\multicolumn{4}{l}{\\emph{Unseen architectures, $R^2$}}\\\\",
+             "\\quad HGB & %s & %s & %s \\\\" % (pm(mcv["Hist Gradient Boosting"]["r2"]), pm(R_t["cv"]["Hist Gradient Boosting"]), pm(R_g["cv"]["Hist Gradient Boosting"])),
+             "\\quad MLP & %s & %s & %s \\\\" % (pm(mcv["MLP"]["r2"]), pm(R_t["cv"]["MLP"]), pm(R_g["cv"]["MLP"])),
+             "\\quad fitted linear rule & %s & %s & %s \\\\" % (pm(mcv["Structured linear"]["r2"]), pm(R_t["cv"]["Structured linear"]), pm(R_g["cv"]["Descriptor rule (linear)"])),
+             "\\quad five-coefficient rule & %s & %s & -- \\\\" % (pm(mcv["Physics-informed linear"]["r2"]), pm(R_t["cv"]["Physics-informed linear"])),
+             "\\midrule", "\\multicolumn{4}{l}{\\emph{Trained on $n\\le10$, tested on $n=11,12$, $R^2$}}\\\\",
+             "\\quad MLP (10 seeds) & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ \\\\" % (
+                 M["extrap_mlp_r2_seeds"]["mean"], M["extrap_mlp_r2_seeds"]["sd"], R_t["extrap"]["MLP"]["mean"], R_t["extrap"]["MLP"]["sd"],
+                 R_g["extrap"]["MLP"]["mean"], R_g["extrap"]["MLP"]["sd"]),
+             "\\quad HGB & %.3f & %.3f & %.3f \\\\" % (mex["Hist Gradient Boosting"]["r2"], R_t["extrap"]["Hist Gradient Boosting"]["mean"], R_g["extrap"]["Hist Gradient Boosting"]["mean"]),
+             "\\quad fitted linear rule & %.3f & %.3f & %.3f \\\\" % (mex["Structured linear"]["r2"], R_t["extrap"]["Structured linear"]["mean"], R_g["extrap"]["Descriptor rule (linear)"]["mean"]),
+             ]
+    if "large" in R_t:
+        LG = json.load(open(os.path.join(outdir, "large.json"))); tl = R_t["large"]
+        lines += ["\\midrule", "\\multicolumn{4}{l}{\\emph{Trained on $n\\le12$, tested on $n=13,14$, $R^2$}}\\\\",
+                  "\\quad MLP (10 seeds) & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ & -- \\\\" % (
+                      LG["mlp_seeds"]["mean"], LG["mlp_seeds"]["sd"], tl["MLP"]["mean"], tl["MLP"]["sd"]),
+                  "\\quad HGB & %.3f & %.3f & -- \\\\" % (LG["models"]["Hist Gradient Boosting"]["r2"], tl["Hist Gradient Boosting"]["mean"]),
+                  "\\quad fitted linear rule & %.3f & %.3f & -- \\\\" % (LG["models"]["Structured linear"]["r2"], tl["Structured linear"]["mean"])]
+    lines += ["\\botrule", "\\end{tabular}"]
+    open(os.path.join(outdir, "table_families.tex"), "w").write("\n".join(lines) + "\n")
+    print("wrote families.json, table_families.tex")
+
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--main", required=True)
     ap.add_argument("--tied", required=True)
     ap.add_argument("--graph", required=True)
+    ap.add_argument("--tied-large", default=None, help="held-out shared-parameter circuits with n > 12")
+    ap.add_argument("--only-tied-large", action="store_true",
+                    help="reuse families.json and only (re)compute the held-out shared-parameter test")
     ap.add_argument("--outdir", default="paper/qmi/results")
     args = ap.parse_args()
+    if args.only_tied_large:
+        R = json.load(open(os.path.join(args.outdir, "families.json")))
+        R["tied"]["large"] = tied_large(args.tied, args.tied_large)
+        json.dump(R, open(os.path.join(args.outdir, "families.json"), "w"), indent=1)
+        write_table(R, args.outdir)
+        return
     R = {}
 
     # ---------------- shared parameters ----------------
@@ -142,6 +212,9 @@ def main():
     R_t["offset_vs_main"] = {"mean": float(d.mean()), "sd": float(d.std()), "corr": float(np.corrcoef(kt[d.index], ku[d.index])[0, 1]), "n_arch": int(len(d))}
     R_t["clifford_shortcut"] = shortcut_check()
     print("tied  shortcut check:", R_t["clifford_shortcut"], flush=True)
+    R_t["label_min"] = float(y.min())
+    if args.tied_large:
+        R_t["large"] = tied_large(args.tied, args.tied_large)
     R["tied"] = R_t
 
     # ---------------- random graphs ----------------
@@ -177,30 +250,7 @@ def main():
     R["graph"] = R_g
     json.dump(R, open(os.path.join(args.outdir, "families.json"), "w"), indent=1)
 
-    # ---------------- summary table (with the main family) ----------------
-    M = json.load(open(os.path.join(args.outdir, "results.json")))
-    mcv = M["grouped_cv_reg"]; mex = M["extrap_reg"]
-    def pm(v):
-        return "$%.3f \\pm %.3f$" % (v[0], v[1])
-    lines = ["\\begin{tabular}{lccc}", "\\toprule",
-             " & Named patterns & Shared parameters & Random graphs \\\\", "\\midrule",
-             "Circuits & %d & %d & %d \\\\" % (M["n_rows"], R_t["rows"], R_g["rows"]),
-             "Exact Clifford shortcut & yes & no & yes \\\\",
-             "Noise ceiling on $R^2$ & %.3f & %.3f & -- \\\\" % (M["r2_ceiling"], R_t["r2_ceiling"]),
-             "\\midrule", "\\multicolumn{4}{l}{\\emph{Unseen architectures, $R^2$}}\\\\",
-             "\\quad HGB & %s & %s & %s \\\\" % (pm(mcv["Hist Gradient Boosting"]["r2"]), pm(R_t["cv"]["Hist Gradient Boosting"]), pm(R_g["cv"]["Hist Gradient Boosting"])),
-             "\\quad MLP & %s & %s & %s \\\\" % (pm(mcv["MLP"]["r2"]), pm(R_t["cv"]["MLP"]), pm(R_g["cv"]["MLP"])),
-             "\\quad fitted linear rule & %s & %s & %s \\\\" % (pm(mcv["Structured linear"]["r2"]), pm(R_t["cv"]["Structured linear"]), pm(R_g["cv"]["Descriptor rule (linear)"])),
-             "\\quad five-coefficient rule & %s & %s & -- \\\\" % (pm(mcv["Physics-informed linear"]["r2"]), pm(R_t["cv"]["Physics-informed linear"])),
-             "\\midrule", "\\multicolumn{4}{l}{\\emph{Trained on $n\\le10$, tested on $n=11,12$, $R^2$}}\\\\",
-             "\\quad MLP (10 seeds) & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ & $%.3f \\pm %.3f$ \\\\" % (
-                 M["extrap_mlp_r2_seeds"]["mean"], M["extrap_mlp_r2_seeds"]["sd"], R_t["extrap"]["MLP"]["mean"], R_t["extrap"]["MLP"]["sd"],
-                 R_g["extrap"]["MLP"]["mean"], R_g["extrap"]["MLP"]["sd"]),
-             "\\quad HGB & %.3f & %.3f & %.3f \\\\" % (mex["Hist Gradient Boosting"]["r2"], R_t["extrap"]["Hist Gradient Boosting"]["mean"], R_g["extrap"]["Hist Gradient Boosting"]["mean"]),
-             "\\quad fitted linear rule & %.3f & %.3f & %.3f \\\\" % (mex["Structured linear"]["r2"], R_t["extrap"]["Structured linear"]["mean"], R_g["extrap"]["Descriptor rule (linear)"]["mean"]),
-             "\\botrule", "\\end{tabular}"]
-    open(os.path.join(args.outdir, "table_families.tex"), "w").write("\n".join(lines) + "\n")
-    print("wrote families.json, table_families.tex")
+    write_table(R, args.outdir)
 
 
 if __name__ == "__main__":

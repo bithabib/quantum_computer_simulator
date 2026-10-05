@@ -66,6 +66,38 @@
    "median_abs_log10_diff": 0.0997468853548438,
    "frac_circuits_off_by_factor_two": 0.27,
    "frac_params_grid_zero_but_true_nonzero": 0.2747524752475248
+  },
+  "label_min": -3.254189939484094,
+  "large": {
+   "rows_generated": 1000,
+   "train_rows": 9929,
+   "test_rows": 995,
+   "label_mean": -1.5107620426054955,
+   "label_min": -3.737551059928455,
+   "below_cutoff_frac": 0.34472361809045227,
+   "MLP": {
+    "mean": 0.9795197325262113,
+    "sd": 0.0011367134601978873,
+    "min": 0.9771819981913995,
+    "max": 0.9810363195091302,
+    "mae": 0.10568628729151473,
+    "bias": -0.009391691854811177
+   },
+   "Hist Gradient Boosting": {
+    "mean": 0.9600235892860476,
+    "mae": 0.16684007557981542,
+    "bias": 0.06419203555328264
+   },
+   "Structured linear": {
+    "mean": 0.9400260616830766,
+    "mae": 0.20559929789938028,
+    "bias": 0.004531829357462457
+   },
+   "Physics-informed linear": {
+    "mean": 0.18976539349566912,
+    "mae": 0.8685229884883261,
+    "bias": -0.08222187767142883
+   }
   }
  },
  "graph": {

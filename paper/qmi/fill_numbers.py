@@ -145,6 +145,9 @@ def main():
         rho = [r["spearman_true"] for r in SW] + [r["spearman_pred"] for r in SW]
         M["TOFracMin"] = pct(min(fr), 0); M["TOFracMax"] = pct(max(fr), 0)
         M["TORhoMin"] = f(min(rho), 2); M["TORhoMax"] = f(max(rho), 2)
+        rt = [r["spearman_true"] for r in SW]; rp = [r["spearman_pred"] for r in SW]
+        M["TORhoTrueMin"] = f(min(rt), 2); M["TORhoTrueMax"] = f(max(rt), 2)
+        M["TORhoPredMin"] = f(min(rp), 2); M["TORhoPredMax"] = f(max(rp), 2)
         M["TOCircuitsMin"] = str(min(r["n"] for r in SW)); M["TOCircuitsMax"] = str(max(r["n"] for r in SW))
     for k in ["N11local", "N11global", "N12local", "N12global", "N11", "N12", "Local", "Global"]:
         M.setdefault("RsqEM" + k, "??"); M.setdefault("MaeEM" + k, "??")
@@ -243,18 +246,24 @@ def main():
         M["ClLeTwentyMLP"] = "%.2f \\pm %.2f" % (t20["MLP_seeds"]["r2_mean"], t20["MLP_seeds"]["r2_sd"])
         M["ClLeTwentyHGB"] = f(t20["Hist Gradient Boosting"]["r2"], 2)
         M["ClAbstractSentence"] = ("With exact Clifford-sampled labels up to 32 qubits we measure a prediction "
-            "horizon: an ensemble of neural networks stays within a factor of two of the true variance for "
-            "about six qubits beyond its training range. Prediction beyond that horizon is an open problem, "
+            "horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for "
+            "five to six qubits beyond its training range, for local costs. Prediction beyond that horizon is an open problem, "
             "for which we release a benchmark.")
         if "horizon" in CS:
             HZ = CS["horizon"]; wk = {"8": "Eight", "12": "Twelve", "16": "Sixteen", "20": "Twenty", "24": "Twentyfour"}
             M["HzEnsemble"] = {10: "ten"}.get(HZ["n_ensemble"], str(HZ["n_ensemble"]))
             for k, w_ in wk.items():
-                mm_ = HZ["cuts"][k]["models"]
+                cut_ = HZ["cuts"][k]; mm_ = cut_["models"]
+                M["HzResGlobk%s" % w_] = pct(cut_["resolved_global_within6"], 0)
+                M["HzResLock%s" % w_] = pct(cut_["resolved_local_within6"], 0)
                 for name, key in [("MLP ensemble", "MLP"), ("Structured linear", "Table"), ("Hist Gradient Boosting", "HGB")]:
-                    M["Hz%sk%s" % (key, w_)] = str(mm_[name]["horizon"]["0.3"]["h"])
-                    M["Hz%sWidek%s" % (key, w_)] = str(mm_[name]["horizon"]["0.5"]["h"])
-            m12 = HZ["cuts"]["12"]["models"]["MLP ensemble"]["mae_by_distance"]
+                    for sub_, pre_ in [("all", ""), ("local", "Loc")]:
+                        h_ = mm_[name][sub_]["horizon"]["0.3"]
+                        ge_ = "$\\ge$" if h_.get("censored_by_data") else ""
+                        M["Hz%s%sk%s" % (pre_, key, w_)] = ge_ + str(h_["h"])
+                        M["Hz%s%sIntk%s" % (pre_, key, w_)] = "%d--%d" % (h_["lo"], h_["hi"])
+                        M["Hz%s%sWidek%s" % (pre_, key, w_)] = str(mm_[name][sub_]["horizon"]["0.5"]["h"])
+            m12 = HZ["cuts"]["12"]["models"]["MLP ensemble"]["local"]["mae_by_distance"]
             M["HzMaeTwelveDOne"] = f(m12["1"], 2); M["HzMaeTwelveDFour"] = f(m12["4"], 2); M["HzMaeTwelveDSix"] = f(m12["6"], 2)
     M["ClTargetHits"] = "2\\,000"; M["ClMaxSamples"] = "$2^{20}$"; M["ClResolvedHits"] = "100"
     M.setdefault("ClQmax", "32"); M.setdefault("ClAbstractSentence", "")
@@ -269,6 +278,8 @@ def main():
             "TiedExRule": f(T_["extrap"]["Structured linear"]["mean"]),
             "TiedTransfer": f(T_["transfer_from_main"]["r2"], 2), "TiedOffset": f(T_["offset_vs_main"]["mean"], 2),
             "TiedCorr": f(T_["offset_vs_main"]["corr"], 2),
+            "TiedBelowCut": pct(T_["below_cutoff_frac"], 0),
+            "TiedLabelMin": f(T_.get("label_min", float("nan")), 2),
             "TiedShortN": str(T_["clifford_shortcut"]["n_circuits"]),
             "TiedShortZero": pct(T_["clifford_shortcut"]["frac_params_grid_zero_but_true_nonzero"], 0),
             "TiedShortOff": pct(T_["clifford_shortcut"]["frac_circuits_off_by_factor_two"], 0),
@@ -280,6 +291,16 @@ def main():
             "GraphConeMadRy": f(G_["cone_vs_structural"]["mad_fixed_ry"], 3),
             "GraphConeExactRy": pct(G_["cone_vs_structural"]["exact_frac_fixed_ry"], 0), "GraphNFeat": "19",
         })
+        if "large" in T_:
+            TL = T_["large"]
+            M.update({"TiedLargeN": big(TL["rows_generated"]),
+                      "TiedLargeMLP": "%.3f \\pm %.3f" % (TL["MLP"]["mean"], TL["MLP"]["sd"]),
+                      "TiedLargeRule": f(TL["Structured linear"]["mean"]),
+                      "TiedLargeHGB": f(TL["Hist Gradient Boosting"]["mean"]),
+                      "TiedLargeBelowCut": pct(TL["below_cutoff_frac"], 0),
+                      "TiedLargeLabelMin": f(TL["label_min"], 2)})
+    for k in ["TiedLargeN", "TiedLargeMLP", "TiedLargeRule", "TiedLargeHGB", "TiedLargeBelowCut", "TiedLargeLabelMin"]:
+        M.setdefault(k, "??")
     tune_path = os.path.join(RES, "tuning.json")
     if os.path.exists(tune_path):
         TU = json.load(open(tune_path))

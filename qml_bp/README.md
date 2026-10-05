@@ -65,7 +65,8 @@ python -m qml_bp.clifford_study --train data_bp/bp_clifford_train.csv --test dat
 # two further families and the model-robustness study
 python -m qml_bp.generate_families --family tied  --n-specs 10000 --seed 31337 --workers 9 --out data_bp/bp_tied_v2.csv
 python -m qml_bp.generate_families --family graph --n-specs 10000 --seed 27182 --workers 9 --out data_bp/bp_graph_v2.csv
-python -m qml_bp.families_study --main data_bp/bp_dataset_v2.csv --tied data_bp/bp_tied_v2.csv --graph data_bp/bp_graph_v2.csv
+QSIM_MAX_QUBITS=14 python -m qml_bp.generate_families --family tied --n-specs 1000 --qubit-min 13 --qubit-max 14 --seed 4242 --workers 6 --out data_bp/bp_tied_large_v2.csv
+python -m qml_bp.families_study --main data_bp/bp_dataset_v2.csv --tied data_bp/bp_tied_v2.csv --graph data_bp/bp_graph_v2.csv --tied-large data_bp/bp_tied_large_v2.csv
 python -m qml_bp.tuning_study --main data_bp/bp_dataset_v2.csv --tied data_bp/bp_tied_v2.csv
 # optimization check quoted in the limitations (four budgets)
 python -m qml_bp.training_outcome --data data_bp/bp_dataset_v2.csv --n-circuits 300 --optimizer adam --shots 1000 --workers 9

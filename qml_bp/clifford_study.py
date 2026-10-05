@@ -49,71 +49,96 @@ def mlp_ensemble(Xtr, ytr, Xte, k=N_ENSEMBLE):
     return np.mean([regressors(s)["MLP"].fit(Xtr, ytr).predict(Xte) for s in range(k)], axis=0)
 
 
-def horizon_study(tr_all, te_all, args):
+def _horizon(mae, eps):
+    h = 0
+    for dd in sorted(mae):
+        if mae[dd] <= eps:
+            h = dd
+        else:
+            break
+    return h
+
+
+def horizon_study(tr_all, te_all, args, n_boot=500):
     """Prediction horizon: train on n <= k, measure the mean absolute error at
     each distance d = n_test - k beyond the training range, and report the
     largest d up to which the error stays at or below a tolerance eps (in
-    log10 units; eps = 0.3 is a factor of two in variance).  Uses all resolved
-    Clifford-labeled circuits, n = 2..32, pooled."""
+    log10 units; eps = 0.3 means within a factor of two ON AVERAGE).  A 90%
+    interval comes from a bootstrap over the test circuits at each distance.
+    Reported for all resolved circuits and for local-cost circuits only, which
+    are resolved at every size, so that the result does not rest on which
+    global-cost circuits survive censoring."""
     d = pd.concat([tr_all, te_all], ignore_index=True)
     r = d[d.resolved == 1].reset_index(drop=True)
     X, y, nq = r[FEATURE_COLUMNS].to_numpy(float), r.log_var_all.to_numpy(float), r.n_qubits.to_numpy(int)
-    out = {"eps": HORIZON_EPS, "cuts": {}, "n_ensemble": N_ENSEMBLE, "n_max": int(nq.max())}
+    local = r.cost_global.to_numpy(int) == 0
+    rng = np.random.default_rng(0)
+    out = {"eps": HORIZON_EPS, "cuts": {}, "n_ensemble": N_ENSEMBLE, "n_max": int(nq.max()), "n_boot": n_boot}
     for k in HORIZON_CUTS:
         tr = nq <= k; te = nq > k
         preds = {"MLP ensemble": mlp_ensemble(X[tr], y[tr], X[te]),
                  "Structured linear": StructuredLinear("reg", dilution=True).fit(X[tr], y[tr]).predict(X[te]),
                  "Hist Gradient Boosting": hgb_reg().fit(X[tr], y[tr]).predict(X[te])}
-        nt, yt = nq[te], y[te]
-        entry = {"train_rows": int(tr.sum()), "max_distance": int(nq.max() - k), "models": {}}
+        nt, yt, lt = nq[te], y[te], local[te]
+        # how much of the test set within six qubits is resolved, by cost
+        near = d[(d.n_qubits > k) & (d.n_qubits <= k + 6)]
+        entry = {"train_rows": int(tr.sum()), "max_distance": int(nq.max() - k), "models": {},
+                 "resolved_global_within6": float(near[near.cost_global == 1].resolved.mean()) if len(near) else float("nan"),
+                 "resolved_local_within6": float(near[near.cost_global == 0].resolved.mean()) if len(near) else float("nan")}
         for name, p in preds.items():
-            mae = {}
-            for dd in range(1, int(nq.max()) - k + 1):
-                m = nt == k + dd
-                if m.sum() >= 20:
-                    mae[dd] = float(mean_absolute_error(yt[m], p[m]))
-            hz = {}
-            for eps in HORIZON_EPS:
-                h = 0
-                for dd in sorted(mae):
-                    if mae[dd] <= eps:
-                        h = dd
-                    else:
-                        break
-                hz[str(eps)] = {"h": h, "censored_by_data": bool(h == max(mae))}
-            entry["models"][name] = {"mae_by_distance": {str(k_): v for k_, v in mae.items()}, "horizon": hz}
+            res = {}
+            for subset, mask in [("all", np.ones(len(yt), bool)), ("local", lt)]:
+                err = {}
+                for dd in range(1, int(nq.max()) - k + 1):
+                    m = (nt == k + dd) & mask
+                    if m.sum() >= 20:
+                        err[dd] = np.abs(yt[m] - p[m])
+                mae = {dd: float(e.mean()) for dd, e in err.items()}
+                hz = {}
+                for eps in HORIZON_EPS:
+                    h = _horizon(mae, eps)
+                    hb = [_horizon({dd: float(rng.choice(e, size=len(e), replace=True).mean()) for dd, e in err.items()}, eps)
+                          for _ in range(n_boot)]
+                    hz[str(eps)] = {"h": h, "lo": int(np.percentile(hb, 5)), "hi": int(np.percentile(hb, 95)),
+                                    "censored_by_data": bool(h == max(mae))}
+                res[subset] = {"mae_by_distance": {str(k_): v for k_, v in mae.items()}, "horizon": hz}
+            entry["models"][name] = res
         out["cuts"][str(k)] = entry
-        print("horizon k=%2d: " % k + "  ".join("%s %s" % (n_, {e: v["h"] for e, v in m_["horizon"].items()})
-                                                for n_, m_ in entry["models"].items()), flush=True)
-    # table
+        print("horizon k=%2d: " % k + "  ".join("%s all %s local %s" % (
+            n_.split()[0], {e: (v["h"], v["lo"], v["hi"]) for e, v in m_["all"]["horizon"].items() if e == "0.3"},
+            {e: (v["h"], v["lo"], v["hi"]) for e, v in m_["local"]["horizon"].items() if e == "0.3"})
+            for n_, m_ in entry["models"].items()) + " | resolved within 6: global %.2f local %.2f" % (
+            entry["resolved_global_within6"], entry["resolved_local_within6"]), flush=True)
+
     def cell(e):
-        return ("$\\ge%d$" if e["censored_by_data"] else "$%d$") % e["h"]
+        base = ("$\\ge%d$" if e["censored_by_data"] else "$%d$") % e["h"]
+        return base + " [%d, %d]" % (e["lo"], e["hi"])
     lines = ["\\begin{tabular}{rrcccccc}", "\\toprule",
-             " & & \\multicolumn{2}{c}{MLP ensemble} & \\multicolumn{2}{c}{Structured linear} & \\multicolumn{2}{c}{HGB} \\\\",
+             " & & \\multicolumn{2}{c}{Resolved within $d\\le6$} & \\multicolumn{2}{c}{MLP ensemble, $H(0.3)$} & \\multicolumn{2}{c}{Structured linear, $H(0.3)$} \\\\",
              "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\\cmidrule(lr){7-8}",
-             "Train $n\\le k$ & Circuits & $H(0.3)$ & $H(0.5)$ & $H(0.3)$ & $H(0.5)$ & $H(0.3)$ & $H(0.5)$ \\\\", "\\midrule"]
+             "Train $n\\le k$ & Circuits & local & global & local cost & all resolved & local cost & all resolved \\\\", "\\midrule"]
     for k in HORIZON_CUTS:
         e = out["cuts"][str(k)]; m = e["models"]
-        lines.append("$k=%d$ & %d & %s & %s & %s & %s & %s & %s \\\\" % (
-            k, e["train_rows"], cell(m["MLP ensemble"]["horizon"]["0.3"]), cell(m["MLP ensemble"]["horizon"]["0.5"]),
-            cell(m["Structured linear"]["horizon"]["0.3"]), cell(m["Structured linear"]["horizon"]["0.5"]),
-            cell(m["Hist Gradient Boosting"]["horizon"]["0.3"]), cell(m["Hist Gradient Boosting"]["horizon"]["0.5"])))
+        lines.append("$k=%d$ & %d & %.0f\\%% & %.0f\\%% & %s & %s & %s & %s \\\\" % (
+            k, e["train_rows"], 100 * e["resolved_local_within6"], 100 * e["resolved_global_within6"],
+            cell(m["MLP ensemble"]["local"]["horizon"]["0.3"]), cell(m["MLP ensemble"]["all"]["horizon"]["0.3"]),
+            cell(m["Structured linear"]["local"]["horizon"]["0.3"]), cell(m["Structured linear"]["all"]["horizon"]["0.3"])))
     lines += ["\\botrule", "\\end{tabular}"]
     open(os.path.join(args.outdir, "table_horizon.tex"), "w").write("\n".join(lines) + "\n")
-    # figure
+
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
     fig, ax = plt.subplots(1, 2, figsize=(7.4, 3.2), sharey=True)
     cols = {8: "#9ecae1", 12: "#4292c6", 16: "#2171b5", 20: "#08306b"}
-    for a, name in [(ax[0], "MLP ensemble"), (ax[1], "Structured linear")]:
+    for a_, name in [(ax[0], "MLP ensemble"), (ax[1], "Structured linear")]:
         for k in [8, 12, 16, 20]:
-            mae = out["cuts"][str(k)]["models"][name]["mae_by_distance"]
+            mae = out["cuts"][str(k)]["models"][name]["local"]["mae_by_distance"]
             ds = sorted(int(x) for x in mae)
-            a.plot(ds, [mae[str(x)] for x in ds], marker="o", ms=3, lw=1.3, color=cols[k], label="train $n \\leq %d$" % k)
-        a.axhline(0.3, color="#c0392b", lw=0.9, ls="--"); a.axhline(0.5, color="#c0392b", lw=0.9, ls=":")
-        a.set_ylim(0, 1.6); a.set_xlim(0.5, 16.5)
-        a.set_title(name, fontsize=10); a.set_xlabel("qubits beyond the training range, $d$", fontsize=10); a.tick_params(labelsize=9)
+            a_.plot(ds, [mae[str(x)] for x in ds], marker="o", ms=3, lw=1.3, color=cols[k], label="train $n \\leq %d$" % k)
+        a_.axhline(0.3, color="#c0392b", lw=0.9, ls="--"); a_.axhline(0.5, color="#c0392b", lw=0.9, ls=":")
+        a_.set_ylim(0, 1.6); a_.set_xlim(0.5, 16.5)
+        a_.set_title(name + ", local cost", fontsize=10); a_.set_xlabel("qubits beyond the training range, $d$", fontsize=10); a_.tick_params(labelsize=9)
     ax[0].set_ylabel("MAE ($\\log_{10}$ units)", fontsize=10)
     h, l = ax[0].get_legend_handles_labels()
     fig.legend(h, l, loc="upper center", ncol=4, fontsize=9, frameon=False, bbox_to_anchor=(0.5, 1.0))
