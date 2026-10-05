@@ -1,8 +1,63 @@
-<h1 align="center">
-  <strong><a href="http://3.89.197.36:5000/">Eshyana: The Quantum Computer Simulator</a></strong>
- <p> Please Visit: <strong><a href="https://quantum.qbithabib.com/">https://quantum.qbithabib.com/</a></strong></p>
-</h1>
-Eshyana: The Quantum Computer Simulator is an immersive and interactive quantum computing simulator designed to demystify the complexities of quantum mechanics. Embark on a journey through the fascinating realm of quantum computing, where users can experiment with a comprehensive set of quantum gates, manipulate qubits, and witness the intriguing principles of superposition, entanglement, and quantum parallelism in action. Whether you are a novice curious about the quantum world or a seasoned enthusiast eager to deepen your understanding, EshyQuantum Explorer provides a user-friendly interface for exploring the limitless possibilities of quantum information processing. Dive into the quantum frontier, unravel the mysteries of quantum gates, and unlock the potential of quantum computing in this educational and engaging simulation experience.
+# Eshyana: The Quantum Computer Simulator
+
+Live site: <https://quantum.qbithabib.com/>
+
+This repository holds two things:
+
+1. **Eshyana**, an interactive, educational quantum-computing simulator (a
+   Flask web app) with the pure-NumPy statevector simulator `qsim` behind it.
+2. **The code and data for a research paper** on predicting the gradient
+   variance of variational quantum circuits, built on the same simulator.
+
+## Research paper: code and data
+
+*Predicting the Trainability of Hardware-Efficient Variational Quantum
+Circuits: A Data-Driven Model for Barren Plateaus* (Md Habibur Rahman,
+under review at Quantum Machine Intelligence).
+
+Archived release: <https://doi.org/10.5281/zenodo.21446120>
+
+| Path | Contents |
+|---|---|
+| `qsim/` | NumPy statevector simulator used to compute the labels |
+| `qml_bp/` | circuit sampler, gradient-variance estimators (adjoint and Clifford sampling), dataset generators, all analyses |
+| `data_bp/` | the datasets (table below) |
+| `paper/qmi/` | manuscript and supplement source, figures, and `results/` with the JSON files and tables behind every number |
+
+| Dataset | Circuits | What it is |
+|---|---|---|
+| `bp_dataset_v2.csv` | 20,000 | main dataset, 2 to 12 qubits |
+| `bp_patterns_v2.csv` | 10,000 | brickwork and star entanglement, for the unseen-pattern test |
+| `bp_large_v2.csv` | 2,000 | held-out circuits with 13 and 14 qubits |
+| `bp_clifford_train.csv`, `bp_clifford_test.csv` | 8,000 and 6,000 | exact Clifford-sampled labels up to 32 qubits (the prediction-horizon benchmark) |
+| `bp_tied_v2.csv`, `bp_tied_large_v2.csv` | 10,000 and 1,000 | layer-shared parameters, 2 to 12 and 13 to 14 qubits |
+| `bp_graph_v2.csv` | 10,000 | random entangling graphs |
+| `bp_dataset.csv` | 20,000 | version-1 dataset (single-parameter label), kept for comparison |
+
+The label is `log_var`, the base-10 logarithm of the mean cost-gradient
+variance over all parameters whose gradient does not vanish identically.
+Column descriptions and the full sequence of commands that regenerates every
+dataset, number, table and figure (fixed random seeds) are in
+[`qml_bp/README.md`](qml_bp/README.md); building the manuscript is described
+in [`paper/qmi/README.md`](paper/qmi/README.md).
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r qml_bp/requirements.txt
+python -m qml_bp.analyze --data data_bp/bp_dataset_v2.csv \
+    --outdir paper/qmi/results --figdir paper/qmi/figs
+```
+
+## Running the simulator web app
+
+```bash
+pip install -r requirements.txt
+flask --app app run
+```
+
+## Learning notes
+
+The notes below accompany the simulator.
 
 ## Linear Algebra for Quantum Machanics 
    - bra 
@@ -144,9 +199,6 @@ This formula accounts for the interference between the probability amplitudes an
 
 
 
-
-## Conference To Submit Paper 
-- [Quantum Computing Conference](https://quantum.technology/conf/index.html)
 
 ## License
 The code is licensed under the MIT License (see `LICENSE`). The datasets in

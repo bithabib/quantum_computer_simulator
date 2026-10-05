@@ -41,3 +41,7 @@ paper/qmi/*.hold
 # Internal working notes
 paper/qmi/REVISION_TASKS.md
 paper/qmi/ZENODO_CHECKLIST.md
+
+# Internal planning notes
+paper/research-idea.md
+paper/literature-review.md
