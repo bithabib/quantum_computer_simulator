@@ -99,7 +99,7 @@ def horizon_study(tr_all, te_all, args, n_boot=500):
                     h = _horizon(mae, eps)
                     hb = [_horizon({dd: float(rng.choice(e, size=len(e), replace=True).mean()) for dd, e in err.items()}, eps)
                           for _ in range(n_boot)]
-                    hz[str(eps)] = {"h": h, "lo": int(np.percentile(hb, 5)), "hi": int(np.percentile(hb, 95)),
+                    hz[str(eps)] = {"h": h, "lo": int(np.percentile(hb, 2.5)), "hi": int(np.percentile(hb, 97.5)),
                                     "censored_by_data": bool(h == max(mae))}
                 res[subset] = {"mae_by_distance": {str(k_): v for k_, v in mae.items()}, "horizon": hz}
             entry["models"][name] = res
@@ -116,7 +116,7 @@ def horizon_study(tr_all, te_all, args, n_boot=500):
     lines = ["\\begin{tabular}{rrcccccc}", "\\toprule",
              " & & \\multicolumn{2}{c}{Resolved within $d\\le6$} & \\multicolumn{2}{c}{MLP ensemble, $H(0.3)$} & \\multicolumn{2}{c}{Structured linear, $H(0.3)$} \\\\",
              "\\cmidrule(lr){3-4}\\cmidrule(lr){5-6}\\cmidrule(lr){7-8}",
-             "Train $n\\le k$ & Circuits & local & global & local cost & all resolved & local cost & all resolved \\\\", "\\midrule"]
+             "Train $n\\le k$ & Training circuits & local & global & local cost & all resolved & local cost & all resolved \\\\", "\\midrule"]
     for k in HORIZON_CUTS:
         e = out["cuts"][str(k)]; m = e["models"]
         lines.append("$k=%d$ & %d & %.0f\\%% & %.0f\\%% & %s & %s & %s & %s \\\\" % (

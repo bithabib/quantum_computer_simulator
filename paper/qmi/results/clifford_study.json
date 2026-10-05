@@ -565,7 +565,7 @@
         "0.5": {
          "h": 5,
          "lo": 5,
-         "hi": 5,
+         "hi": 6,
          "censored_by_data": false
         }
        }
@@ -606,7 +606,7 @@
         },
         "0.5": {
          "h": 5,
-         "lo": 5,
+         "lo": 4,
          "hi": 5,
          "censored_by_data": false
         }
@@ -692,7 +692,7 @@
         },
         "0.5": {
          "h": 8,
-         "lo": 6,
+         "lo": 5,
          "hi": 9,
          "censored_by_data": false
         }
@@ -820,14 +820,14 @@
        "horizon": {
         "0.3": {
          "h": 6,
-         "lo": 5,
+         "lo": 4,
          "hi": 6,
          "censored_by_data": false
         },
         "0.5": {
          "h": 8,
          "lo": 8,
-         "hi": 8,
+         "hi": 9,
          "censored_by_data": false
         }
        }
@@ -864,7 +864,7 @@
         },
         "0.5": {
          "h": 8,
-         "lo": 8,
+         "lo": 7,
          "hi": 8,
          "censored_by_data": false
         }
@@ -898,8 +898,8 @@
        "horizon": {
         "0.3": {
          "h": 4,
-         "lo": 4,
-         "hi": 4,
+         "lo": 3,
+         "hi": 5,
          "censored_by_data": false
         },
         "0.5": {
@@ -942,7 +942,7 @@
         },
         "0.5": {
          "h": 11,
-         "lo": 9,
+         "lo": 8,
          "hi": 11,
          "censored_by_data": false
         }
@@ -1129,7 +1129,7 @@
         "0.3": {
          "h": 3,
          "lo": 3,
-         "hi": 5,
+         "hi": 6,
          "censored_by_data": false
         },
         "0.5": {
@@ -1168,7 +1168,7 @@
         },
         "0.5": {
          "h": 10,
-         "lo": 10,
+         "lo": 9,
          "hi": 12,
          "censored_by_data": false
         }
@@ -1516,7 +1516,7 @@
        "horizon": {
         "0.3": {
          "h": 8,
-         "lo": 3,
+         "lo": 2,
          "hi": 8,
          "censored_by_data": true
         },
@@ -1542,7 +1542,7 @@
        "horizon": {
         "0.3": {
          "h": 8,
-         "lo": 8,
+         "lo": 7,
          "hi": 8,
          "censored_by_data": true
         },

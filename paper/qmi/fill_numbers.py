@@ -245,7 +245,7 @@ def main():
         M["ClLeTwentyStruct"] = f(t20["Structured linear"]["r2"], 2)
         M["ClLeTwentyMLP"] = "%.2f \\pm %.2f" % (t20["MLP_seeds"]["r2_mean"], t20["MLP_seeds"]["r2_sd"])
         M["ClLeTwentyHGB"] = f(t20["Hist Gradient Boosting"]["r2"], 2)
-        M["ClAbstractSentence"] = ("With exact Clifford-sampled labels up to 32 qubits we measure a prediction "
+        M["ClAbstractSentence"] = ("With unbiased Clifford-sampled labels up to 32 qubits we measure a prediction "
             "horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for "
             "five to six qubits beyond a training range of 12 or more qubits, for local costs. Prediction beyond that horizon is an open problem, "
             "for which we release a benchmark.")
