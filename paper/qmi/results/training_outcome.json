@@ -1,0 +1,45 @@
+{
+ "n_circuits": 299,
+ "steps": 200,
+ "restarts": 3,
+ "lr": 0.05,
+ "optimizer": "adam",
+ "shots": 1000,
+ "spearman_true_vs_dC": 0.08876792889048506,
+ "spearman_pred_vs_dC": 0.07590787855934762,
+ "spearman_true_vs_pred": 0.9847524100203622,
+ "dC_mean_pred_barren": 0.959692722829153,
+ "dC_mean_pred_trainable": 0.9989120413833165,
+ "dC_mean_true_barren": 0.9579785216310591,
+ "dC_mean_true_trainable": 0.9991959799830509,
+ "frac_progress_pred_barren": 0.976,
+ "frac_progress_pred_trainable": 0.9655172413793104,
+ "n_pred_barren": 125,
+ "n_pred_trainable": 174,
+ "dC_by_pred_bin": {
+  "(-6.0, -3.0]": [
+   0.8971185630099815,
+   43
+  ],
+  "(-3.0, -2.5]": [
+   0.963141227618666,
+   26
+  ],
+  "(-2.5, -2.0]": [
+   1.006139646895172,
+   56
+  ],
+  "(-2.0, -1.5]": [
+   1.015499351342903,
+   48
+  ],
+  "(-1.5, -1.0]": [
+   0.9828267942783574,
+   55
+  ],
+  "(-1.0, 0.0]": [
+   1.0001584880412404,
+   71
+  ]
+ }
+}

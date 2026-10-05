@@ -25,3 +25,23 @@ data_bp/*.log
 
 # Local admin credentials - never commit (copy admin_user.example.csv)
 data_storage/admin_user.csv
+
+# Referee reports and submitted/preprint PDFs: confidential to the review
+# process, keep out of the public repository.
+paper/qmi/reviews/
+reviewer_*_comments.pdf
+v1_covered_*.pdf
+paper/qmi/response_to_reviewers.*
+paper/qmi/cover_letter.*
+
+# Training-outcome check (reported as limitation (viii)): results are tracked,
+# its exploratory figures are not used in the paper.
+paper/qmi/figs/training_outcome*
+paper/qmi/*.hold
+# Internal working notes
+paper/qmi/REVISION_TASKS.md
+paper/qmi/ZENODO_CHECKLIST.md
+
+# Internal planning notes
+paper/research-idea.md
+paper/literature-review.md

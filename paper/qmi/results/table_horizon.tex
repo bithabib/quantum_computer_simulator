@@ -1,0 +1,13 @@
+\begin{tabular}{rrcccccc}
+\toprule
+ & & \multicolumn{2}{c}{Resolved within $d\le6$} & \multicolumn{2}{c}{MLP ensemble, $H(0.3)$} & \multicolumn{2}{c}{Structured linear, $H(0.3)$} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+Train $n\le k$ & Circuits & local & global & local cost & all resolved & local cost & all resolved \\
+\midrule
+$k=8$ & 5032 & 99\% & 100\% & $3$ [3, 4] & $4$ [3, 4] & $4$ [4, 4] & $5$ [4, 5] \\
+$k=12$ & 7941 & 99\% & 99\% & $5$ [5, 6] & $6$ [5, 6] & $4$ [3, 5] & $4$ [4, 4] \\
+$k=16$ & 9115 & 95\% & 81\% & $6$ [4, 7] & $6$ [5, 6] & $3$ [2, 5] & $3$ [3, 5] \\
+$k=20$ & 10266 & 84\% & 36\% & $6$ [6, 7] & $6$ [6, 6] & $6$ [3, 8] & $3$ [3, 6] \\
+$k=24$ & 11026 & 81\% & 24\% & $\ge8$ [8, 8] & $\ge8$ [7, 8] & $\ge8$ [8, 8] & $\ge8$ [3, 8] \\
+\botrule
+\end{tabular}

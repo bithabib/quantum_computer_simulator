@@ -1,0 +1,19 @@
+\begin{tabular}{lllcrr}
+\toprule
+Gate & Pattern & Nominal cost & Effective weight & Mean $\log_{10}\overline{\mathrm{Var}}$ & Circuits \\
+\midrule
+CZ & linear & local & $1$ & $-1.25$ & 491 \\
+CZ & linear & global & $n$ & $-3.37$ & 481 \\
+CZ & circular & local & $1$ & $-1.81$ & 425 \\
+CZ & circular & global & $n$ & $-3.42$ & 503 \\
+CZ & all-to-all & local & $1$ & $-2.67$ & 416 \\
+CZ & all-to-all & global & $n$ & $-3.14$ & 471 \\
+\midrule
+CX & linear & local & $1$ & $-2.07$ & 435 \\
+CX & linear & global & $\approx n/2$ & $-3.22$ & 410 \\
+CX & circular & local & $n-1$ & $-3.32$ & 467 \\
+CX & circular & global & $\approx n/2$ & $-3.26$ & 413 \\
+CX & all-to-all & local & $1$ & $-2.70$ & 455 \\
+CX & all-to-all & global & $1$ & $-2.13$ & 443 \\
+\botrule
+\end{tabular}

@@ -1,0 +1,1044 @@
+% Supplementary Information. Numbers are filled by fill_numbers.py.
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{booktabs}
+\usepackage{xr}\externaldocument[M-]{main}
+\newsavebox{\tblbox}
+% typeset a table at natural size, or scaled down to the text width if wider.
+% Tables use the class's underlying float (tableorg) because its threeparttable
+% wrapper does not accept a boxed tabular.
+\newcommand{\fittable}[1]{\sbox{\tblbox}{#1}\ifdim\wd\tblbox>\textwidth
+  \resizebox{\textwidth}{!}{\usebox{\tblbox}}\else\usebox{\tblbox}\fi}
+\newcommand{\Vbar}{\overline{\mathrm{Var}}}
+\renewcommand{\thetable}{S\arabic{table}}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\renewcommand{\thesection}{S\arabic{section}}
+
+%%BEGIN-NUMBERS
+\newcommand{\Nrows}{20\,000}
+\newcommand{\Nspecs}{20\,000}
+\newcommand{\Nused}{19\,858}
+\newcommand{\NallStruct}{142}
+\newcommand{\Samples}{200}
+\newcommand{\QubitLo}{2}
+\newcommand{\QubitHi}{12}
+\newcommand{\LayerLo}{1}
+\newcommand{\LayerHi}{20}
+\newcommand{\Narch}{5\,168}
+\newcommand{\DesignSpace}{5\,280}
+\newcommand{\MultMedian}{4}
+\newcommand{\MultMax}{13}
+\newcommand{\RowLeak}{95.0}
+\newcommand{\BarrenFrac}{42.6}
+\newcommand{\GlobalFrac}{50.4}
+\newcommand{\LabelMean}{-1.88}
+\newcommand{\LabelStd}{0.94}
+\newcommand{\LabelMin}{-4.89}
+\newcommand{\LabelMax}{-0.23}
+\newcommand{\WithinVar}{0.013}
+\newcommand{\TotalVar}{0.885}
+\newcommand{\RsqCeiling}{0.985}
+\newcommand{\RsqCeilingRy}{1.000}
+\newcommand{\RsqCeilingPauli}{0.973}
+\newcommand{\StructFracParams}{17.0}
+\newcommand{\StructRowsAny}{87.0}
+\newcommand{\LegacyFloorFrac}{9.6}
+\newcommand{\LegacyCorr}{0.963}
+\newcommand{\LegacyMAD}{0.16}
+\newcommand{\LegacyFloorTrainable}{69}
+\newcommand{\SpreadMedian}{0.6}
+\newcommand{\SpreadPNineZero}{2.3}
+\newcommand{\CostGap}{0.40}
+\newcommand{\NFolds}{10}
+\newcommand{\NFoldsK}{5}
+\newcommand{\NRepeats}{2}
+\newcommand{\RsqCV}{0.980}
+\newcommand{\RsqCVsd}{0.003}
+\newcommand{\MaeCV}{0.067}
+\newcommand{\MaeCVsd}{0.003}
+\newcommand{\AucCV}{0.998}
+\newcommand{\AucCVsd}{0.000}
+\newcommand{\AccCV}{0.979}
+\newcommand{\AccCVsd}{0.004}
+\newcommand{\RsqPhys}{0.682}
+\newcommand{\RsqSub}{0.043}
+\newcommand{\AucPhys}{0.927}
+\newcommand{\GainOverPhys}{0.30}
+\newcommand{\FracOfCeiling}{100}
+\newcommand{\OofRsq}{0.980}
+\newcommand{\OofRsqLo}{0.979}
+\newcommand{\OofRsqHi}{0.982}
+\newcommand{\RowRsq}{0.979}
+\newcommand{\RowMae}{0.064}
+\newcommand{\RowAuc}{0.999}
+\newcommand{\ExtrapCut}{10}
+\newcommand{\ExtrapTrainRows}{16\,278}
+\newcommand{\ExtrapTestRows}{3\,580}
+\newcommand{\RsqExtrap}{0.860}
+\newcommand{\MaeExtrap}{0.320}
+\newcommand{\RsqExtrapLo}{0.851}
+\newcommand{\RsqExtrapHi}{0.869}
+\newcommand{\MaeExtrapLo}{0.312}
+\newcommand{\MaeExtrapHi}{0.327}
+\newcommand{\RsqExtrapSeedSd}{0.001}
+\newcommand{\AucExtrap}{0.995}
+\newcommand{\RsqExtrapPhys}{0.326}
+\newcommand{\MaeExtrapPhys}{0.665}
+\newcommand{\RsqExtrapSub}{-1.027}
+\newcommand{\RsqFull}{0.980}
+\newcommand{\RsqPrim}{0.980}
+\newcommand{\DeltaDerived}{0.000}
+\newcommand{\AblTopOne}{qubit count $n$}
+\newcommand{\AblTopOneDelta}{0.721}
+\newcommand{\AblTopTwo}{cost locality}
+\newcommand{\AblTopTwoDelta}{0.304}
+\newcommand{\AblTopThree}{layers $L$}
+\newcommand{\AblTopThreeDelta}{0.259}
+\newcommand{\DeltaSize}{0.001}
+\newcommand{\DeltaAddEff}{0.002}
+\newcommand{\DeltaGatePrim}{0.155}
+\newcommand{\DeltaAddCone}{0.001}
+\newcommand{\DeltaAddBoth}{0.002}
+\newcommand{\PythonVersion}{3.9.6}
+\newcommand{\NumpyVersion}{2.0.2}
+\newcommand{\SklearnVersion}{1.6.1}
+\newcommand{\ValN}{200}
+\newcommand{\ValState}{3.1e-16}
+\newcommand{\ValGrad}{1.0e-15}
+\newcommand{\ValGradN}{4\,792}
+\newcommand{\ValStructN}{1153}
+\newcommand{\ValStructViol}{0}
+\newcommand{\RepeatN}{200}
+\newcommand{\RepeatMAD}{0.021}
+\newcommand{\RepeatMax}{0.20}
+\newcommand{\RsqStruct}{0.969}
+\newcommand{\RsqStructsd}{0.002}
+\newcommand{\AucStruct}{0.997}
+\newcommand{\StructNcoef}{124}
+\newcommand{\RsqPhysEff}{0.750}
+\newcommand{\GainOverStruct}{0.011}
+\newcommand{\RsqExtrapStruct}{0.935}
+\newcommand{\MaeExtrapStruct}{0.169}
+\newcommand{\RsqExtrapMLPmean}{0.961}
+\newcommand{\RsqExtrapMLPsd}{0.003}
+\newcommand{\DeltaCostObs}{0.018}
+\newcommand{\DeltaGateEff}{0.047}
+\newcommand{\DeltaEffWeight}{0.000}
+\newcommand{\GateGap}{0.08}
+\newcommand{\NFeatures}{12}
+\newcommand{\ConeExactRy}{90}
+\newcommand{\ConeMadRy}{0.022}
+\newcommand{\ConeMadPauli}{0.159}
+\newcommand{\MaeENOneOnelocal}{0.185}
+\newcommand{\MaeEPNOneOnelocal}{0.805}
+\newcommand{\RsqENOneOnelocal}{0.951}
+\newcommand{\RsqEPNOneOnelocal}{0.220}
+\newcommand{\RsqEMNOneOnelocal}{0.971}
+\newcommand{\MaeEMNOneOnelocal}{0.113}
+\newcommand{\MaeENOneOneglobal}{0.280}
+\newcommand{\MaeEPNOneOneglobal}{0.438}
+\newcommand{\RsqENOneOneglobal}{0.811}
+\newcommand{\RsqEPNOneOneglobal}{0.199}
+\newcommand{\RsqEMNOneOneglobal}{0.911}
+\newcommand{\MaeEMNOneOneglobal}{0.109}
+\newcommand{\MaeENOneTwolocal}{0.309}
+\newcommand{\MaeEPNOneTwolocal}{0.907}
+\newcommand{\RsqENOneTwolocal}{0.876}
+\newcommand{\RsqEPNOneTwolocal}{0.163}
+\newcommand{\RsqEMNOneTwolocal}{0.956}
+\newcommand{\MaeEMNOneTwolocal}{0.164}
+\newcommand{\MaeENOneTwoglobal}{0.494}
+\newcommand{\MaeEPNOneTwoglobal}{0.516}
+\newcommand{\RsqENOneTwoglobal}{0.608}
+\newcommand{\RsqEPNOneTwoglobal}{0.188}
+\newcommand{\RsqEMNOneTwoglobal}{0.923}
+\newcommand{\MaeEMNOneTwoglobal}{0.142}
+\newcommand{\MaeENOneOne}{0.234}
+\newcommand{\MaeEPNOneOne}{0.615}
+\newcommand{\RsqENOneOne}{0.920}
+\newcommand{\RsqEPNOneOne}{0.347}
+\newcommand{\RsqEMNOneOne}{0.959}
+\newcommand{\MaeEMNOneOne}{0.111}
+\newcommand{\MaeENOneTwo}{0.400}
+\newcommand{\MaeEPNOneTwo}{0.713}
+\newcommand{\RsqENOneTwo}{0.815}
+\newcommand{\RsqEPNOneTwo}{0.307}
+\newcommand{\RsqEMNOneTwo}{0.953}
+\newcommand{\MaeEMNOneTwo}{0.153}
+\newcommand{\MaeELocal}{0.250}
+\newcommand{\MaeEPLocal}{0.859}
+\newcommand{\RsqELocal}{0.909}
+\newcommand{\RsqEPLocal}{0.189}
+\newcommand{\RsqEMLocal}{0.963}
+\newcommand{\MaeEMLocal}{0.140}
+\newcommand{\MaeEGlobal}{0.388}
+\newcommand{\MaeEPGlobal}{0.477}
+\newcommand{\RsqEGlobal}{0.695}
+\newcommand{\RsqEPGlobal}{0.202}
+\newcommand{\RsqEMGlobal}{0.919}
+\newcommand{\MaeEMGlobal}{0.126}
+\newcommand{\RsqExtrapMLPLo}{0.950}
+\newcommand{\RsqExtrapMLPHi}{0.961}
+\newcommand{\AucCutmOnepFive}{0.997}
+\newcommand{\BarrenCutmOnepFive}{60}
+\newcommand{\AucCutmTwopZero}{0.998}
+\newcommand{\BarrenCutmTwopZero}{43}
+\newcommand{\AucCutmTwopFive}{0.999}
+\newcommand{\BarrenCutmTwopFive}{27}
+\newcommand{\AucCutmThreepZero}{0.998}
+\newcommand{\BarrenCutmThreepZero}{15}
+\newcommand{\RsqCVMLP}{0.979}
+\newcommand{\AucCVMLP}{0.999}
+\newcommand{\RsqExtrapMLP}{0.956}
+\newcommand{\RsqCVRandomForest}{0.976}
+\newcommand{\AucCVRandomForest}{0.997}
+\newcommand{\RsqExtrapRandomForest}{0.861}
+\newcommand{\RsqCVExtraTrees}{0.978}
+\newcommand{\AucCVExtraTrees}{0.998}
+\newcommand{\RsqExtrapExtraTrees}{0.864}
+\newcommand{\RsqCVkNN}{0.972}
+\newcommand{\AucCVkNN}{0.995}
+\newcommand{\RsqExtrapkNN}{0.864}
+\newcommand{\RsqCVLinearbaseline}{0.891}
+\newcommand{\AucCVLinearbaseline}{0.984}
+\newcommand{\RsqExtrapLinearbaseline}{0.755}
+\newcommand{\CrossLo}{seven}
+\newcommand{\CrossHi}{eight}
+\newcommand{\AllAboveMaxN}{4}
+\newcommand{\BelowAtFive}{three}
+\newcommand{\RowsAtFive}{1\,745}
+\newcommand{\MinParamVar}{2.5\times10^{-9}}
+\newcommand{\MinParamGradExp}{-4}
+\newcommand{\TOFracMin}{94}
+\newcommand{\TOFracMax}{99}
+\newcommand{\TORhoMin}{0.08}
+\newcommand{\TORhoMax}{0.19}
+\newcommand{\TORhoTrueMin}{0.09}
+\newcommand{\TORhoTrueMax}{0.19}
+\newcommand{\TORhoPredMin}{0.08}
+\newcommand{\TORhoPredMax}{0.17}
+\newcommand{\TOCircuitsMin}{199}
+\newcommand{\TOCircuitsMax}{299}
+\newcommand{\ScreenSpearman}{0.989}
+\newcommand{\ScreenTrainableFrac}{57.4}
+\newcommand{\ScreenPrecFifty}{99.7}
+\newcommand{\ScreenRecallFifty}{86.9}
+\newcommand{\ScreenBottomTen}{100.0}
+\newcommand{\ScreenTopPct}{20}
+\newcommand{\ScreenTopK}{3\,971}
+\newcommand{\GapHGBkSix}{-0.062}
+\newcommand{\GapMLPkSix}{0.716}
+\newcommand{\GapPhyskSix}{0.332}
+\newcommand{\GapStructkSix}{0.839}
+\newcommand{\GapMLPmeankSix}{0.631}
+\newcommand{\GapMLPsdkSix}{0.110}
+\newcommand{\GapMLPminkSix}{0.47}
+\newcommand{\GapMLPmaxkSix}{0.81}
+\newcommand{\GapHGBkSeven}{0.257}
+\newcommand{\GapMLPkSeven}{0.832}
+\newcommand{\GapPhyskSeven}{0.330}
+\newcommand{\GapStructkSeven}{0.883}
+\newcommand{\GapMLPmeankSeven}{0.846}
+\newcommand{\GapMLPsdkSeven}{0.038}
+\newcommand{\GapMLPminkSeven}{0.78}
+\newcommand{\GapMLPmaxkSeven}{0.92}
+\newcommand{\GapHGBkEight}{0.541}
+\newcommand{\GapMLPkEight}{0.909}
+\newcommand{\GapPhyskEight}{0.324}
+\newcommand{\GapStructkEight}{0.902}
+\newcommand{\GapMLPmeankEight}{0.906}
+\newcommand{\GapMLPsdkEight}{0.017}
+\newcommand{\GapMLPminkEight}{0.88}
+\newcommand{\GapMLPmaxkEight}{0.93}
+\newcommand{\GapHGBkNine}{0.729}
+\newcommand{\GapMLPkNine}{0.946}
+\newcommand{\GapPhyskNine}{0.324}
+\newcommand{\GapStructkNine}{0.920}
+\newcommand{\GapMLPmeankNine}{0.949}
+\newcommand{\GapMLPsdkNine}{0.006}
+\newcommand{\GapMLPminkNine}{0.94}
+\newcommand{\GapMLPmaxkNine}{0.96}
+\newcommand{\GapHGBkTen}{0.860}
+\newcommand{\GapMLPkTen}{0.956}
+\newcommand{\GapPhyskTen}{0.326}
+\newcommand{\GapStructkTen}{0.935}
+\newcommand{\GapMLPmeankTen}{0.961}
+\newcommand{\GapMLPsdkTen}{0.003}
+\newcommand{\GapMLPminkTen}{0.95}
+\newcommand{\GapMLPmaxkTen}{0.96}
+\newcommand{\ScreenByNPrec}{100}
+\newcommand{\ScreenByNRecall}{35}
+\newcommand{\ScrSpHGBmin}{0.94}
+\newcommand{\ScrSpHGBmax}{0.98}
+\newcommand{\ScrSpPhysmin}{0.58}
+\newcommand{\ScrSpPhysmax}{0.64}
+\newcommand{\ScrSpStructmin}{0.91}
+\newcommand{\ScrSpStructmax}{0.97}
+\newcommand{\ScrAboveTwelve}{26}
+\newcommand{\ScrPrecTwelve}{99.5}
+\newcommand{\LCHGBTwoFifty}{0.841}
+\newcommand{\LCMLPTwoFifty}{0.877}
+\newcommand{\LCHGBFiveHundred}{0.877}
+\newcommand{\LCMLPFiveHundred}{0.929}
+\newcommand{\LCHGBOneThousand}{0.914}
+\newcommand{\LCMLPOneThousand}{0.943}
+\newcommand{\LCHGBTwoThousand}{0.950}
+\newcommand{\LCMLPTwoThousand}{0.962}
+\newcommand{\LCHGBFourThousand}{0.969}
+\newcommand{\LCMLPFourThousand}{0.970}
+\newcommand{\LCHGBEightThousand}{0.977}
+\newcommand{\LCMLPEightThousand}{0.978}
+\newcommand{\LCHGBSixteenThousand}{0.980}
+\newcommand{\LCMLPSixteenThousand}{0.979}
+\newcommand{\LCRowsNinety}{1\,000}
+\newcommand{\LCRowsSaturate}{4\,000}
+\newcommand{\LargeN}{1\,991}
+\newcommand{\LargeRsqMLPmean}{0.972}
+\newcommand{\LargeRsqMLPsd}{0.002}
+\newcommand{\LargeRsqHGB}{0.905}
+\newcommand{\LargeMaeHGB}{0.316}
+\newcommand{\LargeRsqHGBLo}{0.898}
+\newcommand{\LargeRsqHGBHi}{0.913}
+\newcommand{\LargeRsqHGBThirteen}{0.939}
+\newcommand{\LargeRsqHGBFourteen}{0.876}
+\newcommand{\LargeRsqMLP}{0.970}
+\newcommand{\LargeMaeMLP}{0.137}
+\newcommand{\LargeRsqMLPLo}{0.965}
+\newcommand{\LargeRsqMLPHi}{0.974}
+\newcommand{\LargeRsqMLPThirteen}{0.970}
+\newcommand{\LargeRsqMLPFourteen}{0.969}
+\newcommand{\LargeRsqPhys}{0.350}
+\newcommand{\LargeMaePhys}{0.815}
+\newcommand{\LargeRsqPhysLo}{0.326}
+\newcommand{\LargeRsqPhysHi}{0.375}
+\newcommand{\LargeRsqPhysThirteen}{0.354}
+\newcommand{\LargeRsqPhysFourteen}{0.345}
+\newcommand{\LargeRsqStruct}{0.951}
+\newcommand{\LargeMaeStruct}{0.183}
+\newcommand{\LargeRsqStructLo}{0.945}
+\newcommand{\LargeRsqStructHi}{0.956}
+\newcommand{\LargeRsqStructThirteen}{0.950}
+\newcommand{\LargeRsqStructFourteen}{0.952}
+\newcommand{\ClValN}{200}
+\newcommand{\ClValParams}{15\,182}
+\newcommand{\ClValMAD}{0.009}
+\newcommand{\ClValMax}{0.12}
+\newcommand{\ClValStruct}{2\,804}
+\newcommand{\ClValStructHits}{0}
+\newcommand{\ClValSamples}{65\,536}
+\newcommand{\ClValSvSamples}{400}
+\newcommand{\ClValBelow}{one}
+\newcommand{\ClTrainRows}{7\,941}
+\newcommand{\ClTestRows}{6\,000}
+\newcommand{\ClResolved}{4\,370}
+\newcommand{\ClCensored}{1\,630}
+\newcommand{\ClStructCensOK}{66}
+\newcommand{\ClStructRsqA}{0.92}
+\newcommand{\ClStructMaeA}{0.22}
+\newcommand{\ClMLPRsqA}{0.95 \pm 0.01}
+\newcommand{\ClHGBRsqA}{0.71}
+\newcommand{\ClResolvedFracA}{99}
+\newcommand{\ClStructRsqB}{0.90}
+\newcommand{\ClStructMaeB}{0.36}
+\newcommand{\ClMLPRsqB}{0.89 \pm 0.04}
+\newcommand{\ClHGBRsqB}{0.27}
+\newcommand{\ClResolvedFracB}{96}
+\newcommand{\ClStructRsqC}{0.80}
+\newcommand{\ClStructMaeC}{0.54}
+\newcommand{\ClMLPRsqC}{0.47 \pm 0.25}
+\newcommand{\ClHGBRsqC}{0.31}
+\newcommand{\ClResolvedFracC}{63}
+\newcommand{\ClStructRsqD}{0.27}
+\newcommand{\ClStructMaeD}{0.84}
+\newcommand{\ClMLPRsqD}{-1.86 \pm 1.53}
+\newcommand{\ClHGBRsqD}{0.47}
+\newcommand{\ClResolvedFracD}{54}
+\newcommand{\ClStructRsqE}{-0.07}
+\newcommand{\ClStructMaeE}{0.99}
+\newcommand{\ClMLPRsqE}{-5.11 \pm 3.48}
+\newcommand{\ClHGBRsqE}{0.44}
+\newcommand{\ClResolvedFracE}{52}
+\newcommand{\ClLocStructA}{0.92}
+\newcommand{\ClLocBiasA}{-0.14}
+\newcommand{\ClGloStructA}{0.87}
+\newcommand{\ClGloCensA}{0}
+\newcommand{\ClLocStructB}{0.89}
+\newcommand{\ClLocBiasB}{-0.23}
+\newcommand{\ClGloStructB}{0.84}
+\newcommand{\ClGloCensB}{5}
+\newcommand{\ClLocStructC}{0.78}
+\newcommand{\ClLocBiasC}{-0.40}
+\newcommand{\ClGloStructC}{0.73}
+\newcommand{\ClGloCensC}{35}
+\newcommand{\ClLocStructD}{0.43}
+\newcommand{\ClLocBiasD}{-0.66}
+\newcommand{\ClGloStructD}{-0.35}
+\newcommand{\ClGloCensD}{60}
+\newcommand{\ClLocStructE}{0.23}
+\newcommand{\ClLocBiasE}{-0.77}
+\newcommand{\ClGloStructE}{-1.20}
+\newcommand{\ClGloCensE}{98}
+\newcommand{\ClShallowTrueA}{-2.07}
+\newcommand{\ClShallowTrueE}{-2.03}
+\newcommand{\ClShallowStructA}{-2.13}
+\newcommand{\ClShallowStructE}{-2.52}
+\newcommand{\ClFloorMinExp}{-7}
+\newcommand{\ClFloorMaxExp}{-5}
+\newcommand{\ClTrainGenerated}{8\,000}
+\newcommand{\ClTrainUnresolved}{59}
+\newcommand{\ClSlack}{0.3}
+\newcommand{\ClLeTwentyResolved}{2\,045}
+\newcommand{\ClLeTwentyTotal}{3\,611}
+\newcommand{\ClLeTwentyStruct}{0.90}
+\newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
+\newcommand{\ClLeTwentyHGB}{0.94}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits we measure a prediction horizon: an ensemble of neural networks stays on average within a factor of two of the true variance for five to six qubits beyond a training range of 12 or more qubits, for local costs. Prediction beyond that horizon is an open problem, for which we release a benchmark.}
+\newcommand{\HzEnsemble}{ten}
+\newcommand{\HzResGlobkEight}{100}
+\newcommand{\HzResLockEight}{99}
+\newcommand{\HzMLPkEight}{4}
+\newcommand{\HzMLPIntkEight}{3--4}
+\newcommand{\HzMLPWidekEight}{5}
+\newcommand{\HzLocMLPkEight}{3}
+\newcommand{\HzLocMLPIntkEight}{3--4}
+\newcommand{\HzLocMLPWidekEight}{5}
+\newcommand{\HzTablekEight}{5}
+\newcommand{\HzTableIntkEight}{4--5}
+\newcommand{\HzTableWidekEight}{8}
+\newcommand{\HzLocTablekEight}{4}
+\newcommand{\HzLocTableIntkEight}{4--4}
+\newcommand{\HzLocTableWidekEight}{8}
+\newcommand{\HzHGBkEight}{1}
+\newcommand{\HzHGBIntkEight}{1--1}
+\newcommand{\HzHGBWidekEight}{2}
+\newcommand{\HzLocHGBkEight}{1}
+\newcommand{\HzLocHGBIntkEight}{1--1}
+\newcommand{\HzLocHGBWidekEight}{3}
+\newcommand{\HzResGlobkTwelve}{99}
+\newcommand{\HzResLockTwelve}{99}
+\newcommand{\HzMLPkTwelve}{6}
+\newcommand{\HzMLPIntkTwelve}{5--6}
+\newcommand{\HzMLPWidekTwelve}{8}
+\newcommand{\HzLocMLPkTwelve}{5}
+\newcommand{\HzLocMLPIntkTwelve}{5--6}
+\newcommand{\HzLocMLPWidekTwelve}{8}
+\newcommand{\HzTablekTwelve}{4}
+\newcommand{\HzTableIntkTwelve}{4--4}
+\newcommand{\HzTableWidekTwelve}{10}
+\newcommand{\HzLocTablekTwelve}{4}
+\newcommand{\HzLocTableIntkTwelve}{3--5}
+\newcommand{\HzLocTableWidekTwelve}{11}
+\newcommand{\HzHGBkTwelve}{1}
+\newcommand{\HzHGBIntkTwelve}{1--1}
+\newcommand{\HzHGBWidekTwelve}{2}
+\newcommand{\HzLocHGBkTwelve}{2}
+\newcommand{\HzLocHGBIntkTwelve}{2--2}
+\newcommand{\HzLocHGBWidekTwelve}{4}
+\newcommand{\HzResGlobkSixteen}{81}
+\newcommand{\HzResLockSixteen}{95}
+\newcommand{\HzMLPkSixteen}{6}
+\newcommand{\HzMLPIntkSixteen}{5--6}
+\newcommand{\HzMLPWidekSixteen}{8}
+\newcommand{\HzLocMLPkSixteen}{6}
+\newcommand{\HzLocMLPIntkSixteen}{4--7}
+\newcommand{\HzLocMLPWidekSixteen}{9}
+\newcommand{\HzTablekSixteen}{3}
+\newcommand{\HzTableIntkSixteen}{3--5}
+\newcommand{\HzTableWidekSixteen}{10}
+\newcommand{\HzLocTablekSixteen}{3}
+\newcommand{\HzLocTableIntkSixteen}{2--5}
+\newcommand{\HzLocTableWidekSixteen}{10}
+\newcommand{\HzHGBkSixteen}{1}
+\newcommand{\HzHGBIntkSixteen}{1--1}
+\newcommand{\HzHGBWidekSixteen}{3}
+\newcommand{\HzLocHGBkSixteen}{3}
+\newcommand{\HzLocHGBIntkSixteen}{2--3}
+\newcommand{\HzLocHGBWidekSixteen}{16}
+\newcommand{\HzResGlobkTwenty}{36}
+\newcommand{\HzResLockTwenty}{84}
+\newcommand{\HzMLPkTwenty}{6}
+\newcommand{\HzMLPIntkTwenty}{6--6}
+\newcommand{\HzMLPWidekTwenty}{8}
+\newcommand{\HzLocMLPkTwenty}{6}
+\newcommand{\HzLocMLPIntkTwenty}{6--7}
+\newcommand{\HzLocMLPWidekTwenty}{10}
+\newcommand{\HzTablekTwenty}{3}
+\newcommand{\HzTableIntkTwenty}{3--6}
+\newcommand{\HzTableWidekTwenty}{12}
+\newcommand{\HzLocTablekTwenty}{6}
+\newcommand{\HzLocTableIntkTwenty}{3--8}
+\newcommand{\HzLocTableWidekTwenty}{12}
+\newcommand{\HzHGBkTwenty}{$\ge$12}
+\newcommand{\HzHGBIntkTwenty}{1--12}
+\newcommand{\HzHGBWidekTwenty}{12}
+\newcommand{\HzLocHGBkTwenty}{$\ge$12}
+\newcommand{\HzLocHGBIntkTwenty}{12--12}
+\newcommand{\HzLocHGBWidekTwenty}{12}
+\newcommand{\HzResGlobkTwentyfour}{24}
+\newcommand{\HzResLockTwentyfour}{81}
+\newcommand{\HzMLPkTwentyfour}{$\ge$8}
+\newcommand{\HzMLPIntkTwentyfour}{7--8}
+\newcommand{\HzMLPWidekTwentyfour}{8}
+\newcommand{\HzLocMLPkTwentyfour}{$\ge$8}
+\newcommand{\HzLocMLPIntkTwentyfour}{8--8}
+\newcommand{\HzLocMLPWidekTwentyfour}{8}
+\newcommand{\HzTablekTwentyfour}{$\ge$8}
+\newcommand{\HzTableIntkTwentyfour}{3--8}
+\newcommand{\HzTableWidekTwentyfour}{8}
+\newcommand{\HzLocTablekTwentyfour}{$\ge$8}
+\newcommand{\HzLocTableIntkTwentyfour}{8--8}
+\newcommand{\HzLocTableWidekTwentyfour}{8}
+\newcommand{\HzHGBkTwentyfour}{$\ge$8}
+\newcommand{\HzHGBIntkTwentyfour}{8--8}
+\newcommand{\HzHGBWidekTwentyfour}{8}
+\newcommand{\HzLocHGBkTwentyfour}{$\ge$8}
+\newcommand{\HzLocHGBIntkTwentyfour}{8--8}
+\newcommand{\HzLocHGBWidekTwentyfour}{8}
+\newcommand{\HzMaeTwelveDOne}{0.08}
+\newcommand{\HzMaeTwelveDFour}{0.19}
+\newcommand{\HzMaeTwelveDSix}{0.32}
+\newcommand{\ClTargetHits}{2\,000}
+\newcommand{\ClMaxSamples}{$2^{20}$}
+\newcommand{\ClResolvedHits}{100}
+\newcommand{\ClQmax}{32}
+\newcommand{\TiedRows}{10\,000}
+\newcommand{\TiedCeil}{0.989}
+\newcommand{\TiedHGB}{0.983}
+\newcommand{\TiedMLP}{0.981}
+\newcommand{\TiedRule}{0.958}
+\newcommand{\TiedPhys}{0.309}
+\newcommand{\TiedExMLP}{0.969}
+\newcommand{\TiedExHGB}{0.942}
+\newcommand{\TiedExRule}{0.934}
+\newcommand{\TiedTransfer}{-1.57}
+\newcommand{\TiedOffset}{0.93}
+\newcommand{\TiedCorr}{0.67}
+\newcommand{\TiedBelowCut}{10}
+\newcommand{\TiedLabelMin}{-3.25}
+\newcommand{\TiedShortN}{100}
+\newcommand{\TiedShortZero}{27}
+\newcommand{\TiedShortOff}{27}
+\newcommand{\GraphRows}{10\,000}
+\newcommand{\GraphHGB}{0.975}
+\newcommand{\GraphMLP}{0.974}
+\newcommand{\GraphRule}{0.966}
+\newcommand{\GraphDesignOnly}{0.936}
+\newcommand{\GraphRuleCoef}{96}
+\newcommand{\GraphExMLP}{0.923}
+\newcommand{\GraphExHGB}{0.684}
+\newcommand{\GraphExRule}{0.902}
+\newcommand{\GraphConeMadRy}{0.002}
+\newcommand{\GraphConeExactRy}{92}
+\newcommand{\GraphNFeat}{19}
+\newcommand{\TiedLargeN}{1\,000}
+\newcommand{\TiedLargeMLP}{0.980 \pm 0.001}
+\newcommand{\TiedLargeRule}{0.940}
+\newcommand{\TiedLargeHGB}{0.960}
+\newcommand{\TiedLargeBelowCut}{34}
+\newcommand{\TiedLargeInRange}{91}
+\newcommand{\TiedLargeLabelMin}{-3.74}
+\newcommand{\TuneBest}{0.982}
+\newcommand{\TuneSpread}{0.003}
+\newcommand{\TuneGap}{0.013}
+\newcommand{\TuneHeadroom}{0.003}
+\newcommand{\TuneBestTied}{0.984}
+\newcommand{\TuneGapTied}{0.026}
+\newcommand{\LopoExtraRows}{9\,926}
+\newcommand{\LopoDescRsq}{0.978}
+\newcommand{\LopoIndexRsq}{0.978}
+\newcommand{\LopoLinearUnseen}{0.946}
+\newcommand{\LopoLinearSeen}{0.983}
+\newcommand{\LopoLinearPhys}{0.692}
+\newcommand{\LopoLinearUnseenMae}{0.128}
+\newcommand{\LopoLinearUnseenAuc}{0.987}
+\newcommand{\LopoLinearNoPhys}{0.732}
+\newcommand{\LopoCircularUnseen}{0.950}
+\newcommand{\LopoCircularSeen}{0.985}
+\newcommand{\LopoCircularPhys}{0.824}
+\newcommand{\LopoCircularUnseenMae}{0.132}
+\newcommand{\LopoCircularUnseenAuc}{0.988}
+\newcommand{\LopoCircularNoPhys}{0.694}
+\newcommand{\LopoAllUnseen}{0.753}
+\newcommand{\LopoAllSeen}{0.972}
+\newcommand{\LopoAllPhys}{0.621}
+\newcommand{\LopoAllUnseenMae}{0.241}
+\newcommand{\LopoAllUnseenAuc}{0.972}
+\newcommand{\LopoAllNoPhys}{0.414}
+\newcommand{\LopoBrickUnseen}{0.930}
+\newcommand{\LopoBrickSeen}{0.978}
+\newcommand{\LopoBrickPhys}{0.669}
+\newcommand{\LopoBrickUnseenMae}{0.141}
+\newcommand{\LopoBrickUnseenAuc}{0.980}
+\newcommand{\LopoBrickNoPhys}{0.925}
+\newcommand{\LopoStarUnseen}{0.924}
+\newcommand{\LopoStarSeen}{0.968}
+\newcommand{\LopoStarPhys}{0.726}
+\newcommand{\LopoStarUnseenMae}{0.156}
+\newcommand{\LopoStarUnseenAuc}{0.996}
+\newcommand{\LopoStarNoPhys}{0.742}
+\newcommand{\LopoMinAuc}{0.97}
+%%END-NUMBERS
+
+\raggedbottom
+\begin{document}
+\title[Supplementary Information]{Supplementary Information for:
+Predicting the Trainability of Hardware-Efficient Variational Quantum
+Circuits: A Data-Driven Model for Barren Plateaus}
+\author*[1]{\fnm{Md Habibur} \sur{Rahman}}\email{habib@gnu.ac.kr}
+\affil*[1]{\orgdiv{Department of AI Convergence Engineering},
+\orgname{Gyeongsang National University}, \orgaddress{\city{Jinju},
+\country{Republic of Korea}}}
+\abstract{This document collects material referenced from the main text.
+Sections~S1 and S2 give the comparison with a single-parameter label and
+the validation of the simulator and of the labels. Tables: model
+hyperparameters (S1), descriptive statistics (S2), sensitivity to the barren
+cutoff (S3), all learners on the 11- and 12-qubit split (S4), extrapolation
+with a widening gap (S5), error by subset of the 11- and 12-qubit test set
+(S6), Clifford-label extrapolation pooled over cost locality (S7),
+robustness to model choice and tuning (S8), dataset statistics by design
+choice (S9), and all models on the 13- and 14-qubit circuits (S10).
+Figures: the learning curve (S1), structural zeros against depth (S2), the
+two labels compared (S3), predictions on 13- and 14-qubit circuits (S4),
+the label against qubit count (S5), transfer to unseen patterns (S6),
+Clifford-label extrapolation (S7), and extrapolation with a widening gap
+(S8). Every number is produced by the released analysis scripts.}
+\maketitle
+
+\section{Why not a single-parameter label}
+A simpler label, used
+in an earlier preprint of this work, is the variance of a single parameter, the rotation on qubit
+$0$ in layer $\lfloor L/2\rfloor$, estimated by parameter shift. We keep that
+quantity as a secondary column of the dataset. In \LegacyFloorFrac\% of specs it is a
+structural zero, and a label built on it has to clip every such case to
+a floor, where it is indistinguishable from an extremely flat landscape. Figure~S3 compares the two
+labels. Where the single-parameter gradient is not a structural zero, the two
+labels agree closely (correlation \LegacyCorr, mean absolute difference
+\LegacyMAD). Where it is a structural zero, \LegacyFloorTrainable\% of the
+circuits are in fact trainable by the all-parameter label. A
+single-parameter label therefore mixes two different phenomena, and the
+all-parameter label removes the mixture.
+
+\section{Simulator and label validation}
+Statevectors are evolved exactly with a small in-house NumPy simulator
+(\texttt{qsim} in the released code), which applies each gate as a tensor
+contraction on the $2^n$-amplitude state. We validate it in four ways,
+reproducible with two commands in the repository. (i)~On \ValN{} random
+circuits with up to seven qubits, the statevector agrees with an independent
+dense-matrix simulation that builds the full $2^n\times2^n$ unitary of every
+gate, to a maximum amplitude difference of \ValState. (ii)~On \ValN{} random
+circuits, the adjoint gradient agrees with the parameter-shift rule of
+the parameter-shift formula for every one of \ValGradN{} parameters, to a maximum
+difference of \ValGrad. (iii)~Every parameter flagged as a structural zero
+from 50 samples remained below $10^{-10}$ on 200 fresh samples, in all
+\ValStructN{} flagged cases. (iv)~The Clifford estimator of
+main-text Section~\ref{M-sec:cliffordmethod}, with \ClValSamples{} grid samples,
+reproduces the label from \ClValSvSamples{} exact adjoint gradients on
+\ClValN{} random circuits to a mean absolute difference of \ClValMAD{} in
+$\log_{10}$ units (maximum \ClValMax; \ClValBelow{} of the circuits has a
+variance below the Clifford resolution at this sample size and is not
+included in the comparison), and none of the \ClValStruct{}
+parameters that the exact gradients flagged as structural zeros produced a
+single non-zero Clifford sample.
+
+\section{Model hyperparameters}
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Model hyperparameters. Everything not listed is the scikit-learn
+\SklearnVersion{} default. Features are standardized (zero mean, unit variance
+on the training fold) for the linear, $k$-NN, and MLP models only.}
+\label{tab:hyper}
+\fittable{%
+\begin{tabular}{ll}
+\toprule
+\textbf{Model} & \textbf{Settings}\\
+\midrule
+Linear baseline & ridge, $\alpha=1$ / logistic regression, $C=1$\\
+$k$-NN & $k=10$, uniform weights\\
+MLP & hidden layers (128, 64), ReLU, Adam, 800 iterations\\
+Random forest & 400 trees\\
+Extra trees & 400 trees\\
+HGB & 400 iterations, learning rate 0.08, 31 leaves\\
+\botrule
+\end{tabular}%
+}
+\end{tableorg}
+
+\section{Descriptive statistics}
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Descriptive statistics of the numeric features and the regression
+label over the \Nused{} labeled circuits.}
+\label{tab:datastats}
+%%BEGIN-TABLE:datastats
+\fittable{%
+\begin{tabular}{lrrrrrr}
+\toprule
+\textbf{Variable} & \textbf{Mean} & \textbf{Std} & \textbf{Min} & \textbf{25\%} & \textbf{Median} & \textbf{Max}\\
+\midrule
+\texttt{n\_qubits} & $7.02$ & $3.16$ & $2.00$ & $4.00$ & $7.00$ & $12.00$\\
+\texttt{n\_layers} & $10.55$ & $5.77$ & $1.00$ & $6.00$ & $11.00$ & $20.00$\\
+\texttt{n\_params} & $74.02$ & $55.48$ & $2.00$ & $28.00$ & $60.00$ & $240.00$\\
+\texttt{n\_entanglers} & $136.63$ & $198.79$ & $1.00$ & $28.00$ & $70.00$ & $1320.00$\\
+\texttt{depth\_ratio} & $2.01$ & $1.83$ & $0.08$ & $0.80$ & $1.50$ & $10.00$\\
+structural-zero fraction & $0.22$ & $0.25$ & $0.00$ & $0.05$ & $0.12$ & $0.99$\\
+$\log_{10}\overline{\mathrm{Var}}$ (label) & $-1.88$ & $0.94$ & $-4.89$ & $-2.62$ & $-1.78$ & $-0.23$\\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:datastats
+\end{tableorg}
+
+\section{Sensitivity to the barren cutoff}
+Table~S3 moves the classification cutoff from $-1.5$ to $-3$,
+which changes the barren fraction from \BarrenCutmOnepFive\% to
+\BarrenCutmThreepZero\%. The AUC stays at or above \AucCutmOnepFive{} for
+every cutoff, so the ranking the classifier produces is not tied to the
+particular threshold. The regression target is unaffected by this choice.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Classification with alternative barren cutoffs $y<c$. AUC is the
+mean $\pm$ standard deviation over \NFoldsK{} architecture-grouped folds.}
+\label{tab:cutoff}
+%%BEGIN-TABLE:cutoff
+\fittable{%
+\begin{tabular}{lcc}
+\toprule
+Cutoff $y<c$ & Barren fraction & AUC (grouped CV) \\
+\midrule
+$c=-1.5$ & 59.7\% & $0.997 \pm 0.000$ \\
+$c=-2.0$ & 42.6\% & $0.998 \pm 0.000$ \\
+$c=-2.5$ & 27.0\% & $0.999 \pm 0.000$ \\
+$c=-3.0$ & 15.0\% & $0.998 \pm 0.001$ \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:cutoff
+\end{tableorg}
+
+\section{Qubit-count extrapolation: all learners}
+Main-text Section~\ref{M-sec:extrap} discusses this table; the per-subset
+breakdown with confidence intervals is Table~S6.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Extrapolation split: trained on $n\le\ExtrapCut$
+(\ExtrapTrainRows{} circuits), tested on $n\in\{11,12\}$ (\ExtrapTestRows{}
+circuits). Single split; see Table~\ref{tab:extrapbreak} for confidence
+intervals.}
+\label{tab:extrap}
+%%BEGIN-TABLE:extrap
+\fittable{%
+\begin{tabular}{lcccc}
+\toprule
+Model & $R^2$ & MAE & AUC & Accuracy \\
+\midrule
+\textbf{Hist Gradient Boosting} & 0.860 & 0.320 & 0.995 & 0.966 \\
+MLP & 0.956 & 0.133 & 0.997 & 0.976 \\
+Random Forest & 0.861 & 0.312 & 0.997 & 0.974 \\
+Extra Trees & 0.864 & 0.308 & 0.997 & 0.980 \\
+k-NN & 0.864 & 0.311 & 0.983 & 0.976 \\
+Linear baseline & 0.755 & 0.389 & 0.963 & 0.904 \\
+\midrule
+Structured linear & 0.935 & 0.169 & 0.998 & 0.974 \\
+Physics-informed linear (effective weight) & 0.511 & 0.589 & 0.920 & 0.811 \\
+Physics-informed linear & 0.326 & 0.665 & 0.814 & 0.752 \\
+Cost-locality subgroup mean & -1.027 & 1.326 & 0.699 & 0.248 \\
+Training mean & -1.125 & 1.359 & 0.500 & 0.248 \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:extrap
+\end{tableorg}
+
+\section{Extrapolation with a widening gap}
+Figure~S8 (Table~S5) repeats the experiment with the training cutoff moved down: train
+on $n\le k$ and test on every larger circuit, for $k=6,\dots,10$. HGB falls
+from \GapHGBkTen{} at $k=10$ to \GapHGBkSix{} at $k=6$, no better than the
+training mean. The structured linear model is the most stable, from
+\GapStructkTen{} to \GapStructkSix. The MLP is accurate for small gaps
+($\GapMLPmeankTen\pm\GapMLPsdkTen$ at $k=10$) but becomes unreliable for
+large ones: at $k=6$, where 7- to 12-qubit circuits are predicted from 2-
+to 6-qubit ones, ten seeds give $\GapMLPmeankSix\pm\GapMLPsdkSix$ with a
+range from \GapMLPminkSix{} to \GapMLPmaxkSix. A neural network can
+extrapolate, but how well depends on its initialization, and a user cannot
+know in advance which seed is the good one. For prediction well beyond the
+training range, the model with an explicit scaling form is the safer
+choice.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Extrapolation with a widening gap: train on $n\le k$, test on all
+$n>k$.}
+\label{tab:gap}
+%%BEGIN-TABLE:gap
+\fittable{%
+\begin{tabular}{crrcccc}
+\toprule
+Train $n\le k$ & Train rows & Test rows & HGB & MLP (10 seeds, mean $\pm$ sd [min, max]) & Structured linear & Physics-linear \\
+\midrule
+$k=6$ & 8916 & 10942 & -0.062 & $0.631 \pm 0.110$ [0.47, 0.81] & 0.839 & 0.332 \\
+$k=7$ & 10671 & 9187 & 0.257 & $0.846 \pm 0.038$ [0.78, 0.92] & 0.883 & 0.330 \\
+$k=8$ & 12572 & 7286 & 0.541 & $0.906 \pm 0.017$ [0.88, 0.93] & 0.902 & 0.324 \\
+$k=9$ & 14448 & 5410 & 0.729 & $0.949 \pm 0.006$ [0.94, 0.96] & 0.920 & 0.324 \\
+$k=10$ & 16278 & 3580 & 0.860 & $0.961 \pm 0.003$ [0.95, 0.96] & 0.935 & 0.326 \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:gap
+\end{tableorg}
+
+\section{Learning curve}
+Figure~S1 shows grouped-CV $R^2$ as a function of the
+number of training rows, with whole architectures added at a time. Both
+models reach $R^2>0.9$ with about \LCRowsNinety{} rows and are within
+$0.02$ of their final value by \LCRowsSaturate{} rows; the MLP is the more
+data-efficient of the two below 2\,000 rows (\LCMLPFiveHundred{} versus
+\LCHGBFiveHundred{} at 500 rows). For a user extending the predictor to a
+new circuit family, this sets the expectation: a few thousand labeled
+circuits, which the released generator produces in well under an hour on a
+laptop for $n\le12$, suffice to reach the plateau.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.6\textwidth]{figs/learning_curve.pdf}
+\caption{Learning curve: architecture-grouped CV $R^2$ against the number
+of training rows. Error bars: standard deviation over the five folds.}
+\label{fig:learningcurve}
+\end{figure}
+
+
+\section{Extrapolation error by subset of the 11- and 12-qubit test set}
+Main-text Section~\ref{M-sec:extrap} discusses this table.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Extrapolation error by subset of the $n\in\{11,12\}$ test set. MAE in
+$\log_{10}$ units, with 95\% bootstrap confidence intervals for HGB and the MLP. The
+physics-informed linear model and the cost-locality subgroup mean are fitted
+on the same $n\le\ExtrapCut$ training set.}
+\label{tab:extrapbreak}
+%%BEGIN-TABLE:extrap_breakdown
+\fittable{%
+\begin{tabular}{lrrcccc}
+\toprule
+Subset & Rows & Label mean (std) & HGB MAE [95\% CI] & MLP MAE [95\% CI] & Structured linear MAE & Physics-linear MAE \\
+\midrule
+$n=$11 local & 836 & $-2.31$ ($1.04$) & 0.185 [0.175, 0.194] & 0.113 [0.105, 0.122] & 0.169 & 0.805 \\
+$n=$11 global & 904 & $-3.11$ ($0.72$) & 0.280 [0.271, 0.289] & 0.109 [0.099, 0.123] & 0.133 & 0.438 \\
+$n=$12 local & 930 & $-2.40$ ($1.13$) & 0.309 [0.294, 0.326] & 0.164 [0.154, 0.175] & 0.219 & 0.907 \\
+$n=$12 global & 910 & $-3.29$ ($0.86$) & 0.494 [0.479, 0.506] & 0.142 [0.129, 0.155] & 0.156 & 0.516 \\
+all & 3580 & $-2.78$ ($1.04$) & 0.320 [0.312, 0.327] & 0.133 [0.128, 0.139] & 0.169 & 0.665 \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:extrap_breakdown
+\end{tableorg}
+
+\section{Clifford-label extrapolation: all models, pooled over cost locality}
+Main-text Section~\ref{M-sec:clifford} reports this experiment split by cost locality. The
+pooled scores below are computed on resolved circuits only; beyond 24 qubits
+most global-cost circuits are censored, so the pooled $R^2$ there mixes
+extrapolation with survivorship and is shown for completeness.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Models trained on $n\le12$ with Clifford labels, tested on resolved
+circuits with $13\le n\le32$, pooled over cost locality. MLP: mean $\pm$
+standard deviation over ten seeds.}
+\label{tab:cliffordpooled}
+%%BEGIN-TABLE:clifford
+\fittable{%
+\begin{tabular}{lrrcccccc}
+\toprule
+ & & & \multicolumn{2}{c}{Structured linear} & \multicolumn{2}{c}{MLP (10 seeds)} & \multicolumn{2}{c}{HGB} \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}\cmidrule(lr){8-9}
+Qubits & Resolved & Censored & $R^2$ & MAE & $R^2$ & MAE & $R^2$ & MAE \\
+\midrule
+13--16 & 1174 & 10 & 0.923 & 0.220 & $0.954 \pm 0.007$ & $0.157 \pm 0.012$ & 0.712 & 0.464 \\
+17--20 & 1151 & 54 & 0.904 & 0.356 & $0.885 \pm 0.039$ & $0.364 \pm 0.057$ & 0.273 & 1.036 \\
+21--24 & 760 & 437 & 0.800 & 0.541 & $0.469 \pm 0.247$ & $0.867 \pm 0.225$ & 0.307 & 0.938 \\
+25--28 & 656 & 548 & 0.265 & 0.839 & $-1.861 \pm 1.534$ & $1.610 \pm 0.517$ & 0.475 & 0.625 \\
+29--32 & 629 & 581 & -0.070 & 0.994 & $-5.114 \pm 3.481$ & $2.360 \pm 0.800$ & 0.439 & 0.664 \\
+\midrule
+13--32 & 4370 & 1630 & 0.711 & 0.516 & $-0.152 \pm 0.616$ & $0.870 \pm 0.246$ & 0.435 & 0.750 \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:clifford
+\end{tableorg}
+
+\section{Robustness to model choice and tuning}
+Main-text Section~\ref{M-sec:cv} discusses this table. The hyperparameter
+search is nested: it is run inside each training fold, with a three-fold
+architecture-grouped inner split, so the test folds are never used for
+selection.
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Unseen architectures ($R^2$, mean $\pm$ standard deviation over five
+architecture-grouped folds) for eight learner configurations and the fitted
+linear rule. The kernel methods are trained on at most 6\,000 rows.}
+\label{tab:tuning}
+%%BEGIN-TABLE:tuning
+\fittable{%
+\begin{tabular}{lcc}
+\toprule
+Model & Named patterns & Shared parameters \\
+\midrule
+Fitted linear rule (structured linear) & $0.969 \pm 0.002$ & $0.958 \pm 0.003$ \\
+\midrule
+HGB, paper settings & $0.980 \pm 0.001$ & $0.982 \pm 0.003$ \\
+HGB, nested randomized search (20 configurations) & $0.981 \pm 0.001$ & $0.984 \pm 0.003$ \\
+Extra trees, 1000 trees & $0.979 \pm 0.002$ & $0.984 \pm 0.002$ \\
+MLP (256, 256, 128), early stopping & $0.981 \pm 0.002$ & $0.984 \pm 0.003$ \\
+Ensemble of 5 MLPs (128, 64) & $0.982 \pm 0.001$ & $0.983 \pm 0.003$ \\
+Blend of HGB and the MLP ensemble & $0.982 \pm 0.001$ & $0.984 \pm 0.003$ \\
+SVR, RBF kernel & $0.979 \pm 0.002$ & $0.982 \pm 0.003$ \\
+Kernel ridge, RBF kernel & $0.979 \pm 0.002$ & $0.982 \pm 0.003$ \\
+\midrule
+Noise ceiling & 0.985 & 0.989 \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:tuning
+\end{tableorg}
+
+\section{Dataset statistics by design choice}
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Dataset statistics broken down by design choice. Lower mean
+$\log_{10}\Vbar$ and higher barren fraction indicate less trainable
+families; the last column is the mean fraction of parameters that are
+structural zeros. These are properties of the labeled data, not model
+outputs.}
+\label{tab:labelbydesign}
+%%BEGIN-TABLE:labelbydesign
+\fittable{%
+\begin{tabular}{lrrrr}
+\toprule
+\textbf{Design choice} & \textbf{Count} & \textbf{Mean} $\boldsymbol{\log_{10}\overline{\mathrm{Var}}}$ & \textbf{Barren \%} & \textbf{Structural-zero \%}\\
+\midrule
+\multicolumn{5}{l}{\emph{Cost-observable locality}}\\
+\quad local $Z_0$ & 9859 & $-1.68$ & 33.4 & 29.5\\
+\quad global $Z^{\otimes n}$ & 9999 & $-2.08$ & 51.7 & 14.9\\
+\midrule
+\multicolumn{5}{l}{\emph{Entanglement pattern}}\\
+\quad linear & 6608 & $-1.76$ & 35.7 & 26.7\\
+\quad circular & 6709 & $-2.01$ & 48.9 & 16.8\\
+\quad all-to-all & 6541 & $-1.86$ & 43.3 & 23.0\\
+\midrule
+\multicolumn{5}{l}{\emph{Entangler gate}}\\
+\quad CZ & 10021 & $-1.84$ & 39.2 & 20.7\\
+\quad CX & 9837 & $-1.92$ & 46.2 & 23.6\\
+\midrule
+\multicolumn{5}{l}{\emph{Single-qubit rotation scheme}}\\
+\quad fixed-\texttt{ry} & 9878 & $-1.77$ & 39.5 & 15.8\\
+\quad random-Pauli & 9980 & $-1.99$ & 45.8 & 28.4\\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:labelbydesign
+\end{tableorg}
+
+\section{Held-out 13- and 14-qubit circuits: all models}
+\begin{tableorg}[!htbp]
+\centering\tablebodyfont
+\caption{Held-out 13- and 14-qubit circuits predicted by models trained on
+all $n\le12$ circuits, for every learner and control (main-text
+Section~\ref{M-sec:extrap}). 95\% bootstrap confidence intervals over test
+rows.}
+\label{tab:largefull}
+%%BEGIN-TABLE:large
+\fittable{%
+\begin{tabular}{lcccccc}
+\toprule
+Model & $R^2$ [95\% CI] & MAE & $R^2$, $n=13$ & $R^2$, $n=14$ & $R^2$, local & $R^2$, global \\
+\midrule
+Hist Gradient Boosting & 0.905 [0.898, 0.913] & 0.316 & 0.939 & 0.876 & 0.942 & 0.749 \\
+MLP & 0.970 [0.965, 0.974] & 0.137 & 0.970 & 0.969 & 0.971 & 0.943 \\
+Random Forest & 0.907 [0.899, 0.914] & 0.308 & 0.942 & 0.877 & 0.940 & 0.759 \\
+k-NN & 0.904 [0.895, 0.911] & 0.314 & 0.937 & 0.874 & 0.944 & 0.739 \\
+Linear baseline & 0.771 [0.755, 0.787] & 0.474 & 0.778 & 0.763 & 0.810 & 0.498 \\
+\midrule
+Structured linear & 0.951 [0.945, 0.956] & 0.183 & 0.950 & 0.952 & 0.947 & 0.919 \\
+Physics-informed linear (effective weight) & 0.561 [0.544, 0.576] & 0.694 & 0.547 & 0.571 & 0.452 & 0.428 \\
+Physics-informed linear & 0.350 [0.326, 0.375] & 0.815 & 0.354 & 0.345 & 0.187 & 0.157 \\
+Cost-locality subgroup mean & -0.889 [-1.024, -0.776] & 1.549 & -0.902 & -0.884 & -0.442 & -3.400 \\
+\botrule
+\end{tabular}%
+}
+%%END-TABLE:large
+\end{tableorg}
+
+\section{Additional figures}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.58\textwidth]{figs/structural.pdf}
+\caption{Mean percentage of parameters that are structural zeros, as a
+function of the number of layers $L$, for local and global cost observables.
+Shallow, local-cost circuits have many rotations outside the light cone of
+the observable.}
+\label{fig:structural}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.58\textwidth]{figs/label_compare.pdf}
+\caption{All-parameter label versus the single-parameter label, for the same
+circuits and parameter samples.
+Circles: the single parameter has a non-zero gradient and the two labels
+agree. Triangles (drawn at $-6.5$ for visibility): the single parameter is a
+structural zero; a label built on it clips these to a floor, whereas most
+have all-parameter labels above the cutoff.}
+\label{fig:labelcompare}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{figs/large.pdf}
+\caption{Predicted versus true label on the held-out 13- and 14-qubit
+circuits for HGB (left) and the MLP (right), both trained on $n\le12$
+only. The dashed line is $y=x$.}
+\label{fig:large}
+\end{figure}
+
+\paragraph{Trainability versus qubit count.} Figure~\ref{fig:qubittrend} shows the mean label as a function of qubit
+count, split by cost locality. Global-cost circuits show a steep, monotone
+decay of the mean gradient variance with qubit number; local-cost circuits
+decay far more slowly. The shaded bands are one standard deviation of the
+label across the heterogeneous circuits at each $n$, not the uncertainty of
+the mean, which is much smaller. The dataset therefore contains the
+qubit-scaling behavior that the predictor must learn, within the finite range
+$n\le12$ where it can be measured exactly.
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.58\textwidth]{figs/qubit_trend.pdf}
+\caption{Mean $\log_{10}\Vbar$ versus qubit count for local and global cost
+observables. Shaded: $\pm1$ standard deviation across circuits at each $n$
+(spread of the population, not uncertainty of the mean).}
+\label{fig:qubittrend}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=0.7\textwidth]{figs/lopo.pdf}
+\caption{$R^2$ on each entanglement pattern when it is seen in training
+(grouped CV), when it is held out entirely (LOPO), and for the
+physics-informed linear control.}
+\label{fig:lopo}
+\end{figure}
+
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{figs/clifford.pdf}
+\caption{Left: mean absolute error against test qubit count for models
+trained on $n\le12$; the band is the range over ten MLP seeds. Middle and
+right: predicted versus true label for the structured linear model and the
+MLP, colored by qubit count.}
+\label{fig:clifford}
+\end{figure}
+\begin{figure}[!htbp]
+\centering
+\includegraphics[width=\textwidth]{figs/gap.pdf}
+\caption{Extrapolation with a widening gap. Left: $R^2$ on all circuits with
+$n>k$ when training on $n\le k$. Right: $R^2$ at each test qubit count when
+training on $n\le8$. HGB cannot continue the decay in $n$ beyond its training range. The band
+around the MLP curve is the range over ten random seeds.}
+\label{fig:gap}
+\end{figure}
+\end{document}

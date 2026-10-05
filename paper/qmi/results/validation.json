@@ -1,0 +1,8 @@
+{
+ "n_circuits": 200,
+ "max_state_diff": 3.1031676915590914e-16,
+ "max_grad_diff": 9.992007221626409e-16,
+ "n_params_checked": 4792,
+ "n_flagged": 1153,
+ "n_violations": 0
+}

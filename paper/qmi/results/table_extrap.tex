@@ -1,0 +1,18 @@
+\begin{tabular}{lcccc}
+\toprule
+Model & $R^2$ & MAE & AUC & Accuracy \\
+\midrule
+\textbf{Hist Gradient Boosting} & 0.860 & 0.320 & 0.995 & 0.966 \\
+MLP & 0.956 & 0.133 & 0.997 & 0.976 \\
+Random Forest & 0.861 & 0.312 & 0.997 & 0.974 \\
+Extra Trees & 0.864 & 0.308 & 0.997 & 0.980 \\
+k-NN & 0.864 & 0.311 & 0.983 & 0.976 \\
+Linear baseline & 0.755 & 0.389 & 0.963 & 0.904 \\
+\midrule
+Structured linear & 0.935 & 0.169 & 0.998 & 0.974 \\
+Physics-informed linear (effective weight) & 0.511 & 0.589 & 0.920 & 0.811 \\
+Physics-informed linear & 0.326 & 0.665 & 0.814 & 0.752 \\
+Cost-locality subgroup mean & -1.027 & 1.326 & 0.699 & 0.248 \\
+Training mean & -1.125 & 1.359 & 0.500 & 0.248 \\
+\botrule
+\end{tabular}

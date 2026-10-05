@@ -1,8 +1,9 @@
 """Generate a barren-plateau trainability dataset in parallel.
 
 Each row = one random circuit spec + its measured gradient variance (the label).
-Work is spread across CPU cores; rows are streamed to a CSV as they complete, so
-a long run can be interrupted and resumed-by-appending without losing progress.
+Work is spread across CPU cores; rows are written to a CSV as they complete, so
+partial output can be inspected while a long run is in progress.  (The output
+file is overwritten at start; runs are not resumable.)
 
 Example (big run on an M4, ~10 cores):
 
@@ -23,14 +24,11 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from qml_bp.ansatz import compute_datapoint, sample_spec
+from qml_bp.ansatz import (ALL_PARAM_COLUMNS, FEATURE_COLUMNS, compute_datapoint,
+                           compute_datapoint_all, sample_spec)
 
 # Column order written to CSV.
-_COLUMNS = [
-    "n_qubits", "n_layers", "n_params", "ansatz_type", "entangle_pattern",
-    "entangler_gate", "cost_global", "n_entanglers", "depth_ratio",
-    "grad_mean", "grad_var", "log_grad_var", "samples",
-]
+_COLUMNS = list(FEATURE_COLUMNS) + ["grad_mean", "grad_var", "log_grad_var", "samples"]
 
 # Config shared with worker processes (set in the initializer to avoid pickling
 # it on every task).
@@ -48,7 +46,10 @@ def _work(task_seed):
         rng,
         qubit_range=(_CFG["qubit_min"], _CFG["qubit_max"]),
         layer_range=(_CFG["layer_min"], _CFG["layer_max"]),
+        patterns=_CFG["patterns"],
     )
+    if _CFG["label_mode"] == "all":
+        return compute_datapoint_all(spec, _CFG["samples"], rng)
     return compute_datapoint(spec, _CFG["samples"], rng)
 
 
@@ -64,12 +65,20 @@ def main():
     ap.add_argument("--workers", type=int, default=max(1, (os.cpu_count() or 2) - 1))
     ap.add_argument("--seed", type=int, default=12345)
     ap.add_argument("--out", type=str, default="data_bp/bp_dataset.csv")
+    ap.add_argument("--patterns", default=None,
+                    help="comma-separated entanglement patterns to sample "
+                         "(default: linear,circular,all_to_all)")
+    ap.add_argument("--label-mode", choices=["all", "legacy"], default="all",
+                    help="'all': variance of every parameter via adjoint "
+                         "differentiation (default); 'legacy': one fixed "
+                         "middle-layer parameter via parameter shift")
     args = ap.parse_args()
 
     os.makedirs(os.path.dirname(os.path.abspath(args.out)), exist_ok=True)
 
     cfg = {
-        "samples": args.samples,
+        "samples": args.samples, "label_mode": args.label_mode,
+        "patterns": args.patterns.split(",") if args.patterns else None,
         "qubit_min": args.qubit_min, "qubit_max": args.qubit_max,
         "layer_min": args.layer_min, "layer_max": args.layer_max,
     }
@@ -82,8 +91,9 @@ def main():
     t0 = time.time()
     done = 0
 
+    columns = _COLUMNS + (ALL_PARAM_COLUMNS if args.label_mode == "all" else [])
     with open(args.out, "w", newline="") as fh:
-        writer = csv.DictWriter(fh, fieldnames=_COLUMNS)
+        writer = csv.DictWriter(fh, fieldnames=columns)
         writer.writeheader()
         with Pool(args.workers, initializer=_init_worker, initargs=(cfg,)) as pool:
             for row in pool.imap_unordered(_work, seeds, chunksize=8):

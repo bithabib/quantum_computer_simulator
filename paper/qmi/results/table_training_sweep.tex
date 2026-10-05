@@ -1,0 +1,12 @@
+\begin{tabular}{lrrcccc}
+\toprule
+ & & & \multicolumn{2}{c}{Spearman $\rho(\Delta C,\cdot)$} & \multicolumn{2}{c}{Mean $\Delta C$ (\% with $\Delta C>0.5$)} \\
+\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+Optimizer, shots & Circuits & Step size & true label & predicted label & predicted barren & predicted trainable \\
+\midrule
+GD, exact gradients & 199 & 0.5 & 0.14 & 0.13 & 0.93 (97\%) & 1.00 (99\%) \\
+GD, 100 shots & 199 & 0.5 & 0.19 & 0.17 & 0.93 (97\%) & 1.02 (96\%) \\
+Adam, 1000 shots & 299 & 0.05 & 0.09 & 0.08 & 0.96 (98\%) & 1.00 (97\%) \\
+Adam, 100 shots & 199 & 0.05 & 0.19 & 0.17 & 0.93 (94\%) & 1.02 (96\%) \\
+\botrule
+\end{tabular}
