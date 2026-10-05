@@ -215,6 +215,19 @@
 \newcommand{\RsqCVLinearbaseline}{0.891}
 \newcommand{\AucCVLinearbaseline}{0.984}
 \newcommand{\RsqExtrapLinearbaseline}{0.755}
+\newcommand{\CrossLo}{seven}
+\newcommand{\CrossHi}{eight}
+\newcommand{\AllAboveMaxN}{4}
+\newcommand{\BelowAtFive}{three}
+\newcommand{\RowsAtFive}{1\,745}
+\newcommand{\MinParamVar}{2.5\times10^{-9}}
+\newcommand{\MinParamGradExp}{-4}
+\newcommand{\TOFracMin}{94}
+\newcommand{\TOFracMax}{99}
+\newcommand{\TORhoMin}{0.08}
+\newcommand{\TORhoMax}{0.19}
+\newcommand{\TOCircuitsMin}{199}
+\newcommand{\TOCircuitsMax}{299}
 \newcommand{\ScreenSpearman}{0.989}
 \newcommand{\ScreenTrainableFrac}{57.4}
 \newcommand{\ScreenPrecFifty}{99.7}
@@ -323,6 +336,7 @@
 \newcommand{\ClValStructHits}{0}
 \newcommand{\ClValSamples}{65\,536}
 \newcommand{\ClValSvSamples}{400}
+\newcommand{\ClValBelow}{one}
 \newcommand{\ClTrainRows}{7\,941}
 \newcommand{\ClTestRows}{6\,000}
 \newcommand{\ClResolved}{4\,370}
@@ -379,10 +393,15 @@
 \newcommand{\ClShallowStructE}{-2.52}
 \newcommand{\ClFloorMinExp}{-7}
 \newcommand{\ClFloorMaxExp}{-5}
+\newcommand{\ClTrainGenerated}{8\,000}
+\newcommand{\ClTrainUnresolved}{59}
+\newcommand{\ClSlack}{0.3}
+\newcommand{\ClLeTwentyResolved}{2\,045}
+\newcommand{\ClLeTwentyTotal}{3\,611}
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits, such models stay accurate for about eight qubits beyond training; further out they overestimate the decay for local costs, whose causal cone saturates, and training up to 20 qubits restores $R^2\approx0.9$ up to 32.}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits, such models stay accurate on circuits whose variance is resolvable for about eight qubits beyond training; further out they overestimate the decay for local costs, whose causal cone saturates, and they overestimate the variance of the flattest global-cost circuits.}
 \newcommand{\ClTargetHits}{2\,000}
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
@@ -420,6 +439,7 @@
 \newcommand{\LopoStarUnseenMae}{0.156}
 \newcommand{\LopoStarUnseenAuc}{0.996}
 \newcommand{\LopoStarNoPhys}{0.742}
+\newcommand{\LopoMinAuc}{0.97}
 %%END-NUMBERS
 
 \raggedbottom
@@ -778,7 +798,12 @@ parameters in closed form and can differ sharply from the nominal weight:
 with circular CX entanglement the nominally local cost has effective weight
 $n-1$, and with all-to-all CX entanglement the nominally global cost has
 effective weight
-$1$ (Table~\ref{tab:effweight}).
+$1$ (Table~\ref{tab:effweight}). The effect follows from the convention,
+common for hardware-efficient ans\"atze and used here, that every layer
+ends with its entangling gates, so that an entangling layer directly
+precedes the measurement. An ansatz that ends with a rotation layer has
+effective weight equal to nominal weight. The practical point is that a
+layout convention can silently change the locality of the cost.
 
 \paragraph{Causal cone.} A rotation can only affect the cost if some
 sequence of entangling gates connects it to the support of the observable.
@@ -818,9 +843,10 @@ symmetry, not a barren plateau. We flag parameter $k$ as a structural zero
 when $\max_\theta|\partial C/\partial\theta_k|<10^{-10}$ over all \Samples{}
 samples. Section~\ref{sec:validation} verifies that flagged parameters remain
 exactly zero on fresh samples, so the flag is a property of the circuit and
-not of the sample. At $n\le12$ no genuine barren-plateau variance in our data
-comes within eight orders of magnitude of this tolerance, so the two
-populations do not overlap.
+not of the sample. The smallest per-parameter variance among non-flagged parameters in the
+dataset is $\MinParamVar$, which corresponds to gradient components of order
+$10^{\MinParamGradExp}$, more than five orders of magnitude above the
+tolerance, so the two populations do not overlap.
 
 \paragraph{Regression and classification labels.} Let $\mathcal{K}$ be the
 set of parameters that are not structural zeros. The label is
@@ -836,7 +862,7 @@ structural zero) cannot be labeled and are excluded; there are \NallStruct{}
 such rows. The classification label is $\mathbb{1}[y<-2]$, which we call
 ``barren'' for brevity. The cutoff is a modeling choice: $\Vbar<10^{-2}$
 means the typical gradient component has magnitude below $0.1$; in our data
-the mean label crosses this value between six and seven qubits. The regression
+the mean label crosses this value between \CrossLo{} and \CrossHi{} qubits. The regression
 target is threshold-free, and Supplementary Table~S3 reports the effect of
 moving the cutoff.
 
@@ -865,8 +891,8 @@ all-parameter label removes the mixture.
 \subsection{Simulator and validation}\label{sec:validation}
 Statevectors are evolved exactly with a small in-house NumPy simulator
 (\texttt{qsim} in the released code), which applies each gate as a tensor
-contraction on the $2^n$-amplitude state. We validate it in three ways,
-reproducible with one command in the repository. (i)~On \ValN{} random
+contraction on the $2^n$-amplitude state. We validate it in four ways,
+reproducible with two commands in the repository. (i)~On \ValN{} random
 circuits with up to seven qubits, the statevector agrees with an independent
 dense-matrix simulation that builds the full $2^n\times2^n$ unitary of every
 gate, to a maximum amplitude difference of \ValState. (ii)~On \ValN{} random
@@ -878,7 +904,9 @@ from 50 samples remained below $10^{-10}$ on 200 fresh samples, in all
 Section~\ref{sec:cliffordmethod}, with \ClValSamples{} grid samples,
 reproduces the label from \ClValSvSamples{} exact adjoint gradients on
 \ClValN{} random circuits to a mean absolute difference of \ClValMAD{} in
-$\log_{10}$ units (maximum \ClValMax), and none of the \ClValStruct{}
+$\log_{10}$ units (maximum \ClValMax; \ClValBelow{} of the circuits has a
+variance below the Clifford resolution at this sample size and is not
+included in the comparison), and none of the \ClValStruct{}
 parameters that the exact gradients flagged as structural zeros produced a
 single non-zero Clifford sample.
 
@@ -888,8 +916,8 @@ uniformly over the ranges in Table~\ref{tab:designspace}: $n$ uniformly on
 $\{2,\dots,12\}$, $L$ uniformly on $\{1,\dots,20\}$, and each categorical
 choice uniformly over its options. Every spec is labeled with \Samples{}
 gradient samples. Generation is embarrassingly parallel; every spec is seeded
-reproducibly from a root seed, and completed rows are appended to a
-comma-separated text file (CSV) as they finish, so a long run can be resumed.
+reproducibly from a root seed, and completed rows are written to a
+comma-separated text file (CSV) as they finish.
 
 \begin{tableorg}[t]
 \centering\tablebodyfont
@@ -1049,9 +1077,11 @@ upper bounds on generalization.
 $n\le\ExtrapCut$ and test on all circuits with $n\in\{11,12\}$. This split is
 defined purely by qubit count, so no large-circuit information enters
 training. We report scores for the whole test set and separately for $n=11$,
-$n=12$, local cost, and global cost, with 95\% bootstrap confidence intervals
-from 1000 resamples of the test rows, and the spread over random seeds of the models (ten seeds for the neural
-network, whose out-of-range predictions depend on its initialization). The
+$n=12$, local cost, and global cost, with 95\% bootstrap confidence intervals from
+resamples of the test rows (1000 for the full test set, 500 for each
+subset), and the spread over random seeds of the models (five seeds for
+HGB; ten for the neural network, whose out-of-range predictions depend on
+its initialization). The
 controls are fitted on the same training set; the linear controls
 extrapolate in $n$ by construction, so they are the natural yardstick here.
 
@@ -1122,9 +1152,19 @@ certified by sampling at large $n$, the label in this experiment is the
 mean gradient variance over \emph{all} parameters, $\log_{10}\Vbar_{\rm
 all}$, which the estimator measures without bias. It differs from the main
 label by $\log_{10}$ of the non-structural fraction, which the causal-cone
-feature approximates in closed form. We generated \ClTrainRows{} circuits
-with $n\in[2,12]$ for training and \ClTestRows{} with $n\in[13,\ClQmax]$
-for testing, sampled as in Table~\ref{tab:designspace} otherwise.
+feature approximates in closed form. The two labels are therefore not directly
+comparable, and scores on one should not be set against scores on the
+other. For the all-parameter label the structured linear model predicts the
+variance per in-cone parameter and adds $\log_{10}$ of \texttt{cone\_frac}
+as a fixed offset, which accounts for the dilution by parameters outside
+the cone; the other models receive the same features and no offset. We
+generated \ClTrainGenerated{} circuits with $n\in[2,12]$ for training, of
+which \ClTrainUnresolved{} fell below the sampling resolution and were
+excluded, leaving \ClTrainRows, and \ClTestRows{} circuits with
+$n\in[13,\ClQmax]$ for testing, sampled as in Table~\ref{tab:designspace}
+otherwise. A prediction for a censored circuit is counted as consistent
+when it lies no more than \ClSlack{} $\log_{10}$ units above a 95\% upper
+bound on the label (the Poisson bound for the observed number of events).
 
 %=================================================================
 \section{Results}\label{sec:results}
@@ -1234,8 +1274,8 @@ circuits at $n=12$ are the hardest subset (HGB $R^2=\RsqENOneTwoglobal$, MLP
 \RsqEMNOneTwoglobal), as expected, since they are furthest from training in
 both $n$ and label value. Every subset is predicted far better than the
 subgroup-mean and physics-informed controls. The result should still be read
-narrowly: small-circuit labels transfer usefully to the largest sizes we can
-simulate exactly, two qubits beyond training. This is not evidence of
+narrowly: in this split the test circuits are only two qubits beyond
+training. This is not evidence of
 unbounded extrapolation, and Section~\ref{sec:discussion} lists it as a
 limitation.
 
@@ -1343,9 +1383,13 @@ and 17--20 qubits, with negligible bias. Beyond that most circuits are
 censored and the only available test is whether a prediction respects the
 measured upper bound on the label. At 21--24, 25--28 and 29--32 qubits,
 \ClGloCensC\%, \ClGloCensD\% and \ClGloCensE\% of the predictions for
-censored circuits do. Just beyond the resolution limit the model therefore
-predicts a variance that is too large, and at the largest sizes it is
-consistent with the bound. Tree ensembles predict a constant outside their
+censored circuits do. Even at 17--20 qubits, where few global-cost
+circuits are censored, only \ClGloCensB\% of the predictions for those few
+respect the bound. Just beyond the resolution limit the model therefore
+predicts a variance that is too large: it rates the flattest circuits as
+less flat than they are, which is the costly direction for a screening
+tool, and the accuracy quoted above holds for resolved circuits only. At
+the largest sizes the predictions are consistent with the bound. Tree ensembles predict a constant outside their
 training range; their apparent scores on the resolved circuits at large $n$
 (Supplementary Table~S7) reflect the same survivorship and should not be
 read as extrapolation.
@@ -1357,8 +1401,11 @@ becomes impractical, and is unreliable beyond that. The remedy is cheap for
 this family: when the training range is extended to $n\le20$ with Clifford
 labels, the same models predict 21- to 32-qubit circuits with
 $R^2=\ClLeTwentyStruct$ (structured linear), $\ClLeTwentyMLP$ (neural
-network, five seeds) and \ClLeTwentyHGB{} (HGB), because the resolved
-large-$n$ circuits are then within the range of behavior seen in training.
+network, five seeds) and \ClLeTwentyHGB{} (HGB), computed on the \ClLeTwentyResolved{} resolved circuits of the
+\ClLeTwentyTotal{} with $n>20$. That HGB, which cannot extrapolate, scores
+highest shows what this number measures: the resolved large-$n$ circuits
+lie within the range of labels seen in training, so the task has become
+interpolation in label, and the censored circuits are not tested.
 
 \begin{tableorg}[t]
 \centering\tablebodyfont
@@ -1531,8 +1578,8 @@ the observable. Held-out linear is then predicted with $R^2=\LopoLinearUnseen$
 (\LopoCircularSeen), brickwork with \LopoBrickUnseen{} (\LopoBrickSeen), star
 with \LopoStarUnseen{} (\LopoStarSeen), and even all-to-all with
 \LopoAllUnseen{} (\LopoAllSeen), far above the physics-informed control
-(\LopoAllPhys). The classifier is more forgiving still: AUC stays above
-\LopoCircularUnseenAuc{} for every held-out pattern.
+(\LopoAllPhys). The classifier is more forgiving still: AUC is at least
+\LopoMinAuc{} for every held-out pattern.
 
 Two readings follow. First, transfer to a pattern the model has never seen
 is possible when the pattern is described by what it does to the observable
@@ -1588,13 +1635,16 @@ laptop for $n\le12$, suffice to reach the plateau.
 The intended use of the predictor is to rank candidate architectures and
 pass the most promising ones to a more expensive evaluation. A global
 ranking is not an informative test of this use. Every circuit in the dataset
-with $n\le5$ lies above the cutoff, so ranking by qubit count alone selects
+with $n\le\AllAboveMaxN$ lies above the cutoff, as do all but \BelowAtFive{}
+of the \RowsAtFive{} circuits with $n=5$, so ranking by qubit count alone
+selects
 a top fifth that is entirely above the cutoff (\ScreenByNPrec\% precision,
 \ScreenByNRecall\% recall), and the predictor does the same. The informative
 question is whether the predictor ranks circuits correctly \emph{within} a
 fixed qubit count, where size carries no information.
-Table~\ref{tab:screening} answers it with the out-of-fold predictions of
-Section~\ref{sec:cv}. For every $n$ at which both classes occur, the rank
+Table~\ref{tab:screening} answers it with out-of-fold predictions from a
+five-fold architecture-grouped split (a separate fold assignment from the
+one used in Section~\ref{sec:cv}). For every $n$ at which both classes occur, the rank
 correlation between the HGB prediction and the true label lies between
 \ScrSpHGBmin{} and \ScrSpHGBmax, against \ScrSpPhysmin{} to \ScrSpPhysmax{}
 for the five-coefficient model; the structured linear model is again close
@@ -1702,11 +1752,12 @@ substitute.
 (viii)~\emph{Gradient variance is not optimization outcome.} The label measures
 how flat the landscape is on average, not whether training succeeds. As a
 check we trained several hundred fresh circuits from the same design space
-with gradient descent and with Adam, with exact gradients and with gradients
-estimated from 100 or 1\,000 shots, for 200 steps from random starts. At
-$n\le12$ between 94\% and 99\% of circuits reached the ground state of the
-observable regardless of their label, and the rank correlation between the
-label and the loss decrease was between 0.08 and 0.19. At these sizes even
+with gradient descent and with Adam, with exact gradients and with
+gradients estimated from 100 or 1\,000 shots, for 200 steps from random
+starts (four configurations, \TOCircuitsMin{} to \TOCircuitsMax{} circuits
+each; code and results are in the repository). At $n\le12$ between
+\TOFracMin\% and \TOFracMax\% of circuits decreased the cost by more than $0.5$ (of a possible range of $2$) regardless of their label, and the rank correlation between
+the label and the loss decrease was between \TORhoMin{} and \TORhoMax. At these sizes even
 the smallest gradient variances in the dataset correspond to gradient
 components of order $10^{-2}$, which a modest shot budget resolves. The
 predictor should therefore be read as a screen for the gradient-variance
@@ -1740,8 +1791,8 @@ Models with a continuous dependence on qubit count extrapolate to 13- and
 \LargeRsqStruct{} (structured linear); tree ensembles do not extrapolate.
 With exact Clifford labels up to 32 qubits, a model trained on at most
 12 qubits remains accurate for about eight more qubits; for local costs it
-then overestimates the decay, because the causal cone saturates, and
-extending the training range to 20 qubits restores accuracy up to 32.
+then overestimates the decay, because the causal cone saturates, and extending the training range to 20 qubits restores accuracy up to 32
+on the circuits whose variance can be resolved.
 Transfer to an entanglement pattern absent from training succeeds when the
 pattern is described by its effect on the observable and the causal cone
 ($R^2$ between \LopoAllUnseen{} and \LopoCircularUnseen). The predictor is a cheap screening tool for one circuit family.

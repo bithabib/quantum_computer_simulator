@@ -62,6 +62,12 @@ python -m qml_bp.validate_clifford --n-circuits 200 --workers 9 --json paper/qmi
 python -m qml_bp.generate_clifford --n-specs 8000 --qubit-min 2 --qubit-max 12 --workers 9 --seed 2026 --out data_bp/bp_clifford_train.csv
 python -m qml_bp.generate_clifford --n-specs 6000 --qubit-min 13 --qubit-max 32 --workers 9 --seed 2027 --out data_bp/bp_clifford_test.csv
 python -m qml_bp.clifford_study --train data_bp/bp_clifford_train.csv --test data_bp/bp_clifford_test.csv
+# optimization check quoted in the limitations (four budgets)
+python -m qml_bp.training_outcome --data data_bp/bp_dataset_v2.csv --n-circuits 300 --optimizer adam --shots 1000 --workers 9
+python -m qml_bp.training_outcome --data data_bp/bp_dataset_v2.csv --n-circuits 200 --optimizer gd --lr 0.5 --shots 0 --tag _gd_exact --workers 9
+python -m qml_bp.training_outcome --data data_bp/bp_dataset_v2.csv --n-circuits 200 --optimizer gd --lr 0.5 --shots 100 --tag _gd_100shots --workers 9
+python -m qml_bp.training_outcome --data data_bp/bp_dataset_v2.csv --n-circuits 200 --optimizer adam --shots 100 --tag _adam_100shots --workers 9
+python -m qml_bp.training_sweep_table
 
 # 4. inline the numbers into the single-file manuscript and the response letter
 python paper/qmi/fill_numbers.py
@@ -73,7 +79,8 @@ cd paper/qmi && tectonic main.tex && tectonic response_to_reviewers.tex
   `compute_datapoint_all` (v2 label) and `compute_datapoint` (v1 label).
 - `adjoint.py` — exact reverse-mode gradient of a Pauli-Z-string cost with
   respect to every rotation angle, ≈3 forward passes per parameter vector.
-- `generate.py` — parallel dataset generator (multiprocessing, streaming CSV).
+- `generate.py` — parallel dataset generator (multiprocessing; rows are written as
+  they finish; the output file is overwritten at start, runs are not resumable).
   `--label-mode all` (default) or `legacy`.
 - `validate.py` — statevector vs dense-matrix reference; adjoint vs
   parameter-shift; structural zeros are sample-independent.
@@ -88,7 +95,8 @@ cd paper/qmi && tectonic main.tex && tectonic response_to_reviewers.tex
   `clifford_study.py` is the 13-32-qubit extrapolation study.
 - `lopo.py` (unseen entanglement patterns), `eval_large.py` (13-14-qubit
   statevector test set), `extra_experiments.py` (widening gap, learning curve,
-  ranking at fixed n), `training_outcome.py` (exploratory; not in the paper).
+  ranking at fixed n), `training_outcome.py` and `training_sweep_table.py`
+  (the optimization check reported as a limitation in the paper).
 - `train.py`, `compare_models.py`, `describe_data.py` — the v1 scripts
   (row-wise split, permutation importance). Kept for the record; they still run
   on either CSV but are no longer used for the paper.

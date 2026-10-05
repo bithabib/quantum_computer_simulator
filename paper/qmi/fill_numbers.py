@@ -4,8 +4,8 @@ Reads  results/results.json   (from  python -m qml_bp.analyze)
        results/validation.json (from  python -m qml_bp.validate --json ...)
        results/repeat.json     (from  python -m qml_bp.repeat_labels --json ...)
 and rewrites the %%BEGIN-NUMBERS / %%END-NUMBERS macro block and every
-%%BEGIN-TABLE:<name> / %%END-TABLE:<name> block in main.tex and in
-response_to_reviewers.tex, so the single-file manuscript stays self-contained.
+%%BEGIN-TABLE:<name> / %%END-TABLE:<name> block in main.tex, supplement.tex
+and (when present) the letters, so the single-file manuscript stays self-contained.
 
     python paper/qmi/fill_numbers.py
 """
@@ -130,6 +130,22 @@ def main():
             key = name.replace(" ", "").replace("-", "")
             M["RsqCV" + key] = f(cv[name]["r2"][0]); M["AucCV" + key] = f(cc[name]["auc"][0])
             M["RsqExtrap" + key] = f(R["extrap_reg"][name]["r2"])
+    M["CrossLo"] = {6: "six", 7: "seven", 8: "eight"}.get(R["cutoff_cross_lo"], str(R["cutoff_cross_lo"]))
+    M["CrossHi"] = {7: "seven", 8: "eight", 9: "nine"}.get(R["cutoff_cross_hi"], str(R["cutoff_cross_hi"]))
+    M["AllAboveMaxN"] = str(R["all_above_max_n"]); M["BelowAtFive"] = {3: "three"}.get(R["below_cutoff_at_n5"], str(R["below_cutoff_at_n5"]))
+    M["RowsAtFive"] = big(R["rows_at_n5"])
+    import math as _m
+    v_ = R["min_nonstructural_param_var"]; e_ = _m.floor(_m.log10(v_))
+    M["MinParamVar"] = "%.1f\\times10^{%d}" % (v_ / 10 ** e_, e_)
+    M["MinParamGradExp"] = "%d" % round(_m.log10(_m.sqrt(v_)))
+    sw_path = os.path.join(RES, "training_sweep.json")
+    if os.path.exists(sw_path):
+        SW = json.load(open(sw_path))
+        fr = [min(r["frac_pred_barren"], r["frac_pred_trainable"]) for r in SW] + [max(r["frac_pred_barren"], r["frac_pred_trainable"]) for r in SW]
+        rho = [r["spearman_true"] for r in SW] + [r["spearman_pred"] for r in SW]
+        M["TOFracMin"] = pct(min(fr), 0); M["TOFracMax"] = pct(max(fr), 0)
+        M["TORhoMin"] = f(min(rho), 2); M["TORhoMax"] = f(max(rho), 2)
+        M["TOCircuitsMin"] = str(min(r["n"] for r in SW)); M["TOCircuitsMax"] = str(max(r["n"] for r in SW))
     for k in ["N11local", "N11global", "N12local", "N12global", "N11", "N12", "Local", "Global"]:
         M.setdefault("RsqEM" + k, "??"); M.setdefault("MaeEM" + k, "??")
     M.setdefault("RsqExtrapMLPLo", "??"); M.setdefault("RsqExtrapMLPHi", "??")
@@ -194,6 +210,7 @@ def main():
         M["ClValMAD"] = f(C["log10_diff_mad"], 3); M["ClValMax"] = f(C["log10_diff_max"], 2)
         M["ClValStruct"] = big(C["struct_sv_total"]); M["ClValStructHits"] = str(C["struct_with_clifford_hits"])
         M["ClValSamples"] = big(C["cl_samples"]); M["ClValSvSamples"] = str(C["sv_samples"])
+        M["ClValBelow"] = {1: "one"}.get(C["mismatch_zero_circuits"], str(C["mismatch_zero_circuits"]))
     cs_path = os.path.join(RES, "clifford_study.json")
     if os.path.exists(cs_path):
         CS = json.load(open(cs_path)); ov = CS["overall"]
@@ -218,14 +235,17 @@ def main():
         M["ClShallowStructA"] = f(sh["13-16"]["struct"], 2); M["ClShallowStructE"] = f(sh["29-32"]["struct"], 2)
         import math
         M["ClFloorMinExp"] = "%d" % round(math.log10(CS["floor_min"])); M["ClFloorMaxExp"] = "%d" % round(math.log10(CS["floor_max"]))
+        M["ClTrainGenerated"] = big(CS["train_generated"]); M["ClTrainUnresolved"] = str(CS["train_generated"] - CS["train_rows"])
+        M["ClSlack"] = "%g" % CS["censor_slack_log10"]
+        M["ClLeTwentyResolved"] = big(CS["train_le20"]["test_rows"]); M["ClLeTwentyTotal"] = big(CS["train_le20"]["test_total_incl_censored"])
         t20 = CS["train_le20"]
         M["ClLeTwentyStruct"] = f(t20["Structured linear"]["r2"], 2)
         M["ClLeTwentyMLP"] = "%.2f \\pm %.2f" % (t20["MLP_seeds"]["r2_mean"], t20["MLP_seeds"]["r2_sd"])
         M["ClLeTwentyHGB"] = f(t20["Hist Gradient Boosting"]["r2"], 2)
         M["ClAbstractSentence"] = ("With exact Clifford-sampled labels up to 32 qubits, such models stay "
-            "accurate for about eight qubits beyond training; further out they overestimate the decay for "
-            "local costs, whose causal cone saturates, and training up to 20 qubits restores "
-            "$R^2\\approx%.1f$ up to 32." % t20["Structured linear"]["r2"])
+            "accurate on circuits whose variance is resolvable for about eight qubits beyond training; "
+            "further out they overestimate the decay for local costs, whose causal cone saturates, and "
+            "they overestimate the variance of the flattest global-cost circuits.")
     M["ClTargetHits"] = "2\\,000"; M["ClMaxSamples"] = "$2^{20}$"; M["ClResolvedHits"] = "100"
     M.setdefault("ClQmax", "32"); M.setdefault("ClAbstractSentence", "")
     lopo_path = os.path.join(RES, "lopo.json")
@@ -242,6 +262,7 @@ def main():
             M["Lopo%sUnseenMae" % key] = f(lo[name]["unseen_mae"])
             M["Lopo%sUnseenAuc" % key] = f(lo[name]["unseen_auc"])
             M["Lopo%sNoPhys" % key] = f(lo[name]["unseen_r2_no_physics"])
+        M["LopoMinAuc"] = f(min(v["unseen_auc"] for v in lo.values()), 2)
     else:
         for k in ["LopoExtraRows", "LopoDescRsq", "LopoIndexRsq"] + [
                 "Lopo%s%s" % (a, b) for a in ["Linear", "Circular", "All", "Brick", "Star"]

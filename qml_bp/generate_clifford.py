@@ -17,12 +17,10 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from qml_bp.ansatz import sample_spec
+from qml_bp.ansatz import FEATURE_COLUMNS, sample_spec
 from qml_bp.clifford import estimate
 
-_COLUMNS = [
-    "n_qubits", "n_layers", "n_params", "ansatz_type", "entangle_pattern",
-    "entangler_gate", "cost_global", "n_entanglers", "depth_ratio",
+_COLUMNS = list(FEATURE_COLUMNS) + [
     "samples", "total_hits", "var_mean_all", "log_var_all", "rel_se",
     "resolved", "n_zero_hit", "frac_zero_hit", "resolution_floor",
 ]

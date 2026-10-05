@@ -1034,5 +1034,11 @@
    "mean_label": -2.128566223718332,
    "rows": 443
   }
- ]
+ ],
+ "cutoff_cross_lo": 7,
+ "cutoff_cross_hi": 8,
+ "all_above_max_n": 4,
+ "below_cutoff_at_n5": 3,
+ "rows_at_n5": 1745,
+ "min_nonstructural_param_var": 2.54933050758181e-09
 }

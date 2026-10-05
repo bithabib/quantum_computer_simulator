@@ -1,8 +1,9 @@
 """Generate a barren-plateau trainability dataset in parallel.
 
 Each row = one random circuit spec + its measured gradient variance (the label).
-Work is spread across CPU cores; rows are streamed to a CSV as they complete, so
-a long run can be interrupted and resumed-by-appending without losing progress.
+Work is spread across CPU cores; rows are written to a CSV as they complete, so
+partial output can be inspected while a long run is in progress.  (The output
+file is overwritten at start; runs are not resumable.)
 
 Example (big run on an M4, ~10 cores):
 
@@ -23,15 +24,11 @@ from multiprocessing import Pool
 
 import numpy as np
 
-from qml_bp.ansatz import (ALL_PARAM_COLUMNS, compute_datapoint,
+from qml_bp.ansatz import (ALL_PARAM_COLUMNS, FEATURE_COLUMNS, compute_datapoint,
                            compute_datapoint_all, sample_spec)
 
 # Column order written to CSV.
-_COLUMNS = [
-    "n_qubits", "n_layers", "n_params", "ansatz_type", "entangle_pattern",
-    "entangler_gate", "cost_global", "n_entanglers", "depth_ratio",
-    "grad_mean", "grad_var", "log_grad_var", "samples",
-]
+_COLUMNS = list(FEATURE_COLUMNS) + ["grad_mean", "grad_var", "log_grad_var", "samples"]
 
 # Config shared with worker processes (set in the initializer to avoid pickling
 # it on every task).

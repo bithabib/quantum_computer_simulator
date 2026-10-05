@@ -140,7 +140,9 @@ def main():
     both = pd.concat([tr, te], ignore_index=True)
     m_tr = both.n_qubits <= 20; m_te = both.n_qubits > 20
     X2, y2 = both[FEATURE_COLUMNS].to_numpy(float), both.log_var_all.to_numpy(float)
-    R["train_le20"] = {"train_rows": int(m_tr.sum()), "test_rows": int(m_te.sum())}
+    R["train_le20"] = {"train_rows": int(m_tr.sum()), "test_rows": int(m_te.sum()),
+                       "test_total_incl_censored": int((te_all.n_qubits > 20).sum())}
+    R["train_generated"] = int(len(tr_all)); R["censor_slack_log10"] = 0.3
     for name, make in models.items():
         p = make().fit(X2[m_tr], y2[m_tr]).predict(X2[m_te])
         R["train_le20"][name] = {"r2": float(r2_score(y2[m_te], p)), "mae": float(mean_absolute_error(y2[m_te], p))}

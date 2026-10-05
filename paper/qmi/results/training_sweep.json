@@ -1,0 +1,62 @@
+[
+ {
+  "tag": "_gd_exact",
+  "label": "GD, exact gradients",
+  "n": 199,
+  "steps": 200,
+  "lr": 0.5,
+  "shots": 0,
+  "optimizer": "gd",
+  "spearman_true": 0.1399375666209837,
+  "spearman_pred": 0.133162072926031,
+  "dC_pred_barren": 0.929448185722368,
+  "dC_pred_trainable": 1.0020743815227575,
+  "frac_pred_barren": 0.9659090909090909,
+  "frac_pred_trainable": 0.990990990990991
+ },
+ {
+  "tag": "_gd_100shots",
+  "label": "GD, 100 shots",
+  "n": 199,
+  "steps": 200,
+  "lr": 0.5,
+  "shots": 100,
+  "optimizer": "gd",
+  "spearman_true": 0.1942865844373382,
+  "spearman_pred": 0.17247912763787135,
+  "dC_pred_barren": 0.9325432517209241,
+  "dC_pred_trainable": 1.0188991008312085,
+  "frac_pred_barren": 0.9659090909090909,
+  "frac_pred_trainable": 0.963963963963964
+ },
+ {
+  "tag": "",
+  "label": "Adam, 1000 shots",
+  "n": 299,
+  "steps": 200,
+  "lr": 0.05,
+  "shots": 1000,
+  "optimizer": "adam",
+  "spearman_true": 0.08876792889048506,
+  "spearman_pred": 0.07590787855934762,
+  "dC_pred_barren": 0.959692722829153,
+  "dC_pred_trainable": 0.9989120413833165,
+  "frac_pred_barren": 0.976,
+  "frac_pred_trainable": 0.9655172413793104
+ },
+ {
+  "tag": "_adam_100shots",
+  "label": "Adam, 100 shots",
+  "n": 199,
+  "steps": 200,
+  "lr": 0.05,
+  "shots": 100,
+  "optimizer": "adam",
+  "spearman_true": 0.18989645195675348,
+  "spearman_pred": 0.16774713253660897,
+  "dC_pred_barren": 0.9287171826652486,
+  "dC_pred_trainable": 1.023206544403077,
+  "frac_pred_barren": 0.9431818181818182,
+  "frac_pred_trainable": 0.963963963963964
+ }
+]

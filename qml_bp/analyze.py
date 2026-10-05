@@ -300,6 +300,18 @@ def write(path, lines):
     print("wrote", path)
 
 
+def dataset_facts(df, raw, cutoff):
+    """Small facts quoted verbatim in the text."""
+    mean_by_n = df.groupby("n_qubits").log_var.mean()
+    above = [int(n) for n in mean_by_n.index if mean_by_n[n] >= cutoff]
+    below_small = {int(n): int((g.log_var < cutoff).sum()) for n, g in df[df.n_qubits <= 5].groupby("n_qubits")}
+    all_above = [n for n, c in below_small.items() if c == 0]
+    return {"cutoff_cross_lo": max(above), "cutoff_cross_hi": max(above) + 1,
+            "all_above_max_n": max(all_above),
+            "below_cutoff_at_n5": below_small.get(5, 0), "rows_at_n5": int((df.n_qubits == 5).sum()),
+            "min_nonstructural_param_var": float(raw.var_min_nz.min())}
+
+
 # ------------------------------------------------------------- analysis ---
 def main():
     ap = argparse.ArgumentParser()
@@ -537,6 +549,8 @@ def main():
         "full": ms(full), "primitive": ms(prim),
         "add": {k: {"r2": ms(v), "delta": ms(np.array(v) - np.array(prim))} for k, v in ap_add.items()},
         "drop": {NICE_P[c]: {"r2": ms(v), "delta": ms(np.array(prim) - np.array(v))} for c, v in ap_drop.items()}}
+
+    R.update(dataset_facts(df, raw, args.cutoff))
 
     # ---- 6. nominal vs effective observable weight (n >= 10) -----------
     R["gate_gap"] = float(abs(df[df.entangler_gate == 1].log_var.mean() - df[df.entangler_gate == 0].log_var.mean()))

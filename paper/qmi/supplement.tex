@@ -202,6 +202,19 @@
 \newcommand{\RsqCVLinearbaseline}{0.891}
 \newcommand{\AucCVLinearbaseline}{0.984}
 \newcommand{\RsqExtrapLinearbaseline}{0.755}
+\newcommand{\CrossLo}{seven}
+\newcommand{\CrossHi}{eight}
+\newcommand{\AllAboveMaxN}{4}
+\newcommand{\BelowAtFive}{three}
+\newcommand{\RowsAtFive}{1\,745}
+\newcommand{\MinParamVar}{2.5\times10^{-9}}
+\newcommand{\MinParamGradExp}{-4}
+\newcommand{\TOFracMin}{94}
+\newcommand{\TOFracMax}{99}
+\newcommand{\TORhoMin}{0.08}
+\newcommand{\TORhoMax}{0.19}
+\newcommand{\TOCircuitsMin}{199}
+\newcommand{\TOCircuitsMax}{299}
 \newcommand{\ScreenSpearman}{0.989}
 \newcommand{\ScreenTrainableFrac}{57.4}
 \newcommand{\ScreenPrecFifty}{99.7}
@@ -310,6 +323,7 @@
 \newcommand{\ClValStructHits}{0}
 \newcommand{\ClValSamples}{65\,536}
 \newcommand{\ClValSvSamples}{400}
+\newcommand{\ClValBelow}{one}
 \newcommand{\ClTrainRows}{7\,941}
 \newcommand{\ClTestRows}{6\,000}
 \newcommand{\ClResolved}{4\,370}
@@ -366,10 +380,15 @@
 \newcommand{\ClShallowStructE}{-2.52}
 \newcommand{\ClFloorMinExp}{-7}
 \newcommand{\ClFloorMaxExp}{-5}
+\newcommand{\ClTrainGenerated}{8\,000}
+\newcommand{\ClTrainUnresolved}{59}
+\newcommand{\ClSlack}{0.3}
+\newcommand{\ClLeTwentyResolved}{2\,045}
+\newcommand{\ClLeTwentyTotal}{3\,611}
 \newcommand{\ClLeTwentyStruct}{0.90}
 \newcommand{\ClLeTwentyMLP}{0.85 \pm 0.07}
 \newcommand{\ClLeTwentyHGB}{0.94}
-\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits, such models stay accurate for about eight qubits beyond training; further out they overestimate the decay for local costs, whose causal cone saturates, and training up to 20 qubits restores $R^2\approx0.9$ up to 32.}
+\newcommand{\ClAbstractSentence}{With exact Clifford-sampled labels up to 32 qubits, such models stay accurate on circuits whose variance is resolvable for about eight qubits beyond training; further out they overestimate the decay for local costs, whose causal cone saturates, and they overestimate the variance of the flattest global-cost circuits.}
 \newcommand{\ClTargetHits}{2\,000}
 \newcommand{\ClMaxSamples}{$2^{20}$}
 \newcommand{\ClResolvedHits}{100}
@@ -407,6 +426,7 @@
 \newcommand{\LopoStarUnseenMae}{0.156}
 \newcommand{\LopoStarUnseenAuc}{0.996}
 \newcommand{\LopoStarNoPhys}{0.742}
+\newcommand{\LopoMinAuc}{0.97}
 %%END-NUMBERS
 
 \raggedbottom
