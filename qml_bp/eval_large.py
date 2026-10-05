@@ -21,6 +21,20 @@ from qml_bp.ansatz import FEATURE_COLUMNS
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
+def write_short_table(R, outdir):
+    """Four-model version of the table for the main text."""
+    lines = ["\\begin{tabular}{lcccccc}", "\\toprule",
+             "Model & $R^2$ [95\\% CI] & MAE & $R^2$, $n=13$ & $R^2$, $n=14$ & $R^2$, local & $R^2$, global \\\\", "\\midrule"]
+    for name in ["MLP", "Structured linear", "Hist Gradient Boosting", "Physics-informed linear"]:
+        e = R["models"][name]; pn = e["per_n"]
+        g = lambda k: (pn.get(k) or pn.get(str(k)))["r2"]
+        lines.append("%s & %.3f [%.3f, %.3f] & %.3f & %.3f & %.3f & %.3f & %.3f \\\\" % (
+            name, e["r2"], e["r2_ci"][0], e["r2_ci"][1], e["mae"], g(13), g(14),
+            e["per_cost"]["local"]["r2"], e["per_cost"]["global"]["r2"]))
+    lines += ["\\botrule", "\\end{tabular}"]
+    open(os.path.join(outdir, "table_large_short.tex"), "w").write("\n".join(lines) + "\n")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--train", required=True)
@@ -85,6 +99,7 @@ def main():
             e["per_cost"]["local"]["r2"], e["per_cost"]["global"]["r2"]))
     lines += ["\\botrule", "\\end{tabular}"]
     open(os.path.join(args.outdir, "table_large.tex"), "w").write("\n".join(lines) + "\n")
+    write_short_table(R, args.outdir)
 
     import matplotlib
     matplotlib.use("Agg")

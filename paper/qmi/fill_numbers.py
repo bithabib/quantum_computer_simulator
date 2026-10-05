@@ -319,7 +319,7 @@ def main():
     tables = {}
     for t in ["datastats", "labelbydesign", "grouped_cv", "extrap", "extrap_breakdown",
               "ablation", "cutoff", "lopo", "gap", "screening_within", "large", "effweight",
-              "clifford", "clifford_cost", "horizon", "families", "tuning"]:
+              "clifford", "clifford_cost", "horizon", "families", "tuning", "large_short"]:
         tp = os.path.join(RES, "table_%s.tex" % t)
         body = open(tp).read().strip() if os.path.exists(tp) else "% (pending)"
         # never let a generated table exceed the text width
