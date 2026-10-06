@@ -1,0 +1,139 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 10: Gates for one qubit</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> A gate is a unitary matrix that turns the qubit's arrow. Six gates cover
+        almost everything: X, Y, Z, H, S and T. The Hadamard gate H makes superposition, and applying it twice
+        shows interference in action.
+    </div>
+
+    <h2>What a gate is</h2>
+    <p>
+        A classical computer has NOT, AND, OR. A quantum computer has <strong>gates</strong>, and each gate is
+        a unitary matrix from Chapter 7. To apply a gate, multiply the matrix by the state column. Because the
+        matrix is unitary, the arrow stays a unit vector. Because matrices are linear, a gate acts on
+        <em>both parts</em> of a superposition at the same time. That last sentence is where the speed comes from.
+    </p>
+
+    <h2>The Pauli gates: X, Y, Z</h2>
+    <p>Three gates named after Wolfgang Pauli. You met two in Chapter 3.</p>
+    \[ X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}, \qquad
+       Y = \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix}, \qquad
+       Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix} \]
+    <ul>
+        <li><strong>X</strong> is the quantum NOT. \( X|0\rangle = |1\rangle \), \( X|1\rangle = |0\rangle \). On a superposition it swaps the amplitudes: \( X(\alpha|0\rangle + \beta|1\rangle) = \beta|0\rangle + \alpha|1\rangle \). On the Bloch sphere it is a half turn about the \( x \) axis.</li>
+        <li><strong>Z</strong> flips the sign of \( |1\rangle \): \( Z(\alpha|0\rangle + \beta|1\rangle) = \alpha|0\rangle - \beta|1\rangle \). A relative phase of \( \pi \). It turns \( |+\rangle \) into \( |-\rangle \). Half turn about the \( z \) axis.</li>
+        <li><strong>Y</strong> does both at once with a factor of \( i \): \( Y|0\rangle = i|1\rangle \), \( Y|1\rangle = -i|0\rangle \). Half turn about the \( y \) axis. You will use it rarely.</li>
+    </ul>
+    <p>
+        Each one is its own inverse: \( XX = YY = ZZ = I \). Each is also <em>Hermitian</em>, meaning
+        \( M^\dagger = M \) (check \( Y \): transpose swaps the \( -i \) and \( i \), conjugating swaps them back).
+        Hermitian matrices are the things you can measure, which is why "measure \( Z \)" made sense in Chapter 9.
+    </p>
+
+    <h2>The Hadamard gate: H</h2>
+    <p>This is the most important gate in the book.</p>
+    \[ H = \frac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} \]
+    <p>Use the column rule from Chapter 3. The first column is where \( |0\rangle \) goes, the second is where \( |1\rangle \) goes:</p>
+    \[ H|0\rangle = \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ 1 \end{pmatrix} = |+\rangle, \qquad
+       H|1\rangle = \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ -1 \end{pmatrix} = |-\rangle \]
+    <p>
+        \( H \) turns a definite bit into an equal superposition. That is how every quantum algorithm starts:
+        put \( H \) on every qubit and you have all \( 2^n \) bit patterns at once, each with the same amplitude
+        (Chapter 11 shows how several qubits combine).
+    </p>
+    <p>
+        \( H \) also goes the other way. Since \( H \) is real and symmetric, \( H^\dagger = H \), and you can
+        check that \( HH = I \):
+    </p>
+    \[ HH = \frac{1}{2}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix}
+         = \frac{1}{2}\begin{pmatrix} 1 + 1 & 1 - 1 \\ 1 - 1 & 1 + 1 \end{pmatrix}
+         = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} \]
+    <p>So \( H|+\rangle = |0\rangle \) and \( H|-\rangle = |1\rangle \). That is the "plus/minus measurement" trick from Chapter 9.</p>
+
+    <h2>Interference, seen up close</h2>
+    <p>
+        Follow \( |0\rangle \) through two H gates, amplitude by amplitude, and watch Chapter 6 happen.
+    </p>
+    <p>After the first \( H \): \( \tfrac{1}{\sqrt{2}}|0\rangle + \tfrac{1}{\sqrt{2}}|1\rangle \). Now apply the second \( H \) to each part separately (linearity):</p>
+    \[ \tfrac{1}{\sqrt{2}}\,H|0\rangle = \tfrac{1}{\sqrt{2}}\cdot\tfrac{1}{\sqrt{2}}(|0\rangle + |1\rangle) = \tfrac{1}{2}|0\rangle + \tfrac{1}{2}|1\rangle \]
+    \[ \tfrac{1}{\sqrt{2}}\,H|1\rangle = \tfrac{1}{\sqrt{2}}\cdot\tfrac{1}{\sqrt{2}}(|0\rangle - |1\rangle) = \tfrac{1}{2}|0\rangle - \tfrac{1}{2}|1\rangle \]
+    <p>Add them up:</p>
+    \[ \left(\tfrac{1}{2} + \tfrac{1}{2}\right)|0\rangle + \left(\tfrac{1}{2} - \tfrac{1}{2}\right)|1\rangle = |0\rangle \]
+    <p>
+        Two paths lead to \( |1\rangle \): "0 then 1" with amplitude \( +\tfrac{1}{2} \), and "1 then 1" with
+        amplitude \( -\tfrac{1}{2} \). They cancel. Two paths lead to \( |0\rangle \), both \( +\tfrac{1}{2} \).
+        They add. Destructive interference on the wrong answer, constructive on the right one. In ordinary
+        probability, two coin flips in a row can never give a certain result. In quantum computing they just did.
+    </p>
+    <div class="note">
+        If you insert a \( Z \) between the two \( H \) gates, the \( |1\rangle \) part gets a minus sign, the
+        cancellation swaps over, and the output is \( |1\rangle \) with certainty. Three gates, and a hidden
+        phase became a visible bit. Chapter 12 builds a whole algorithm out of exactly this.
+    </div>
+
+    <h2>Phase gates: S and T</h2>
+    <p>These leave \( |0\rangle \) alone and turn the phase of \( |1\rangle \):</p>
+    \[ S = \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}, \qquad
+       T = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{pmatrix} \]
+    <p>
+        \( S \) turns the \( |1\rangle \) amplitude by 90 degrees, \( T \) by 45 degrees. So \( TT = S \),
+        \( SS = Z \), and \( TTTT = Z \). On the Bloch sphere, all three are turns about the \( z \) axis: a
+        quarter, an eighth, and a half. Their inverses are written \( S^\dagger \) and \( T^\dagger \) and turn
+        the other way.
+    </p>
+    <p>
+        Both are special cases of the general <strong>phase gate</strong> \( P(\lambda) \), which turns the
+        \( |1\rangle \) amplitude by any angle \( \lambda \): \( S = P(\pi/2) \), \( T = P(\pi/4) \), \( Z = P(\pi) \).
+        In the Lab it is <code>qc.p(lam, q)</code>.
+    </p>
+    \[ P(\lambda) = \begin{pmatrix} 1 & 0 \\ 0 & e^{i\lambda} \end{pmatrix} \]
+    <p>Build the plus-i state from Chapter 8:</p>
+    \[ S\,H|0\rangle = S|+\rangle = \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}\begin{pmatrix} 1 \\ 1 \end{pmatrix}
+       = \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ i \end{pmatrix} = |{+i}\rangle \]
+
+    <h2>Rotation gates, for any angle</h2>
+    <p>
+        The gates above are fixed turns. For any angle, there are rotation gates about each axis of the Bloch
+        sphere. The one about \( y \) is the Chapter 3 rotation with half angles (the Bloch sphere's doubling again):
+    </p>
+    \[ R_y(\theta) = \begin{pmatrix} \cos\tfrac{\theta}{2} & -\sin\tfrac{\theta}{2} \\ \sin\tfrac{\theta}{2} & \cos\tfrac{\theta}{2} \end{pmatrix},
+       \qquad R_y(\theta)|0\rangle = \cos\tfrac{\theta}{2}|0\rangle + \sin\tfrac{\theta}{2}|1\rangle \]
+    <p>
+        Pick \( \theta \) and you can set the chance of measuring 1 to \( \sin^2\tfrac{\theta}{2} \), anything
+        from 0 to 1. \( R_x \) and \( R_z \) do the same about the other axes. These are the adjustable gates
+        that get "trained" in Chapter 4's learning story. Any single-qubit gate at all can be built from three
+        rotations, so this list is complete.
+    </p>
+
+    <h2>A gate table</h2>
+    <table class="summary">
+        <tr><th>Gate</th><th>Matrix</th><th>On \( |0\rangle \)</th><th>On \( |1\rangle \)</th><th>Bloch sphere</th></tr>
+        <tr><td>X</td><td>\( \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} \)</td><td>\( |1\rangle \)</td><td>\( |0\rangle \)</td><td>half turn about \( x \)</td></tr>
+        <tr><td>Z</td><td>\( \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix} \)</td><td>\( |0\rangle \)</td><td>\( -|1\rangle \)</td><td>half turn about \( z \)</td></tr>
+        <tr><td>Y</td><td>\( \begin{pmatrix} 0 & -i \\ i & 0 \end{pmatrix} \)</td><td>\( i|1\rangle \)</td><td>\( -i|0\rangle \)</td><td>half turn about \( y \)</td></tr>
+        <tr><td>H</td><td>\( \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \\ 1 & -1 \end{pmatrix} \)</td><td>\( |+\rangle \)</td><td>\( |-\rangle \)</td><td>half turn about the \( x{+}z \) diagonal</td></tr>
+        <tr><td>S</td><td>\( \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix} \)</td><td>\( |0\rangle \)</td><td>\( i|1\rangle \)</td><td>quarter turn about \( z \)</td></tr>
+        <tr><td>T</td><td>\( \begin{pmatrix} 1 & 0 \\ 0 & e^{i\pi/4} \end{pmatrix} \)</td><td>\( |0\rangle \)</td><td>\( e^{i\pi/4}|1\rangle \)</td><td>eighth turn about \( z \)</td></tr>
+    </table>
+
+    <div class="try-it">
+        <strong>Try it.</strong> Three <a href="/programming">Quantum Lab</a> challenges use only this chapter:
+        <em>Flip the bit</em> (one X), <em>The minus state</em> (X then H: check that \( H|1\rangle = |-\rangle \)),
+        and <em>The +i state</em> (H then S, as worked above). Write each as lines like <code>qc.x(0)</code>,
+        <code>qc.h(0)</code>, <code>qc.s(0)</code>. The lab checks the exact state, phase included.
+        Then on the <a href="/gate">Gate Simulator</a>, apply H, then Z, then H, and confirm the qubit ends in 1.
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> What is \( HZH \)? Work it out on \( |0\rangle \) and \( |1\rangle \).</p>
+        <p><strong>A1.</strong> \( HZH|0\rangle = HZ|+\rangle = H|-\rangle = |1\rangle \), and \( HZH|1\rangle = |0\rangle \). So \( HZH = X \). The H gates swap the roles of the \( x \) and \( z \) axes.</p>
+        <p><strong>Q2.</strong> What does \( S \) do to \( |-\rangle \)?</p>
+        <p><strong>A2.</strong> \( \tfrac{1}{\sqrt{2}}(|0\rangle - i|1\rangle) \), the minus-i state, on the equator along \( -y \).</p>
+        <p><strong>Q3.</strong> Which gate turns \( |+\rangle \) into \( |-\rangle \)?</p>
+        <p><strong>A3.</strong> \( Z \). (Also \( SS \), or \( TTTT \).)</p>
+    </details>
+</div>
+{% endraw %}

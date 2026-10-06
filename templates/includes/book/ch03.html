@@ -1,0 +1,168 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 3: Machines that move arrows (matrices)</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> A matrix is a machine. You feed it an arrow, it gives back a new arrow.
+        Every quantum gate is a matrix. Matrices multiply by a simple "row times column" rule.
+    </div>
+
+    <h2>A flipping machine</h2>
+    <p>
+        Imagine a machine that swaps east and north. Feed it "3 east, 4 north" and it returns "4 east, 3 north".
+        We can write that machine as a square grid of four numbers:
+    </p>
+    \[ X = \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} \]
+    <p>
+        This grid is a <strong>matrix</strong>. To use it, we multiply it by the arrow.
+    </p>
+
+    <h2>The one rule: row times column</h2>
+    <p>
+        To multiply a matrix by a vector, take each <em>row</em> of the matrix, lay it along the vector's
+        <em>column</em>, multiply matching entries, and add. The first row gives the first entry of the
+        answer, the second row gives the second.
+    </p>
+    \[ \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix} \begin{pmatrix} 3 \\ 4 \end{pmatrix}
+       = \begin{pmatrix} 0 \times 3 + 1 \times 4 \\ 1 \times 3 + 0 \times 4 \end{pmatrix}
+       = \begin{pmatrix} 4 \\ 3 \end{pmatrix} \]
+    <p>
+        It swapped them. Each row is a dot product with the input arrow, nothing more. In general:
+    </p>
+    \[ \begin{pmatrix} a & b \\ c & d \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix}
+       = \begin{pmatrix} ax + by \\ cx + dy \end{pmatrix} \]
+
+    <h2>What the columns tell you</h2>
+    <p>
+        Here is a shortcut that makes matrices much less mysterious. Feed the machine the basis arrow
+        \( |0\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix} \):
+    </p>
+    \[ \begin{pmatrix} a & b \\ c & d \end{pmatrix} \begin{pmatrix} 1 \\ 0 \end{pmatrix} = \begin{pmatrix} a \\ c \end{pmatrix} \]
+    <p>
+        You get the <em>first column</em>. Feed it \( |1\rangle \) and you get the second column. So:
+    </p>
+    <div class="note">
+        The first column of a matrix is where it sends \( |0\rangle \). The second column is where it sends
+        \( |1\rangle \). Because every arrow is a mix of \( |0\rangle \) and \( |1\rangle \), knowing those two
+        answers tells you everything the machine does.
+    </div>
+    <p>
+        Look at \( X \) again: its first column is \( \begin{pmatrix} 0 \\ 1 \end{pmatrix} = |1\rangle \) and its
+        second column is \( |0\rangle \). So \( X \) sends 0 to 1 and 1 to 0. It is a NOT gate. In Chapter 10 it
+        will be the first quantum gate you meet.
+    </p>
+
+    <h2>Some machines worth knowing</h2>
+    <p><strong>The do-nothing machine</strong> (identity):</p>
+    \[ I = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix}, \qquad I \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} x \\ y \end{pmatrix} \]
+    <p><strong>The sign-flip machine</strong>: keeps \( |0\rangle \), turns \( |1\rangle \) into \( -|1\rangle \).</p>
+    \[ Z = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix}, \qquad Z \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} x \\ -y \end{pmatrix} \]
+    <p><strong>The rotation machine</strong>: turns every arrow anticlockwise by an angle \( \theta \).</p>
+    \[ R(\theta) = \begin{pmatrix} \cos\theta & -\sin\theta \\ \sin\theta & \cos\theta \end{pmatrix} \]
+    <p>
+        Check it with the column rule: the first column is \( (\cos\theta, \sin\theta) \), which is exactly
+        where the east arrow lands after turning by \( \theta \). Rotations keep lengths the same. Machines that
+        keep lengths the same are the only ones allowed in quantum computing, because a quantum state must stay
+        a unit vector. Such matrices are called <strong>unitary</strong>.
+    </p>
+
+    <h2>Two machines in a row</h2>
+    <p>
+        Apply \( X \) and then \( Z \) to an arrow. You can do it in two steps:
+    </p>
+    \[ X \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} y \\ x \end{pmatrix}, \qquad
+       Z \begin{pmatrix} y \\ x \end{pmatrix} = \begin{pmatrix} y \\ -x \end{pmatrix} \]
+    <p>
+        Or you can build one combined machine by multiplying the two matrices. The rule is the same as before:
+        each entry of the answer is a row of the left matrix dotted with a column of the right matrix.
+    </p>
+    \[ ZX = \begin{pmatrix} 1 & 0 \\ 0 & -1 \end{pmatrix} \begin{pmatrix} 0 & 1 \\ 1 & 0 \end{pmatrix}
+         = \begin{pmatrix} 1\cdot 0 + 0 \cdot 1 & 1 \cdot 1 + 0 \cdot 0 \\ 0 \cdot 0 + (-1) \cdot 1 & 0 \cdot 1 + (-1) \cdot 0 \end{pmatrix}
+         = \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \]
+    <p>
+        Check: \( \begin{pmatrix} 0 & 1 \\ -1 & 0 \end{pmatrix} \begin{pmatrix} x \\ y \end{pmatrix} = \begin{pmatrix} y \\ -x \end{pmatrix} \).
+        Same answer, one step.
+    </p>
+    <div class="note">
+        <strong>Order matters.</strong> \( ZX \) means "do \( X \) first, then \( Z \)". The matrix nearest the
+        arrow acts first. Try computing \( XZ \) yourself: you get \( \begin{pmatrix} 0 & -1 \\ 1 & 0 \end{pmatrix} \),
+        which is different. Putting on socks then shoes is not the same as shoes then socks.
+    </div>
+
+    <h2>Undoing a machine</h2>
+    <p>
+        \( X \) swaps the two entries. Doing it twice swaps them back. So \( XX = I \): \( X \) is its own undo.
+        The same is true of \( Z \). A machine that undoes \( M \) is written \( M^{-1} \), the
+        <strong>inverse</strong>. Every quantum gate has an inverse, because a quantum computer must be able to
+        run backwards. For a rotation by \( \theta \), the inverse is a rotation by \( -\theta \).
+    </p>
+
+    <h2>Flipping a matrix over: the transpose</h2>
+    <p>
+        Swap the rows and columns of a matrix and you get its <strong>transpose</strong>, written \( M^T \):
+    </p>
+    \[ \begin{pmatrix} a & b \\ c & d \end{pmatrix}^T = \begin{pmatrix} a & c \\ b & d \end{pmatrix} \]
+    <p>
+        For a rotation, the transpose is the inverse: \( R(\theta)^T = R(-\theta) \). (Check: swapping rows and
+        columns moves the minus sign from the top right to the bottom left, which is what changing the sign of
+        \( \theta \) does.) In Chapter 7 we add one more step, the complex conjugate, and get the "dagger"
+        \( M^\dagger \), which is the inverse of every quantum gate.
+    </p>
+
+    <h2>Arrows a machine does not turn: eigenvectors</h2>
+    <p>
+        Feed \( Z \) the arrow \( |0\rangle \). It comes back unchanged. Feed it \( |1\rangle \). It comes back
+        as \( -|1\rangle \): same line, flipped direction. For these two arrows, \( Z \) only stretches or flips,
+        it never turns them off their line. Such arrows are the machine's <strong>eigenvectors</strong>, and the
+        stretch factor (here \( +1 \) and \( -1 \)) is the <strong>eigenvalue</strong>.
+    </p>
+    \[ Z|0\rangle = (+1)|0\rangle, \qquad Z|1\rangle = (-1)|1\rangle \]
+    <p>
+        Now try \( X \). It swaps entries, so \( |0\rangle \) and \( |1\rangle \) are definitely turned. But look
+        at the arrow with equal entries:
+    </p>
+    \[ X \begin{pmatrix} 1 \\ 1 \end{pmatrix} = \begin{pmatrix} 1 \\ 1 \end{pmatrix}, \qquad
+       X \begin{pmatrix} 1 \\ -1 \end{pmatrix} = \begin{pmatrix} -1 \\ 1 \end{pmatrix} = -\begin{pmatrix} 1 \\ -1 \end{pmatrix} \]
+    <p>
+        So \( X \) has eigenvectors \( (1, 1) \) and \( (1, -1) \) with eigenvalues \( +1 \) and \( -1 \).
+        Normalised, these are the famous "plus" and "minus" states of Chapter 8:
+    </p>
+    \[ |+\rangle = \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ 1 \end{pmatrix}, \qquad
+       |-\rangle = \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ -1 \end{pmatrix} \]
+    <p>
+        Why care? When you measure a qubit, the possible answers are exactly the eigenvectors of the thing you
+        measure, and the number you read out is the eigenvalue. Chapter 9 makes this concrete.
+    </p>
+
+    <h2>How to find eigenvectors (the honest method)</h2>
+    <p>
+        For small matrices you can guess, as we just did. The general method, which you will meet in later
+        maths courses, is: an eigenvector \( v \) with eigenvalue \( \lambda \) satisfies \( Mv = \lambda v \),
+        which can be rearranged to \( (M - \lambda I) v = 0 \). A non-zero \( v \) exists only when the
+        <em>determinant</em> of \( M - \lambda I \) is zero. For a 2 by 2 matrix
+        \( \begin{pmatrix} a & b \\ c & d \end{pmatrix} \) the determinant is \( ad - bc \). For \( Z \):
+    </p>
+    \[ \det \begin{pmatrix} 1-\lambda & 0 \\ 0 & -1-\lambda \end{pmatrix} = (1-\lambda)(-1-\lambda) = 0
+       \quad\Rightarrow\quad \lambda = 1 \text{ or } \lambda = -1 \]
+    <p>
+        Then put each \( \lambda \) back in and solve for \( v \). You do not need this method to follow the
+        rest of the book, but it is there if you want it.
+    </p>
+
+    <div class="try-it">
+        <strong>Try it.</strong> On the <a href="/gate">Gate Simulator</a>, apply X to the starting qubit and
+        watch the arrow swap from 0 to 1. Apply X again and it swaps back: \( XX = I \). Then try Z on the
+        starting qubit. Nothing visible happens, because \( |0\rangle \) is an eigenvector of Z.
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> Compute \( \begin{pmatrix} 2 & 1 \\ 0 & 3 \end{pmatrix} \begin{pmatrix} 1 \\ 2 \end{pmatrix} \).</p>
+        <p><strong>A1.</strong> \( \begin{pmatrix} 2 \cdot 1 + 1 \cdot 2 \\ 0 \cdot 1 + 3 \cdot 2 \end{pmatrix} = \begin{pmatrix} 4 \\ 6 \end{pmatrix} \).</p>
+        <p><strong>Q2.</strong> What is \( ZZ \)?</p>
+        <p><strong>A2.</strong> \( I \). Flipping the sign of the second entry twice gives it back.</p>
+        <p><strong>Q3.</strong> Is \( |1\rangle \) an eigenvector of \( X \)?</p>
+        <p><strong>A3.</strong> No. \( X|1\rangle = |0\rangle \), which is a different line, not a stretched \( |1\rangle \).</p>
+    </details>
+</div>
+{% endraw %}

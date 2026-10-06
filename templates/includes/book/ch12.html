@@ -1,0 +1,162 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 12: Circuits and a first algorithm (Deutsch)</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> A quantum program is a circuit: qubits as wires, gates in time order. Deutsch's
+        algorithm answers a question about a mystery function in one look where a classical computer needs two.
+        The trick is interference: H, the mystery box, H.
+    </div>
+
+    <h2>Reading a circuit</h2>
+    <p>
+        A circuit diagram has one horizontal wire per qubit, time running left to right, and gates drawn as
+        boxes on the wires. A CNOT is a dot on the control wire joined to a circled plus on the target wire.
+        A meter symbol at the end is a measurement. The Bell pair circuit from Chapter 11 is:
+    </p>
+<pre class="circuit">
+q0: ─ H ─●─ M
+         │
+q1: ─────⊕─ M
+</pre>
+    <p>
+        Read: H on qubit 0, then CNOT with control 0 and target 1, then measure both. The simulator's
+        <code>draw()</code> prints the same thing as a list of lines. Gates on the same wire are applied in
+        order from left to right; in matrix form, that means the leftmost gate's matrix is <em>rightmost</em>
+        in the product (Chapter 3).
+    </p>
+
+    <h2>The mystery box</h2>
+    <p>
+        Someone gives you a function \( f \) that takes one bit and returns one bit. There are only four
+        possible functions:
+    </p>
+    <table class="summary">
+        <tr><th>Name</th><th>\( f(0) \)</th><th>\( f(1) \)</th><th>Type</th></tr>
+        <tr><td>always 0</td><td>0</td><td>0</td><td>constant</td></tr>
+        <tr><td>always 1</td><td>1</td><td>1</td><td>constant</td></tr>
+        <tr><td>copy</td><td>0</td><td>1</td><td>balanced</td></tr>
+        <tr><td>flip</td><td>1</td><td>0</td><td>balanced</td></tr>
+    </table>
+    <p>
+        A sealed box like this is called an <strong>oracle</strong>. Your question: is \( f \) <strong>constant</strong> (same answer for both inputs) or
+        <strong>balanced</strong> (different answers)? You are only allowed to use \( f \) as a sealed box.
+        Classically you must call it twice, \( f(0) \) and \( f(1) \), and compare. There is no way round it:
+        one call tells you one output, and either type is still possible. David Deutsch showed in 1985 that a
+        quantum computer needs only <strong>one</strong> call.
+    </p>
+
+    <h2>The box as a gate</h2>
+    <p>
+        A gate must be reversible (unitary), and "replace \( x \) by \( f(x) \)" is not reversible when
+        \( f \) is constant. The standard fix is to use two qubits: an input \( x \) and an answer qubit
+        \( y \), and define the box \( U_f \) by
+    </p>
+    \[ U_f\,|x\rangle|y\rangle = |x\rangle\,|y \oplus f(x)\rangle \]
+    <p>
+        where \( \oplus \) is XOR (add, then drop the 2). The input is kept, and \( f(x) \) is XOR-ed into the
+        answer qubit. Applying \( U_f \) twice XORs \( f(x) \) twice, which undoes it, so \( U_f \) is its own
+        inverse. For the four functions, \( U_f \) is: nothing; X on \( y \); CNOT from \( x \) to \( y \);
+        X on \( y \) then CNOT. You can build all four in the Lab.
+    </p>
+
+    <h2>The trick: phase kickback</h2>
+    <p>
+        Here is the clever step. Put the answer qubit in \( |-\rangle = \tfrac{1}{\sqrt{2}}(|0\rangle - |1\rangle) \)
+        instead of \( |0\rangle \), and send in a basis state \( |x\rangle \):
+    </p>
+    \[ U_f\,|x\rangle|-\rangle = \tfrac{1}{\sqrt{2}}\big(|x\rangle|0 \oplus f(x)\rangle - |x\rangle|1 \oplus f(x)\rangle\big) \]
+    <p>
+        If \( f(x) = 0 \), nothing changes: you get \( |x\rangle|-\rangle \). If \( f(x) = 1 \), the two terms
+        swap places, which is the same as a minus sign: \( -|x\rangle|-\rangle \). In one line:
+    </p>
+    \[ U_f\,|x\rangle|-\rangle = (-1)^{f(x)}\,|x\rangle|-\rangle \]
+    <p>
+        The answer qubit comes out unchanged, and the answer \( f(x) \) has been moved into the
+        <em>phase</em> of the input qubit. This is called <strong>phase kickback</strong>. Now the input can be a
+        superposition, and the box will stamp a sign onto each part at once.
+    </p>
+
+    <h2>Deutsch's algorithm, step by step</h2>
+<pre class="circuit">
+q0: |0⟩ ─ H ─┌─────┐─ H ─ M
+             │ U_f │
+q1: |1⟩ ─ H ─└─────┘─────
+</pre>
+    <p><strong>Step 0.</strong> Start in \( |0\rangle|1\rangle \).</p>
+    <p><strong>Step 1.</strong> H on both. Qubit 0 becomes \( |+\rangle \), qubit 1 becomes \( |-\rangle \):</p>
+    \[ |+\rangle|-\rangle = \tfrac{1}{\sqrt{2}}\big(|0\rangle + |1\rangle\big)|-\rangle \]
+    <p><strong>Step 2.</strong> Apply the box once. Phase kickback stamps each part:</p>
+    \[ \tfrac{1}{\sqrt{2}}\big((-1)^{f(0)}|0\rangle + (-1)^{f(1)}|1\rangle\big)|-\rangle \]
+    <p>Now look at the two cases for qubit 0 (ignoring qubit 1, which is just \( |-\rangle \) and no longer matters):</p>
+    <ul>
+        <li><strong>Constant</strong> (\( f(0) = f(1) \)): both signs equal, so qubit 0 is \( \pm\tfrac{1}{\sqrt{2}}(|0\rangle + |1\rangle) = \pm|+\rangle \).</li>
+        <li><strong>Balanced</strong> (\( f(0) \neq f(1) \)): signs differ, so qubit 0 is \( \pm\tfrac{1}{\sqrt{2}}(|0\rangle - |1\rangle) = \pm|-\rangle \).</li>
+    </ul>
+    <p>
+        The overall \( \pm \) is a global phase and does not matter. So after one call the question
+        "constant or balanced?" has become the question "is qubit 0 plus or minus?".
+    </p>
+    <p><strong>Step 3.</strong> Chapter 9 told us how to ask that: apply H and measure. \( H|+\rangle = |0\rangle \), \( H|-\rangle = |1\rangle \).</p>
+    <div class="note">
+        <strong>Measure qubit 0.</strong> Read 0: \( f \) is constant. Read 1: \( f \) is balanced.
+        With certainty, after calling \( f \) once.
+    </div>
+
+    <h2>Check it with real numbers</h2>
+    <p>Take \( f = \) "copy", so \( U_f \) is a CNOT. Follow the four amplitudes of \( (q_0, q_1) \) in order \( 00, 01, 10, 11 \):</p>
+    <ul>
+        <li>Start: \( |01\rangle = (0, 1, 0, 0) \).</li>
+        <li>After H on both: \( |+\rangle|-\rangle = \tfrac{1}{2}(1, -1, 1, -1) \).</li>
+        <li>After CNOT (swap the last two entries, since control 1 flips the target): \( \tfrac{1}{2}(1, -1, -1, 1) \). That is \( |-\rangle|-\rangle \).</li>
+        <li>After H on qubit 0: \( H|-\rangle = |1\rangle \), so the state is \( |1\rangle|-\rangle \). Qubit 0 reads 1: balanced. Correct.</li>
+    </ul>
+    <p>
+        Now take \( f = \) "always 0", so \( U_f \) does nothing. After the H gates the state is
+        \( |+\rangle|-\rangle \), unchanged by the box, and the final H sends qubit 0 to \( |0\rangle \).
+        Reads 0: constant. Correct.
+    </p>
+
+    <h2>Why it works, in one sentence</h2>
+    <p>
+        The first H lets you ask about both inputs at once; the box writes the answers into the phases; the
+        second H turns a phase <em>difference</em> into a bit by interference. Every algorithm in this book has
+        this shape: spread out, stamp phases, interfere, read.
+    </p>
+
+    <h2>From one bit to many: Deutsch-Jozsa</h2>
+    <p>
+        Make the function take \( n \) bits, and promise it is either constant or balanced (1 on exactly half
+        the inputs). Classically, in the worst case you must check \( 2^{n-1} + 1 \) inputs. The quantum
+        circuit is the same picture with \( n \) input wires: H on all, one call of the box, H on all, measure.
+        Constant gives all zeros; balanced gives anything else. One call, for any \( n \). The derivation
+        is the same as above with \( n \) signs instead of two; the key fact is that after the final H gates,
+        the amplitude of \( |00\ldots0\rangle \) is the average of all the \( (-1)^{f(x)} \), which is \( \pm 1 \)
+        for constant and exactly 0 for balanced.
+    </p>
+
+    <div class="try-it">
+        <strong>Try it.</strong> In the <a href="/programming">Quantum Lab</a>, build Deutsch's algorithm on
+        two qubits for the "copy" function:
+<pre class="code">qc = QuantumCircuit(2)
+qc.x(1)        # answer qubit to |1>
+qc.h(0)
+qc.h(1)
+qc.cx(0, 1)    # the box: f(x) = x
+qc.h(0)</pre>
+        The probabilities should show qubit 0 (the left digit) is 1 with certainty. Now delete the
+        <code>qc.cx(0, 1)</code> line (the "always 0" box) and run again: qubit 0 is 0 with certainty. Then try
+        the "flip" box: <code>qc.x(0); qc.cx(0, 1); qc.x(0)</code>.
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> Why must the answer qubit start in \( |-\rangle \) and not \( |0\rangle \)?</p>
+        <p><strong>A1.</strong> With \( |0\rangle \) the box writes \( f(x) \) into the answer qubit as a bit, and the two parts of the input become entangled with different answers, so no phase appears on qubit 0 and the final H cannot interfere them. \( |-\rangle \) turns the answer into a sign instead.</p>
+        <p><strong>Q2.</strong> What does Deutsch's algorithm output for \( f = \) "always 1"?</p>
+        <p><strong>A2.</strong> 0, because it is constant. The box multiplies both parts by \( -1 \), a global phase.</p>
+        <p><strong>Q3.</strong> Could you learn \( f(0) \) itself from this algorithm?</p>
+        <p><strong>A3.</strong> No. It tells you whether \( f(0) = f(1) \), nothing more. Quantum computers answer some questions faster, not every question.</p>
+    </details>
+</div>
+{% endraw %}

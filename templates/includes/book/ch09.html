@@ -1,0 +1,113 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 9: Looking at a qubit (measurement)</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> Measuring a qubit gives 0 or 1, at random, with probabilities
+        \( |\alpha|^2 \) and \( |\beta|^2 \). Afterwards the qubit <em>is</em> whatever you saw. You cannot
+        peek without changing it, and you cannot copy it to peek at the copy.
+    </div>
+
+    <h2>The rule, precisely</h2>
+    <p>
+        Take a qubit \( |\psi\rangle = \alpha|0\rangle + \beta|1\rangle \) and measure it in the
+        \( \{|0\rangle, |1\rangle\} \) basis. Two things happen:
+    </p>
+    <ol>
+        <li>You get the result 0 with probability \( |\alpha|^2 \), or 1 with probability \( |\beta|^2 \). Which one is genuinely random; no hidden detail decides it.</li>
+        <li>The qubit's state becomes the result. If you saw 0, it is now \( |0\rangle \). If you saw 1, it is now \( |1\rangle \). The old \( \alpha \) and \( \beta \) are gone.</li>
+    </ol>
+    <p>
+        Step 2 is called <strong>collapse</strong>. Measure the same qubit again and you get the same answer
+        with certainty, because it is now a basis state. The randomness happened once.
+    </p>
+
+    <h2>A worked example</h2>
+    <p>Take \( |\psi\rangle = 0.6|0\rangle + 0.8i\,|1\rangle \). Is it normalised? \( 0.36 + |0.8i|^2 = 0.36 + 0.64 = 1 \). Yes.</p>
+    <ul>
+        <li>Probability of 0: \( |0.6|^2 = 0.36 \).</li>
+        <li>Probability of 1: \( |0.8i|^2 = (0.8i)(-0.8i) = 0.64 \).</li>
+    </ul>
+    <p>
+        Measure 100 identical copies and you expect roughly 36 zeros and 64 ones. The \( i \) made no
+        difference to the counts. Phase never shows up in a plain measurement. It only shows up after a gate
+        mixes the two parts, which is what Chapter 10 is for.
+    </p>
+
+    <h2>Why you must repeat</h2>
+    <p>
+        One measurement tells you almost nothing: a single 1 could come from \( |1\rangle \) or from
+        \( |+\rangle \) or from our 0.6/0.8 state. To learn \( |\beta|^2 \) you prepare the same state many
+        times, measure each copy, and count. A thousand runs pins the probability to about 3 percent. A real
+        quantum computer does exactly this; the simulator on this site reports the exact probabilities instead,
+        which is a luxury hardware does not have.
+    </p>
+
+    <h2>Measuring in another basis</h2>
+    <p>
+        Nothing forces you to ask "0 or 1?". You can ask "plus or minus?" instead. Chapter 7 gave the general
+        rule: the probability of outcome \( |\phi\rangle \) is \( |\langle\phi|\psi\rangle|^2 \). Measure
+        \( |0\rangle \) in the plus/minus basis:
+    </p>
+    \[ P(+) = |\langle +|0\rangle|^2 = \left|\tfrac{1}{\sqrt{2}}\right|^2 = \tfrac{1}{2}, \qquad
+       P(-) = |\langle -|0\rangle|^2 = \tfrac{1}{2} \]
+    <p>
+        A state that is certain in one basis is a coin flip in another. And measure \( |+\rangle \) in the
+        plus/minus basis: \( P(+) = |\langle +|+\rangle|^2 = 1 \). Certain. So \( |+\rangle \) and \( |-\rangle \),
+        which looked identical when you asked "0 or 1?", are perfectly told apart when you ask "plus or minus?".
+        The phase was there all along; you had to ask the right question.
+    </p>
+    <p>
+        In practice a quantum computer only measures 0/1. To measure in the plus/minus basis you first apply
+        a gate that turns \( |+\rangle \) into \( |0\rangle \) and \( |-\rangle \) into \( |1\rangle \), then
+        measure 0/1. That gate is \( H \), and you will meet it next chapter.
+    </p>
+
+    <h2>Measurement as an eigenvalue</h2>
+    <p>
+        Here is where Chapter 3's eigenvectors return. The gate \( Z \) has eigenvectors \( |0\rangle \) and
+        \( |1\rangle \) with eigenvalues \( +1 \) and \( -1 \). A "0/1 measurement" is exactly a "measurement
+        of \( Z \)": the possible results are the eigenvectors, and the number you read is the eigenvalue
+        (\( +1 \) for 0, \( -1 \) for 1). Likewise, a "plus/minus measurement" is a measurement of \( X \),
+        whose eigenvectors are \( |+\rangle \) and \( |-\rangle \). Physicists say "measure \( Z \)" and
+        "measure \( X \)" and mean these two questions. (Chapter 10 says which matrices can be measured this way.)
+    </p>
+
+    <h2>No peeking, no copying</h2>
+    <p>
+        Could you dodge the collapse by making a copy of the qubit and measuring the copy? No. There is a
+        short proof. It uses linearity from Chapter 3 and one piece of notation from Chapter 11: two qubits
+        side by side are written \( |a\rangle|b\rangle \), meaning "first qubit \( a \), second qubit \( b \)",
+        and brackets of such things multiply out like ordinary algebra.
+    </p>
+    <p>
+        Suppose a copying machine \( C \) existed. It would have to copy \( |0\rangle \) and \( |1\rangle \):
+        \( C|0\rangle|{\text{blank}}\rangle = |0\rangle|0\rangle \) and \( C|1\rangle|{\text{blank}}\rangle = |1\rangle|1\rangle \).
+        Every gate is a matrix, and matrices are linear, meaning \( C(a + b) = Ca + Cb \). So applying \( C \) to
+        \( |+\rangle = \tfrac{1}{\sqrt{2}}(|0\rangle + |1\rangle) \) must give
+        \( \tfrac{1}{\sqrt{2}}(|0\rangle|0\rangle + |1\rangle|1\rangle) \). But a true copy of \( |+\rangle \) would be
+        \( |+\rangle|+\rangle = \tfrac{1}{2}(|0\rangle|0\rangle + |0\rangle|1\rangle + |1\rangle|0\rangle + |1\rangle|1\rangle) \).
+        These are different. So no such \( C \) exists. This is the <strong>no-cloning theorem</strong>, and it
+        is why quantum information cannot be backed up like a file, and also why someone listening in on a
+        quantum key exchange cannot avoid being noticed.
+    </p>
+
+    <div class="try-it">
+        <strong>Try it.</strong> In the <a href="/programming">Quantum Lab</a>, open <em>Equal superposition</em>.
+        Write <code>qc.h(0)</code> and run it. The page shows the measurement probabilities: 50 percent 0,
+        50 percent 1. That is \( |+\rangle \) measured in the 0/1 basis. Now add a second line,
+        <code>qc.h(0)</code> again, and run. The probabilities return to 100 percent 0. The second H measured
+        "plus or minus?" by turning plus back into zero.
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> A qubit \( \tfrac{\sqrt{3}}{2}|0\rangle + \tfrac{1}{2}|1\rangle \) is measured. Probability of 1?</p>
+        <p><strong>A1.</strong> \( \tfrac{1}{4} \). (And \( \tfrac{3}{4} \) for 0; they add to 1.)</p>
+        <p><strong>Q2.</strong> You measured it and got 1. You measure it again. What do you get?</p>
+        <p><strong>A2.</strong> 1, with certainty. The state collapsed to \( |1\rangle \).</p>
+        <p><strong>Q3.</strong> Measure \( |-\rangle \) in the plus/minus basis. Result?</p>
+        <p><strong>A3.</strong> Minus, with certainty: \( |\langle -|-\rangle|^2 = 1 \).</p>
+    </details>
+</div>
+{% endraw %}

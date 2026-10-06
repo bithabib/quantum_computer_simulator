@@ -1,0 +1,136 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 2: Arrows and lists (vectors)</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> A vector is an arrow. You can write an arrow as a short list of numbers.
+        You can add arrows and stretch arrows. Every quantum state in this book is an arrow.
+    </div>
+
+    <h2>An arrow on a map</h2>
+    <p>
+        Stand in the middle of a football pitch. Walk 3 metres east and 4 metres north. The arrow from where
+        you started to where you ended is a <strong>vector</strong>. We write it as a column of two numbers:
+    </p>
+    \[ \vec{v} = \begin{pmatrix} 3 \\ 4 \end{pmatrix} \]
+    <p>
+        The top number is how far east, the bottom number is how far north. That is all a vector is: an arrow,
+        written as a list.
+    </p>
+
+    <h2>How long is the arrow?</h2>
+    <p>
+        Walking 3 east and 4 north makes a right-angled triangle. Pythagoras tells us the straight-line
+        distance:
+    </p>
+    \[ |\vec{v}| = \sqrt{3^2 + 4^2} = \sqrt{9 + 16} = \sqrt{25} = 5 \]
+    <p>
+        The vertical bars mean "the length of". For any arrow \( \begin{pmatrix} a \\ b \end{pmatrix} \),
+        the length is \( \sqrt{a^2 + b^2} \). An arrow of length exactly 1 is called a <strong>unit vector</strong>.
+        Quantum states are always unit vectors. Keep that in mind; it comes back in Chapter 6.
+    </p>
+
+    <h2>Adding arrows</h2>
+    <p>
+        Walk 3 east and 4 north, then walk 2 east and 1 south. Where are you? 5 east and 3 north. To add
+        arrows, add the numbers in each row:
+    </p>
+    \[ \begin{pmatrix} 3 \\ 4 \end{pmatrix} + \begin{pmatrix} 2 \\ -1 \end{pmatrix} = \begin{pmatrix} 5 \\ 3 \end{pmatrix} \]
+    <p>
+        In a picture, you put the tail of the second arrow on the head of the first, and the sum is the
+        arrow from the very start to the very end.
+    </p>
+
+    <h2>Stretching arrows</h2>
+    <p>
+        Walk the arrow \( \begin{pmatrix} 3 \\ 4 \end{pmatrix} \) twice. You are now at 6 east, 8 north.
+        Multiplying an arrow by an ordinary number (called a <strong>scalar</strong>) multiplies every entry:
+    </p>
+    \[ 2 \begin{pmatrix} 3 \\ 4 \end{pmatrix} = \begin{pmatrix} 6 \\ 8 \end{pmatrix}, \qquad
+       \tfrac{1}{5} \begin{pmatrix} 3 \\ 4 \end{pmatrix} = \begin{pmatrix} 0.6 \\ 0.8 \end{pmatrix} \]
+    <p>
+        The second one is useful. Dividing an arrow by its own length gives a unit vector pointing the same
+        way. Check: \( \sqrt{0.6^2 + 0.8^2} = \sqrt{0.36 + 0.64} = 1 \). This is called
+        <strong>normalising</strong> the arrow. We will do it often.
+    </p>
+
+    <h2>The two special arrows</h2>
+    <p>
+        Two arrows deserve names: one step east and one step north.
+    </p>
+    \[ \hat{x} = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \qquad \hat{y} = \begin{pmatrix} 0 \\ 1 \end{pmatrix} \]
+    <p>
+        Every arrow on the pitch is some amount of \( \hat{x} \) plus some amount of \( \hat{y} \):
+    </p>
+    \[ \begin{pmatrix} 3 \\ 4 \end{pmatrix} = 3\hat{x} + 4\hat{y} \]
+    <p>
+        A set of arrows that can build every other arrow this way is called a <strong>basis</strong>. The
+        numbers in front (3 and 4) are the <strong>components</strong>. The same arrow can have different
+        components if you pick a different basis, for example if you rotate the map. The arrow itself does
+        not change, only the numbers describing it. This idea is the heart of quantum measurement, so
+        remember it.
+    </p>
+
+    <h2>The dot product: how much do two arrows agree?</h2>
+    <p>
+        Take two arrows and multiply matching entries, then add:
+    </p>
+    \[ \begin{pmatrix} 3 \\ 4 \end{pmatrix} \cdot \begin{pmatrix} 2 \\ -1 \end{pmatrix} = 3 \times 2 + 4 \times (-1) = 6 - 4 = 2 \]
+    <p>
+        This number is the <strong>dot product</strong>. It tells you how much the two arrows point the same way:
+    </p>
+    <ul>
+        <li>Big and positive: they point roughly the same way.</li>
+        <li>Zero: they are at right angles. We say they are <strong>orthogonal</strong>.</li>
+        <li>Negative: they point roughly opposite ways.</li>
+    </ul>
+    <p>
+        Check that \( \hat{x} \cdot \hat{y} = 1 \times 0 + 0 \times 1 = 0 \). East and north are at right angles,
+        as expected. And \( \hat{x} \cdot \hat{x} = 1 \). A basis whose arrows all have length 1 and are all at
+        right angles to each other is called <strong>orthonormal</strong>. Quantum computing uses orthonormal
+        bases everywhere.
+    </p>
+    <p>
+        One more fact: the dot product of an arrow with itself is its length squared.
+        \( \vec{v} \cdot \vec{v} = 3^2 + 4^2 = 25 = |\vec{v}|^2 \).
+    </p>
+
+    <h2>Arrows with more than two numbers</h2>
+    <p>
+        Nothing stops us using three numbers (east, north, up) or ten or a million. The rules are the same:
+        add row by row, stretch every row, dot product is multiply-and-add. We cannot draw a ten-number arrow,
+        but the maths does not care. A quantum computer with 10 qubits uses arrows with 1024 numbers. We will
+        get there.
+    </p>
+
+    <h2>Meet |0⟩ and |1⟩</h2>
+    <p>
+        Physicists write vectors with a special bracket called a <strong>ket</strong>: \( |v\rangle \) instead of
+        \( \vec{v} \). It means exactly the same thing. The two basis arrows of a qubit are:
+    </p>
+    \[ |0\rangle = \begin{pmatrix} 1 \\ 0 \end{pmatrix}, \qquad |1\rangle = \begin{pmatrix} 0 \\ 1 \end{pmatrix} \]
+    <p>
+        They are just \( \hat{x} \) and \( \hat{y} \) with new names. A qubit is an arrow built from them,
+        like \( 0.6|0\rangle + 0.8|1\rangle \). You already know how to add it up:
+    </p>
+    \[ 0.6 \begin{pmatrix} 1 \\ 0 \end{pmatrix} + 0.8 \begin{pmatrix} 0 \\ 1 \end{pmatrix} = \begin{pmatrix} 0.6 \\ 0.8 \end{pmatrix} \]
+    <p>
+        That is a unit vector, so it is a valid qubit. Chapter 8 explains what the 0.6 and 0.8 mean.
+    </p>
+
+    <div class="try-it">
+        <strong>Try it.</strong> Open the <a href="/">Bloch Sphere Simulator</a> on the home page. The arrow you
+        see is a qubit. Every gate button turns that arrow. For now, just click a few and watch it move.
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> What is the length of \( \begin{pmatrix} 5 \\ 12 \end{pmatrix} \)?</p>
+        <p><strong>A1.</strong> \( \sqrt{25 + 144} = \sqrt{169} = 13 \).</p>
+        <p><strong>Q2.</strong> Normalise it.</p>
+        <p><strong>A2.</strong> \( \begin{pmatrix} 5/13 \\ 12/13 \end{pmatrix} \).</p>
+        <p><strong>Q3.</strong> Is \( \begin{pmatrix} 1 \\ 1 \end{pmatrix} \) orthogonal to \( \begin{pmatrix} 1 \\ -1 \end{pmatrix} \)?</p>
+        <p><strong>A3.</strong> Yes. The dot product is \( 1 - 1 = 0 \). These two arrows will matter a lot in Chapter 10.</p>
+    </details>
+</div>
+{% endraw %}

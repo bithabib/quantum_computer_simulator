@@ -1,0 +1,99 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 1: Why do we need new maths?</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> The maths you learn at school describes balls, cars and planets very well.
+        It does not describe atoms. Atoms play by different rules, and to write those rules down we need a
+        few new tools. This book teaches the tools first, then uses them to build a quantum computer on paper.
+    </div>
+
+    <h2>A ball you can predict</h2>
+    <p>
+        Roll a ball across the floor. If you know how hard you pushed it and how rough the floor is, you can
+        say exactly where it will be one second from now. Push it the same way again and it does the same
+        thing again. This is the world Isaac Newton described, and school physics is mostly about this world.
+    </p>
+    <div class="figure">
+        <img src="static/src/fig_chapter_01/rolling_ball.gif" alt="A ball rolling along the floor">
+        <p class="caption">Figure 1.1: A rolling ball. Same push, same result, every time.</p>
+    </div>
+
+    <h2>An atom you cannot</h2>
+    <p>
+        About a hundred years ago, scientists started looking inside atoms. Ernest Rutherford fired tiny
+        particles at a thin sheet of gold. Most went straight through, but a few bounced back. He worked out
+        that an atom is mostly empty space with a tiny heavy centre, the nucleus, and electrons somewhere
+        around it.
+    </p>
+    <div class="figure">
+        <img src="static/src/fig_chapter_01/rutherfords_model.gif" alt="Rutherford's model of the atom">
+        <p class="caption">Figure 1.2: Rutherford's picture. A heavy nucleus with electrons around it.</p>
+    </div>
+    <p>
+        The obvious guess was that electrons orbit the nucleus like planets orbit the Sun. Niels Bohr improved
+        the picture. He said electrons can only sit on certain fixed "rings", and they jump between rings by
+        taking in or giving out exactly the right amount of light.
+    </p>
+    <div class="figure">
+        <img src="static/src/fig_chapter_01/bohr_model.gif" alt="Bohr's model of the atom">
+        <p class="caption">Figure 1.3: Bohr's picture. Electrons on fixed rings, jumping between them.</p>
+    </div>
+    <p>
+        Then the strange part arrived. An electron is not really a tiny ball on a ring. Experiments showed that:
+    </p>
+    <ul>
+        <li>You cannot know exactly where an electron is <em>and</em> exactly how fast it moves. Only one or the other.</li>
+        <li>Before you look, an electron can be "spread out" over several places at once.</li>
+        <li>When you look, you find it in one place, but you can only say the <em>chance</em> of each place.</li>
+        <li>Two electrons can be linked so that looking at one instantly tells you about the other, even far apart.</li>
+    </ul>
+    <p>
+        A rolling ball does none of these things. So the old maths of positions and speeds is not enough.
+    </p>
+
+    <h2>What the new rules look like</h2>
+    <p>
+        Here is the whole of quantum physics in three sentences. Do not worry if they do not make sense yet.
+        The next six chapters exist to make them make sense.
+    </p>
+    <ol>
+        <li>The state of a quantum thing is an <strong>arrow</strong> (a vector), not a position.</li>
+        <li>Anything that happens to it is a <strong>machine that turns the arrow</strong> (a matrix).</li>
+        <li>When you look, the <strong>length of a part of the arrow, squared</strong>, is the chance you see that result.</li>
+    </ol>
+    <p>
+        Arrows, machines and chances: that is linear algebra, complex numbers and probability. That is the
+        maths we need, and it is less than you might fear. Most of it is adding and multiplying small lists
+        of numbers.
+    </p>
+
+    <h2>Why a computer?</h2>
+    <p>
+        An ordinary computer stores a bit: 0 or 1. A quantum computer stores a <em>qubit</em>, which is an
+        arrow that can point partly at 0 and partly at 1 at the same time. With many qubits, the arrow lives
+        in a space with an enormous number of directions, and a quantum computer can turn the whole arrow at
+        once. For some problems, like searching, or breaking codes, or simulating molecules, this is far faster
+        than anything a normal computer can do.
+    </p>
+    <p>
+        By the end of this book you will have built a qubit, turned it with gates, entangled two of them,
+        and run two real quantum algorithms, all with maths you can check by hand and on the simulator on
+        this site.
+    </p>
+
+    <h2>How to read this book</h2>
+    <ul>
+        <li><strong>Part I (Chapters 1 to 7)</strong> is the maths. Each chapter is short and builds on the last.</li>
+        <li><strong>Part II (Chapters 8 to 15)</strong> is real quantum computing, using only the maths from Part I.</li>
+        <li>Boxes marked <strong>Try it</strong> send you to the simulators on this site. Use them. Seeing the arrow move is worth a page of words.</li>
+        <li>Boxes marked <strong>Check yourself</strong> have a question with the answer hidden. Try before you peek.</li>
+    </ul>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q.</strong> Name one thing an electron does that a rolling ball never does.</p>
+        <p><strong>A.</strong> Any of: it can be spread over several places before you look; you cannot know both its position and its speed exactly; it can be linked to another electron far away.</p>
+    </details>
+</div>
+{% endraw %}

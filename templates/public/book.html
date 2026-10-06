@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Book</title>
+    <title>Quantum Computing, From Arrows to Algorithms</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link type="text/css" rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
@@ -12,114 +12,147 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['\\(', '\\)']], displayMath: [['\\[', '\\]'], ['$$', '$$']] },
+            options: { skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'] }
+        };
+    </script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        /* End-of-chapter navigation */
+        .book-sidebar h3 { font-size: 1.3rem; margin-bottom: .5rem; }
+        .book-sidebar .part { font-weight: 700; color: #1a237e; margin: 1rem 0 .25rem; font-size: .95rem; }
+        .book-sidebar button {
+            display: block; width: 100%; text-align: left; padding: .25rem .4rem;
+            background: transparent; border: 0; border-radius: 4px; font-size: .95rem; line-height: 1.3;
+        }
+        .book-sidebar button:hover { background: #eef0f8; }
+        .book-sidebar button.active { background: #1a237e; color: #fff; }
+        .book-chapter { max-width: 820px; font-size: 1.05rem; line-height: 1.65; }
+        .book-chapter h1 { font-size: 2rem; margin: .5rem 0 1.2rem; }
+        .book-chapter h2 { font-size: 1.45rem; margin: 2rem 0 .6rem; }
+        .book-chapter table.summary { border-collapse: collapse; margin: 1rem 0; width: 100%; }
+        .book-chapter table.summary th, .book-chapter table.summary td { border: 1px solid #d8dbe8; padding: .4rem .6rem; vertical-align: top; }
+        .book-chapter table.summary th { background: #eef0f8; text-align: left; }
+        .big-idea, .note, .try-it {
+            padding: .9rem 1.1rem; margin: 1.2rem 0; border-radius: 8px; border-left: 5px solid;
+        }
+        .big-idea { background: #eef0f8; border-color: #1a237e; }
+        .note { background: #fff8e1; border-color: #f9a825; }
+        .try-it { background: #e8f5e9; border-color: #2e7d32; }
+        .book-chapter details.check { margin: 1.5rem 0; padding: .6rem 1rem; background: #fafafa; border: 1px solid #e3e6ef; border-radius: 8px; }
+        .book-chapter details.check summary { font-weight: 700; cursor: pointer; }
+        .book-chapter .figure { text-align: center; margin: 1.2rem 0; }
+        .book-chapter .figure img { max-width: 100%; height: auto; }
+        .book-chapter .caption { font-size: .9rem; color: #555; margin-top: .4rem; }
+        .book-chapter pre.circuit { background: #f4f5fa; padding: .8rem 1rem; border-radius: 8px; font-size: 1rem; line-height: 1.5; overflow-x: auto; }
+        .book-chapter pre.code { background: #263238; color: #eceff1; padding: .8rem 1rem; border-radius: 8px; overflow-x: auto; margin: .6rem 0; }
+        .book-chapter code { background: #f1f3f8; padding: .05rem .3rem; border-radius: 4px; font-size: .95em; }
+        .book-chapter pre.code code { background: transparent; padding: 0; }
+        .book-chapter dl.glossary dt { font-weight: 700; margin-top: .6rem; }
+        .book-chapter dl.glossary dd { margin-left: 1rem; }
+        .book-chapter p.end { font-weight: 600; margin-top: 2rem; }
         .chapter-nav {
-            margin: 2.5rem 0 3rem;
-            padding-top: 1.25rem;
-            border-top: 1px solid #e3e6ef;
+            max-width: 820px; margin: 2.5rem 0 3rem; padding-top: 1.25rem; border-top: 1px solid #e3e6ef;
+            display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
         }
         .chapter-nav a {
-            display: inline-block;
-            padding: .55rem 1.1rem;
-            background: #1a237e;
-            color: #fff;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
+            display: inline-block; padding: .55rem 1.1rem; background: #1a237e; color: #fff;
+            border-radius: 8px; font-weight: 600; text-decoration: none;
         }
         .chapter-nav a:hover { background: #3949ab; color: #fff; text-decoration: none; }
-        .chapter-nav--end a { background: #5c6bc0; }
-        .chapter-nav--end p { font-weight: 600; color: #444; }
+        .chapter-nav a.prev { background: #5c6bc0; }
     </style>
 </head>
 
 <body>
     {% include 'includes/nav_header.html' %}
-    <div class="row m-5">
-        <div class="col-md-2">
-            <div class="row">
-                <div class="col-md-12">
-                    <h3>Chapters</h3>
-                </div>
-                <div class="col-md-12">
-                    <button class="bg-transparent border-0" style="text-align: left;"
-                        onclick="showChapter('chapter_01')">1. Why linear
-                        algebra?</button>
-                </div>
-                <div class="col-md-12">
-                    <button class="bg-transparent border-0" style="text-align: left;"
-                        onclick="showChapter('chapter_022')">2. Derivatives and Integrals</button>
-                </div>
-                <div class="col-md-12">
-                    <button class="bg-transparent border-0" style="text-align: left;"
-                        onclick="showChapter('chapter_02')">3. Complex
-                        Number</button>
-                </div>
-                <div class="col-md-12">
-                    <button class="bg-transparent border-0" style="text-align: left;"
-                        onclick="showChapter('chapter_03')">4. Probability
-                        Amplitude</button>
-                </div>
-            </div>
+    {% set parts = [
+        ('Part I: The maths you need', [
+            ('ch01', '1. Why do we need new maths?'),
+            ('ch02', '2. Arrows and lists (vectors)'),
+            ('ch03', '3. Machines that move arrows (matrices)'),
+            ('ch04', '4. How fast things change (derivatives)'),
+            ('ch05', '5. Numbers that turn (complex numbers)'),
+            ('ch06', '6. Chance and amplitude (probability)'),
+            ('ch07', '7. The language of kets and bras'),
+        ]),
+        ('Part II: Real quantum computing', [
+            ('ch08', '8. The qubit'),
+            ('ch09', '9. Looking at a qubit (measurement)'),
+            ('ch10', '10. Gates for one qubit'),
+            ('ch11', '11. Two qubits and entanglement'),
+            ('ch12', '12. Circuits and a first algorithm (Deutsch)'),
+            ('ch13', '13. Grover\'s search'),
+            ('ch14', '14. Teleportation, real machines, and the road ahead'),
+            ('ch15', '15. Build it yourself in the Quantum Lab'),
+        ]),
+    ] %}
+    {% set chapters = [] %}
+    {% for part in parts %}{% for ch in part[1] %}{% set _ = chapters.append(ch) %}{% endfor %}{% endfor %}
+
+    <div class="row m-4">
+        <div class="col-md-3 book-sidebar">
+            <h3>Quantum Computing</h3>
+            <p class="text-muted" style="font-size:.9rem">From arrows to algorithms. Written for a reader with
+                school maths; nothing is skipped, everything is explained.</p>
+            {% for part in parts %}
+            <div class="part">{{ part[0] }}</div>
+            {% for ch in part[1] %}
+            <button id="btn-{{ ch[0] }}" onclick="showChapter('{{ ch[0] }}')">{{ ch[1] }}</button>
+            {% endfor %}
+            {% endfor %}
         </div>
 
-        <div class="col-md-10" id="chapterPane" style="height: 100vh; overflow: scroll;">
-            <div class="chapter" id="chapter_01" style="display: block;">
-                {% include 'includes/book_chapter/chapter_01.html' %}
+        <div class="col-md-9" id="chapterPane" style="height: 90vh; overflow: auto;">
+            {% for ch in chapters %}
+            {% set i = loop.index0 %}
+            <div class="chapter" id="{{ ch[0] }}" style="display: {{ 'block' if i == 0 else 'none' }};">
+                {% include 'includes/book/' ~ ch[0] ~ '.html' %}
                 <div class="chapter-nav">
-                    <a href="#" onclick="showChapter('chapter_022'); return false;">
-                        Next: 2. Derivatives and Integrals &rarr;</a>
+                    {% if i > 0 %}
+                    <a href="#{{ chapters[i-1][0] }}" class="prev" onclick="showChapter('{{ chapters[i-1][0] }}'); return false;">
+                        &larr; {{ chapters[i-1][1] }}</a>
+                    {% else %}<span></span>{% endif %}
+                    {% if i < chapters|length - 1 %}
+                    <a href="#{{ chapters[i+1][0] }}" onclick="showChapter('{{ chapters[i+1][0] }}'); return false;">
+                        Next: {{ chapters[i+1][1] }} &rarr;</a>
+                    {% else %}
+                    <a href="/programming">Go to the Quantum Lab &rarr;</a>
+                    {% endif %}
                 </div>
             </div>
-            <div class="chapter" id="chapter_022" style="display: none;">
-                {% include 'includes/book_chapter/chapter_022.html' %}
-                <div class="chapter-nav">
-                    <a href="#" onclick="showChapter('chapter_02'); return false;">
-                        Next: 3. Complex Number &rarr;</a>
-                </div>
-            </div>
-            <div class="chapter" id="chapter_02" style="display: none;">
-                {% include 'includes/book_chapter/chapter_02.html' %}
-                <div class="chapter-nav">
-                    <a href="#" onclick="showChapter('chapter_03'); return false;">
-                        Next: 4. Probability Amplitude &rarr;</a>
-                </div>
-            </div>
-            <div class="chapter" id="chapter_03" style="display: none;">
-                {% include 'includes/book_chapter/chapter_03.html' %}
-                <div class="chapter-nav chapter-nav--end">
-                    <p class="mb-2">That is the end of the book.</p>
-                    <a href="#" onclick="showChapter('chapter_01'); return false;">
-                        &larr; Back to 1. Why linear algebra?</a>
-                    <a href="/programming" class="ml-3">Try the Quantum Lab &rarr;</a>
-                </div>
-            </div>
+            {% endfor %}
         </div>
-
     </div>
+
     <script>
         function showChapter(chapterId) {
-            // Hide all chapters
+            var target = document.getElementById(chapterId);
+            if (!target) return;
             var chapters = document.getElementsByClassName('chapter');
-            for (var i = 0; i < chapters.length; i++) {
-                chapters[i].style.display = 'none';
-            }
-            // Show the selected chapter
-            document.getElementById(chapterId).style.display = 'block';
-            // Scroll back to the top of the reading pane. Without this, following a
-            // "Next chapter" link from the bottom of a chapter leaves the reader
-            // part-way down the new one.
+            for (var i = 0; i < chapters.length; i++) chapters[i].style.display = 'none';
+            target.style.display = 'block';
+            var buttons = document.querySelectorAll('.book-sidebar button');
+            for (var j = 0; j < buttons.length; j++) buttons[j].classList.remove('active');
+            var btn = document.getElementById('btn-' + chapterId);
+            if (btn) btn.classList.add('active');
+            // Keep the URL in step so a chapter can be bookmarked or linked.
+            if (history.replaceState) history.replaceState(null, '', '#' + chapterId);
+            // Scroll the reading pane back to the top of the new chapter.
             var pane = document.getElementById('chapterPane');
             if (pane) pane.scrollTop = 0;
-            // Re-typeset any math in the newly shown chapter (MathJax skips hidden
-            // elements on first load in some browsers).
-            if (window.MathJax && MathJax.typesetPromise) {
-                MathJax.typesetPromise([document.getElementById(chapterId)]);
-            }
+            // Typeset any maths in the newly shown chapter (MathJax skips hidden elements on first load).
+            if (window.MathJax && MathJax.typesetPromise) MathJax.typesetPromise([target]);
         }
+        // Open the chapter named in the URL hash, if any, otherwise chapter 1.
+        document.addEventListener('DOMContentLoaded', function () {
+            var id = (location.hash || '#ch01').substring(1);
+            showChapter(document.getElementById(id) ? id : 'ch01');
+        });
+        window.addEventListener('hashchange', function () {
+            showChapter(location.hash.substring(1));
+        });
     </script>
 </body>
 

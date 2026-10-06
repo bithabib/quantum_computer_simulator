@@ -1,0 +1,148 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 7: The language of kets and bras</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> Physicists write arrows as \( |\psi\rangle \) and a flipped-over,
+        conjugated copy as \( \langle\psi| \). Putting them together, \( \langle\phi|\psi\rangle \), is the dot
+        product, and it gives an amplitude. This chapter collects Part I into one notation you will use for
+        the rest of the book.
+    </div>
+
+    <h2>Kets are column vectors</h2>
+    <p>
+        A <strong>ket</strong> \( |\psi\rangle \) is a column vector with complex entries. (The Greek letter
+        \( \psi \), "psi", is traditional for a quantum state; it is just a name.) For a qubit:
+    </p>
+    \[ |\psi\rangle = \alpha|0\rangle + \beta|1\rangle = \begin{pmatrix} \alpha \\ \beta \end{pmatrix} \]
+
+    <h2>Bras are flipped, conjugated rows</h2>
+    <p>
+        A <strong>bra</strong> \( \langle\psi| \) is what you get by turning the column into a row and taking
+        the complex conjugate of every entry:
+    </p>
+    \[ \langle\psi| = \begin{pmatrix} \alpha^* & \beta^* \end{pmatrix} \]
+    <p>
+        The word is a joke: bra + ket = bracket. The operation (transpose, then conjugate) is called the
+        <strong>dagger</strong>, written \( \dagger \). So \( \langle\psi| = (|\psi\rangle)^\dagger \).
+    </p>
+
+    <h2>Bra-ket is the dot product</h2>
+    <p>
+        Put a bra (row) in front of a ket (column) and multiply by the row-times-column rule from Chapter 3:
+    </p>
+    \[ \langle\phi|\psi\rangle = \begin{pmatrix} \phi_0^* & \phi_1^* \end{pmatrix} \begin{pmatrix} \psi_0 \\ \psi_1 \end{pmatrix}
+       = \phi_0^*\psi_0 + \phi_1^*\psi_1 \]
+    <p>
+        This is the dot product of Chapter 2, with one upgrade: the left entries are conjugated. The upgrade
+        makes a state's dot product with itself come out real and positive:
+    </p>
+    \[ \langle\psi|\psi\rangle = \alpha^*\alpha + \beta^*\beta = |\alpha|^2 + |\beta|^2 = 1 \]
+    <p>
+        That is the normalisation rule again. A valid quantum state has \( \langle\psi|\psi\rangle = 1 \).
+        This is called the <strong>inner product</strong>; it is the dot product's proper name when the
+        entries can be complex.
+    </p>
+
+    <h2>Inner products are amplitudes</h2>
+    <p>
+        Here is the payoff. Take the inner product of a basis state with your state:
+    </p>
+    \[ \langle 0|\psi\rangle = \begin{pmatrix} 1 & 0 \end{pmatrix}\begin{pmatrix} \alpha \\ \beta \end{pmatrix} = \alpha,
+       \qquad \langle 1|\psi\rangle = \beta \]
+    <p>
+        The inner product pulls out the amplitude. So the Born rule from Chapter 6 can be written in one line
+        that works for any state and any outcome:
+    </p>
+    <div class="note">
+        The probability of finding \( |\psi\rangle \) in the state \( |\phi\rangle \) is
+        \( P = |\langle\phi|\psi\rangle|^2 \).
+    </div>
+    <p>
+        In words: "how much does \( \psi \) agree with \( \phi \), squared". That is the dot product's old
+        meaning from Chapter 2, now doing physics.
+    </p>
+
+    <h2>Orthonormal bases in bra-ket</h2>
+    <p>The two basis states are at right angles and have length 1:</p>
+    \[ \langle 0|0\rangle = 1, \quad \langle 1|1\rangle = 1, \quad \langle 0|1\rangle = 0, \quad \langle 1|0\rangle = 0 \]
+    <p>
+        Physicists shorten these four lines to \( \langle i|j\rangle = \delta_{ij} \), where
+        \( \delta_{ij} \) (the <strong>Kronecker delta</strong>) is 1 when \( i = j \) and 0 otherwise. It is
+        nothing deeper than "same: 1, different: 0".
+    </p>
+    <p>
+        The plus and minus states from Chapter 3 are another orthonormal basis. Check:
+    </p>
+    \[ \langle +|-\rangle = \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 & 1 \end{pmatrix}\tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ -1 \end{pmatrix}
+       = \tfrac{1}{2}(1 - 1) = 0 \]
+    <p>
+        Same arrow, different basis, different components. Measuring in the \( \{|0\rangle, |1\rangle\} \) basis
+        and measuring in the \( \{|+\rangle, |-\rangle\} \) basis ask different questions of the same qubit.
+    </p>
+
+    <h2>The dagger of a matrix</h2>
+    <p>
+        Apply the dagger to a matrix the same way: transpose, then conjugate every entry.
+    </p>
+    \[ M = \begin{pmatrix} a & b \\ c & d \end{pmatrix} \quad\Rightarrow\quad
+       M^\dagger = \begin{pmatrix} a^* & c^* \\ b^* & d^* \end{pmatrix} \]
+    <p>
+        A matrix is <strong>unitary</strong> if its dagger is its inverse: \( U^\dagger U = I \). Unitary
+        matrices keep inner products, and so keep lengths, and so keep probabilities adding to 1. Every quantum
+        gate is unitary, and \( U^\dagger \) is how you undo it. For the gates \( X \) and \( Z \), all entries
+        are real and the matrices are symmetric, so \( X^\dagger = X \) and \( Z^\dagger = Z \), which matches
+        \( XX = I \) from Chapter 3.
+    </p>
+    <p>
+        One worked example with a complex entry, the S gate from Chapter 5:
+    </p>
+    \[ S = \begin{pmatrix} 1 & 0 \\ 0 & i \end{pmatrix}, \qquad
+       S^\dagger = \begin{pmatrix} 1 & 0 \\ 0 & -i \end{pmatrix}, \qquad
+       S^\dagger S = \begin{pmatrix} 1 & 0 \\ 0 & (-i)(i) \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & 1 \end{pmatrix} = I \]
+
+    <h2>Ket times bra: building machines from arrows</h2>
+    <p>
+        Write a ket <em>before</em> a bra and you get a column times a row, which is a matrix:
+    </p>
+    \[ |0\rangle\langle 0| = \begin{pmatrix} 1 \\ 0 \end{pmatrix}\begin{pmatrix} 1 & 0 \end{pmatrix} = \begin{pmatrix} 1 & 0 \\ 0 & 0 \end{pmatrix},
+       \qquad |1\rangle\langle 1| = \begin{pmatrix} 0 & 0 \\ 0 & 1 \end{pmatrix} \]
+    <p>
+        These are <strong>projectors</strong>: \( |0\rangle\langle 0| \) keeps the \( |0\rangle \) part of an arrow
+        and throws the rest away. You can now write the gates from Chapter 3 without any grids at all:
+    </p>
+    \[ I = |0\rangle\langle 0| + |1\rangle\langle 1|, \qquad
+       Z = |0\rangle\langle 0| - |1\rangle\langle 1|, \qquad
+       X = |0\rangle\langle 1| + |1\rangle\langle 0| \]
+    <p>
+        Read \( X \) as "send 1 to 0, and send 0 to 1". This way of writing matrices is how physicists think
+        about gates, and it will make Chapter 11's two-qubit gates easy to write down.
+    </p>
+
+    <h2>Part I in one table</h2>
+    <table class="summary">
+        <tr><th>Idea</th><th>Symbol</th><th>What it is</th></tr>
+        <tr><td>State</td><td>\( |\psi\rangle \)</td><td>A unit column vector with complex entries</td></tr>
+        <tr><td>Bra</td><td>\( \langle\psi| \)</td><td>Transpose and conjugate of the ket</td></tr>
+        <tr><td>Inner product</td><td>\( \langle\phi|\psi\rangle \)</td><td>Row times column; an amplitude</td></tr>
+        <tr><td>Probability</td><td>\( |\langle\phi|\psi\rangle|^2 \)</td><td>Amplitude times its conjugate</td></tr>
+        <tr><td>Gate</td><td>\( U \)</td><td>A unitary matrix: \( U^\dagger U = I \)</td></tr>
+        <tr><td>Two gates in a row</td><td>\( VU \)</td><td>Matrix product; \( U \) acts first</td></tr>
+        <tr><td>Phase</td><td>\( e^{i\theta} \)</td><td>A unit complex number; an angle</td></tr>
+        <tr><td>Interference</td><td>\( |\alpha_1 + \alpha_2|^2 \)</td><td>Add amplitudes, then square</td></tr>
+    </table>
+    <p>
+        That is all the maths. Everything in Part II is built from this table.
+    </p>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> If \( |\psi\rangle = \tfrac{1}{\sqrt{2}}(|0\rangle + i|1\rangle) \), write \( \langle\psi| \).</p>
+        <p><strong>A1.</strong> \( \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 & -i \end{pmatrix} \). The \( i \) became \( -i \).</p>
+        <p><strong>Q2.</strong> Compute \( \langle\psi|\psi\rangle \) for that state.</p>
+        <p><strong>A2.</strong> \( \tfrac{1}{2}(1 \cdot 1 + (-i)(i)) = \tfrac{1}{2}(1 + 1) = 1 \). Normalised.</p>
+        <p><strong>Q3.</strong> What is the probability of finding \( |+\rangle \) in the state \( |0\rangle \)?</p>
+        <p><strong>A3.</strong> \( |\langle 0|+\rangle|^2 = |\tfrac{1}{\sqrt{2}}|^2 = \tfrac{1}{2} \).</p>
+    </details>
+</div>
+{% endraw %}

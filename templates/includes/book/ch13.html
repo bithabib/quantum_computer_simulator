@@ -1,0 +1,137 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 13: Grover's search</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> To find one marked item among \( N \), a classical computer checks about
+        \( N/2 \) of them. Grover's algorithm needs about \( \sqrt{N} \) steps. Each step flips the sign of the
+        marked item and then reflects every amplitude about the average, which pumps amplitude into the
+        marked one. For four items, one step finds it with certainty.
+    </div>
+
+    <h2>The problem</h2>
+    <p>
+        You have a phone book with \( N \) names in random order and one phone number. Find the name that
+        goes with it. There is no shortcut: on average you look at half the entries. Now suppose you have a
+        box that, given a name, says yes or no. Classically you still need about \( N/2 \) calls.
+    </p>
+    <p>
+        Lov Grover showed in 1996 that a quantum computer can do it in about \( \tfrac{\pi}{4}\sqrt{N} \) calls.
+        For a million entries that is about 800 instead of 500,000. It is not exponential speed-up like some
+        algorithms, but it applies to almost any search problem, which makes it one of the most useful.
+    </p>
+
+    <h2>Setup</h2>
+    <p>
+        Use \( n \) qubits, so there are \( N = 2^n \) bit strings, one per item. Put H on every qubit to get
+        the uniform state \( |s\rangle \), every item with amplitude \( \tfrac{1}{\sqrt{N}} \). The box is an
+        oracle \( U_w \) that flips the sign of the marked item \( |w\rangle \) and leaves the rest alone. It
+        is the phase-kickback box from Chapter 12, with the answer qubit already folded in:
+    </p>
+    \[ U_w|x\rangle = \begin{cases} -|x\rangle & x = w \\ |x\rangle & x \neq w \end{cases} \]
+    <p>
+        Flipping one sign does not change any probability (Chapter 6). We need a second step to turn the hidden
+        sign into a visible probability.
+    </p>
+
+    <h2>The diffusion step: reflect about the average</h2>
+    <p>
+        The second step is a fixed gate \( D \) that does something simple to the list of amplitudes:
+        compute their average \( m \), then replace every amplitude \( a \) by \( 2m - a \). That is a
+        reflection about the average: an amplitude just above the mean ends up just below it, and one far
+        below the mean ends up far above. In matrix form, \( D = 2|s\rangle\langle s| - I \), which you can read
+        with Chapter 7: project onto the uniform state, double it, subtract the original.
+    </p>
+    <p>
+        Here is why that helps. After the oracle, the marked amplitude is negative and all the others are
+        positive, so the average is slightly less than the others. Reflecting about it pushes the many
+        positive ones down a little and throws the negative one far up above the mean. Amplitude moves from
+        the crowd to the marked item.
+    </p>
+
+    <h2>Four items, by hand</h2>
+    <p>Two qubits, \( N = 4 \), and suppose the marked item is \( w = 11 \). Follow the four amplitudes in order \( 00, 01, 10, 11 \).</p>
+    <p><strong>Start.</strong> H on both qubits:</p>
+    \[ |s\rangle = \tfrac{1}{2}\,(1,\ 1,\ 1,\ 1) \]
+    <p><strong>Oracle.</strong> Flip the sign of \( |11\rangle \):</p>
+    \[ \tfrac{1}{2}\,(1,\ 1,\ 1,\ -1) \]
+    <p><strong>Diffusion.</strong> The average is \( m = \tfrac{1}{2}\cdot\tfrac{1 + 1 + 1 - 1}{4} = \tfrac{1}{4} \). Replace each \( a \) by \( 2m - a = \tfrac{1}{2} - a \):</p>
+    \[ \big(\tfrac{1}{2} - \tfrac{1}{2},\ \tfrac{1}{2} - \tfrac{1}{2},\ \tfrac{1}{2} - \tfrac{1}{2},\ \tfrac{1}{2} + \tfrac{1}{2}\big) = (0,\ 0,\ 0,\ 1) \]
+    <p>
+        The state is exactly \( |11\rangle \). Measure and you read the marked item with probability 1, after
+        calling the oracle once. A classical search of four items needs up to three calls (or two if you can
+        assume the last one by elimination).
+    </p>
+
+    <h2>The circuit for four items</h2>
+    <p>
+        Every piece is a gate you know. The oracle for \( w = 11 \) is a CZ (it flips the sign of
+        \( |11\rangle \) only). To mark a different item, sandwich the CZ with X gates on the qubits that
+        should be 0: for \( w = 01 \), put X on qubit 0 before and after. The diffusion gate \( D \) is
+        "H on all, X on all, CZ, X on all, H on all". (The X-CZ-X part flips the sign of \( |00\rangle \);
+        wrapping it in H gates turns "flip \( |00\rangle \)" into "flip \( |s\rangle \)", which is
+        \( -D \), and the minus sign is a global phase.)
+    </p>
+<pre class="circuit">
+q0: ─ H ─●─ H ─ X ─●─ X ─ H ─ M
+         │         │
+q1: ─ H ─●─ H ─ X ─●─ X ─ H ─ M
+        oracle     diffusion
+</pre>
+
+    <h2>Bigger lists: the rotation picture</h2>
+    <p>
+        For larger \( N \), one step is not enough, and here is the cleanest way to see how many you need.
+        Every state in the algorithm stays in the flat plane that contains both the marked item \( |w\rangle \) and the
+        uniform state \( |s\rangle \). Draw that plane. The oracle is a reflection in one line, the diffusion is a
+        reflection in another, and two reflections make a rotation. Each Grover step rotates the state towards
+        \( |w\rangle \) by a fixed angle \( 2\theta \), where \( \sin\theta = \tfrac{1}{\sqrt{N}} \).
+    </p>
+    <p>
+        You start at angle \( \theta \) from the "not marked" direction and want to reach \( 90^\circ \). So you
+        need about \( \tfrac{\pi/2}{2\theta} \approx \tfrac{\pi}{4}\sqrt{N} \) steps (for large \( N \) the angle is small, and for small angles measured in radians
+        \( \sin\theta \approx \theta \), so \( \theta \approx \tfrac{1}{\sqrt{N}} \)). Check with \( N = 4 \): \( \sin\theta = \tfrac{1}{2} \), so
+        \( \theta = 30^\circ \), and one step of \( 60^\circ \) takes you from \( 30^\circ \) to exactly
+        \( 90^\circ \). That is why four items need exactly one step.
+    </p>
+    <div class="note">
+        <strong>Do not overshoot.</strong> Keep rotating past \( 90^\circ \) and the probability goes back down.
+        Grover's algorithm must be stopped at the right step, unlike a classical search which only gets better
+        the longer you look. If you do not know how many items are marked, there are versions that handle that.
+    </div>
+
+    <h2>What Grover is really for</h2>
+    <p>
+        The oracle can be any yes/no test you can build from gates: "does this key decrypt the message?",
+        "does this colouring of the map use no clashing colours?", "does this schedule fit?". Any problem where
+        you can check an answer quickly but have to search for it can be sped up by a square root. That covers a
+        huge number of real problems, and it is also why some encryption key lengths are being doubled: a
+        128-bit key searched by Grover is only as strong as a 64-bit key.
+    </p>
+
+    <div class="try-it">
+        <strong>Try it.</strong> The <a href="/programming">Quantum Lab</a> challenge <em>Grover search (2 qubits)</em>
+        asks for exactly the circuit above. Build it line by line:
+<pre class="code">qc = QuantumCircuit(2)
+qc.h(0); qc.h(1)          # uniform state
+qc.cz(0, 1)               # oracle: mark |11>
+qc.h(0); qc.h(1)          # diffusion begins
+qc.x(0); qc.x(1)
+qc.cz(0, 1)
+qc.x(0); qc.x(1)
+qc.h(0); qc.h(1)          # diffusion ends</pre>
+        The probabilities should show 100 percent for 11. Then change the oracle to mark 01 (add
+        <code>qc.x(0)</code> before and after the first CZ) and watch the answer move.
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> After the oracle but before diffusion, what is the probability of measuring the marked item?</p>
+        <p><strong>A1.</strong> Still \( \tfrac{1}{N} \). A sign flip changes no probability. The diffusion step is what makes it visible.</p>
+        <p><strong>Q2.</strong> Roughly how many Grover steps for \( N = 1{,}000{,}000 \)?</p>
+        <p><strong>A2.</strong> \( \tfrac{\pi}{4}\sqrt{10^6} \approx 0.785 \times 1000 \approx 785 \).</p>
+        <p><strong>Q3.</strong> With \( N = 4 \), what happens if you run two Grover steps?</p>
+        <p><strong>A3.</strong> The state rotates another \( 60^\circ \), to \( 150^\circ \). The probability of the marked item drops to \( \sin^2 150^\circ = \tfrac{1}{4} \), back to chance.</p>
+    </details>
+</div>
+{% endraw %}

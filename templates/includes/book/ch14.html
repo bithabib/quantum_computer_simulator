@@ -1,0 +1,120 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 14: Teleportation, real machines, and the road ahead</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> With one Bell pair and two ordinary bits, a qubit's state can be sent
+        across any distance without the qubit itself moving. Real quantum computers exist but are noisy,
+        and error correction is how they will grow. Here is what they are, what they can do, and what to
+        learn next.
+    </div>
+
+    <h2>Quantum teleportation</h2>
+    <p>
+        Alice has a qubit \( |\psi\rangle = \alpha|0\rangle + \beta|1\rangle \) and wants Bob to have it. She
+        cannot measure it (that destroys \( \alpha, \beta \)) and cannot copy it (no-cloning, Chapter 9). But if
+        Alice and Bob share a Bell pair, she can do this:
+    </p>
+<pre class="circuit">
+q0: |ψ⟩ ────────●─ H ─ M ══╗
+                │          ║
+q1: |0⟩ ─ H ─●──⊕──── M ═╗ ║
+             │           ║ ║
+q2: |0⟩ ─────⊕───────────X─Z─  → |ψ⟩
+</pre>
+    <p>
+        Qubits 1 and 2 are the Bell pair (H then CNOT, as in Chapter 11). Alice holds qubits 0 and 1, Bob holds
+        qubit 2. Alice applies CNOT from 0 to 1, then H on 0, then measures both of hers and phones Bob the two
+        bits. Bob applies X if the second bit is 1 and Z if the first bit is 1. His qubit is now
+        \( |\psi\rangle \). Alice's original is gone (it collapsed), so nothing was copied.
+    </p>
+    <p><strong>Why it works.</strong> Write out the three-qubit state after the Bell pair is made:</p>
+    \[ (\alpha|0\rangle + \beta|1\rangle)\,\tfrac{1}{\sqrt{2}}(|00\rangle + |11\rangle)
+       = \tfrac{1}{\sqrt{2}}\big(\alpha|000\rangle + \alpha|011\rangle + \beta|100\rangle + \beta|111\rangle\big) \]
+    <p>Apply CNOT from qubit 0 to qubit 1 (flip the middle digit when the left digit is 1):</p>
+    \[ \tfrac{1}{\sqrt{2}}\big(\alpha|000\rangle + \alpha|011\rangle + \beta|110\rangle + \beta|101\rangle\big) \]
+    <p>Apply H to qubit 0 (\( |0\rangle \to \tfrac{1}{\sqrt{2}}(|0\rangle + |1\rangle) \), \( |1\rangle \to \tfrac{1}{\sqrt{2}}(|0\rangle - |1\rangle) \)) and regroup by what Alice's two qubits read:</p>
+    \[ \tfrac{1}{2}\Big( |00\rangle(\alpha|0\rangle + \beta|1\rangle) + |01\rangle(\alpha|1\rangle + \beta|0\rangle)
+       + |10\rangle(\alpha|0\rangle - \beta|1\rangle) + |11\rangle(\alpha|1\rangle - \beta|0\rangle) \Big) \]
+    <p>
+        Each of Alice's four possible readings comes with probability \( \tfrac{1}{4} \), and next to each one
+        is Bob's qubit in a state that is \( |\psi\rangle \) with a known mistake: nothing, an X, a Z, or both.
+        Alice's two bits tell Bob which fix to apply. Two classical bits, one Bell pair, and the state has moved.
+        Note that Bob learns nothing until the phone call, so again nothing travels faster than light.
+    </p>
+
+    <h2>What a real quantum computer is</h2>
+    <p>
+        Several kinds exist in 2026, and all of them implement the same matrices you have been using:
+    </p>
+    <ul>
+        <li><strong>Superconducting circuits</strong> (IBM, Google): tiny loops of metal cooled to 0.015 degrees above absolute zero, where current can flow "both ways at once". Gates are microwave pulses lasting nanoseconds.</li>
+        <li><strong>Trapped ions</strong> (IonQ, Quantinuum): single charged atoms held in place by electric fields, with lasers as gates. Slower, but very accurate.</li>
+        <li><strong>Neutral atoms</strong> (QuEra, Pasqal): arrays of atoms held by focused laser beams, moved around with light.</li>
+        <li><strong>Photons</strong>: particles of light travelling through chips. They do not need cooling but are hard to make interact.</li>
+    </ul>
+    <p>
+        Today's machines have hundreds to a few thousand qubits. The number matters less than the quality.
+    </p>
+
+    <h2>Noise, the real enemy</h2>
+    <p>
+        A qubit is a delicate arrow, and everything around it (heat, stray fields, a slightly wrong pulse)
+        nudges the arrow. After a short time, the superposition is smeared out. This is called
+        <strong>decoherence</strong>. A typical gate today has an error of about one in a thousand. A useful
+        algorithm needs millions of gates, so without help it will fail almost every time.
+    </p>
+
+    <h2>Error correction, and why no-cloning does not forbid it</h2>
+    <p>
+        Classical computers protect bits by repetition: store 0 as 000, and if one bit flips to 010, take the
+        majority. Quantum states cannot be copied, so you might think this is impossible. The escape is
+        entanglement. Encode \( \alpha|0\rangle + \beta|1\rangle \) as \( \alpha|000\rangle + \beta|111\rangle \)
+        using two CNOTs. This is not three copies (it is an entangled state, like GHZ in Chapter 11), and
+        \( \alpha, \beta \) are never read. If one qubit flips, you measure <em>whether pairs of qubits agree</em>
+        (CNOTs onto spare qubits) without measuring the qubits themselves. "Qubits 0 and 1 disagree, 1 and 2
+        agree" tells you qubit 0 flipped, and you flip it back. The superposition survives.
+    </p>
+    <p>
+        Real codes also handle sign flips (Z errors) by doing the same thing in the plus/minus basis. The most
+        studied is the <strong>surface code</strong>, which uses a grid of physical qubits to make one reliable
+        "logical" qubit. The price is high: hundreds or thousands of physical qubits per logical qubit. The
+        first experiments showing that error correction makes things better rather than worse were done in
+        2023 and 2024. That was the milestone the field had been waiting for.
+    </p>
+
+    <h2>Other famous algorithms</h2>
+    <ul>
+        <li><strong>Shor's algorithm (1994)</strong> factors large numbers in a time that grows polynomially, where the best classical methods grow faster than any polynomial (almost exponentially). Most internet encryption (RSA) relies on factoring being hard, so Shor's algorithm is the reason "post-quantum" cryptography is being rolled out now. Its core is the <em>quantum Fourier transform</em>, a circuit of H and controlled phase gates that finds the period of a function by interference, exactly the H-box-H pattern from Chapter 12 at a larger scale.</li>
+        <li><strong>Simulating molecules and materials.</strong> A molecule's electrons are a quantum system, and simulating one with \( n \) electron orbitals (one qubit each) classically needs \( 2^n \) amplitudes (Chapter 11). A quantum computer stores them natively. This is the application many researchers expect to pay off first: new catalysts, batteries, medicines.</li>
+        <li><strong>Variational algorithms.</strong> Short circuits with adjustable rotation angles, trained by a classical optimiser using derivatives (Chapter 4). They suit today's noisy machines. Their weakness is the barren plateau, where the derivatives vanish and training stalls; predicting when that happens is the research project on this site.</li>
+    </ul>
+
+    <h2>What quantum computers will not do</h2>
+    <p>
+        They will not replace your laptop. They are slow at ordinary tasks and offer no speed-up for most of
+        them. They do not "try every answer at once and pick the best"; as Chapter 12 showed, you get one
+        measurement, and the art is arranging interference so that one measurement is enough. They do not
+        send messages faster than light. What they do is solve a specific set of problems that are otherwise
+        out of reach, and that set is important enough to have built an industry.
+    </p>
+
+    <h2>Where to go next</h2>
+    <ul>
+        <li>Finish every challenge in the <a href="/programming">Quantum Lab</a>, then invent your own circuits. Chapter 15 is a guide to the Lab's commands.</li>
+        <li>Read <em>Quantum Computing for Computer Scientists</em> by Yanofsky and Mannucci. It assumes exactly the maths in Part I of this book.</li>
+        <li>Work through the free online <em>Qubit Guide</em> at qubit.guide, and then Nielsen and Chuang's <em>Quantum Computation and Quantum Information</em>, the standard university textbook.</li>
+        <li>Run a real circuit. IBM and others let anyone submit small circuits to real hardware over the internet. Build the Bell pair from Chapter 11 and see that 01 and 10 do show up a little; that is the noise.</li>
+    </ul>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> In teleportation, Alice reads 10. What does Bob do?</p>
+        <p><strong>A1.</strong> Apply Z. His state was \( \alpha|0\rangle - \beta|1\rangle \), and Z flips the sign back.</p>
+        <p><strong>Q2.</strong> Does teleportation copy the qubit?</p>
+        <p><strong>A2.</strong> No. Alice's qubit collapses when she measures it; afterwards only Bob has \( |\psi\rangle \).</p>
+        <p><strong>Q3.</strong> Why does the three-qubit repetition code not break the no-cloning theorem?</p>
+        <p><strong>A3.</strong> \( \alpha|000\rangle + \beta|111\rangle \) is one entangled state, not three copies of \( \alpha|0\rangle + \beta|1\rangle \). (Three copies would be \( (\alpha|0\rangle + \beta|1\rangle)(\alpha|0\rangle + \beta|1\rangle)(\alpha|0\rangle + \beta|1\rangle) \) multiplied out, which has eight terms.)</p>
+    </details>
+</div>
+{% endraw %}

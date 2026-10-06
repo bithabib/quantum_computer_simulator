@@ -1,0 +1,179 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 11: Two qubits and entanglement</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> Two qubits are one arrow with four entries, one for each of 00, 01, 10, 11.
+        The CNOT gate links them. Some two-qubit states cannot be split into "this qubit" and "that qubit" at
+        all. Those are entangled, and measuring one instantly fixes the other.
+    </div>
+
+    <h2>Four outcomes, four amplitudes</h2>
+    <p>
+        Two bits can be 00, 01, 10 or 11. Two qubits can be a superposition of all four, so the state is a
+        column with four complex entries:
+    </p>
+    \[ |\psi\rangle = a|00\rangle + b|01\rangle + c|10\rangle + d|11\rangle = \begin{pmatrix} a \\ b \\ c \\ d \end{pmatrix},
+       \qquad |a|^2 + |b|^2 + |c|^2 + |d|^2 = 1 \]
+    <p>
+        The four basis states are the unit arrows \( (1,0,0,0) \), \( (0,1,0,0) \), \( (0,0,1,0) \), \( (0,0,0,1) \).
+        Measuring gives 00 with probability \( |a|^2 \), and so on. Everything from Chapters 7 to 9 carries over
+        unchanged; the arrow just has more entries.
+    </p>
+    <div class="note">
+        <strong>Which qubit is which.</strong> In this book and on this site's simulator, the <em>left</em> digit
+        is qubit 0 and the <em>right</em> digit is qubit 1. So \( |10\rangle \) means qubit 0 is 1 and qubit 1 is 0.
+        (Some other software, including IBM's, writes it the other way round. Always check.)
+    </div>
+
+    <h2>Gluing two qubits together</h2>
+    <p>
+        If qubit 0 is \( \alpha|0\rangle + \beta|1\rangle \) and qubit 1 is \( \gamma|0\rangle + \delta|1\rangle \),
+        the pair is found by multiplying out the brackets, exactly like \( (x + y)(u + v) \):
+    </p>
+    \[ (\alpha|0\rangle + \beta|1\rangle)(\gamma|0\rangle + \delta|1\rangle)
+       = \alpha\gamma|00\rangle + \alpha\delta|01\rangle + \beta\gamma|10\rangle + \beta\delta|11\rangle \]
+    <p>
+        Chapter 6's "both: multiply" rule is at work: the amplitude for "qubit 0 is 0 <em>and</em> qubit 1 is 1" is
+        the product \( \alpha\delta \). This way of gluing is called the <strong>tensor product</strong>, written
+        \( \otimes \), so the pair is \( |\psi_0\rangle \otimes |\psi_1\rangle \), or just \( |\psi_0\rangle|\psi_1\rangle \).
+    </p>
+    <p>Example: both qubits in \( |+\rangle \):</p>
+    \[ |+\rangle|+\rangle = \tfrac{1}{\sqrt{2}}(|0\rangle + |1\rangle)\,\tfrac{1}{\sqrt{2}}(|0\rangle + |1\rangle)
+       = \tfrac{1}{2}(|00\rangle + |01\rangle + |10\rangle + |11\rangle) \]
+    <p>
+        All four outcomes, each with probability \( \tfrac{1}{4} \). With \( n \) qubits all in \( |+\rangle \),
+        you get all \( 2^n \) bit strings at once with equal amplitude. That is the starting line of most
+        algorithms.
+    </p>
+
+    <h2>One-qubit gates on two qubits</h2>
+    <p>
+        Applying \( X \) to qubit 0 only means "swap the 0 and 1 of the left digit, leave the right digit alone".
+        On the basis states: \( |00\rangle \to |10\rangle \), \( |01\rangle \to |11\rangle \), \( |10\rangle \to |00\rangle \),
+        \( |11\rangle \to |01\rangle \). The tensor product works for matrices too: \( A \otimes B \) means
+        "\( A \) on the left qubit and \( B \) on the right qubit", so this gate is \( X \otimes I \). By the
+        column rule from Chapter 3, its columns are the four answers above:
+    </p>
+    \[ X \otimes I = \begin{pmatrix} 0 & 0 & 1 & 0 \\ 0 & 0 & 0 & 1 \\ 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \end{pmatrix} \]
+    <p>
+        You rarely need to write the 4 by 4 grid; thinking "act on the left digit" is enough.
+    </p>
+
+    <h2>The CNOT gate</h2>
+    <p>
+        The first truly two-qubit gate. <strong>CNOT</strong> ("controlled NOT") has a control qubit and a target
+        qubit. Rule: <em>if the control is 1, flip the target; otherwise do nothing</em>. With qubit 0 as control
+        and qubit 1 as target:
+    </p>
+    \[ |00\rangle \to |00\rangle, \quad |01\rangle \to |01\rangle, \quad |10\rangle \to |11\rangle, \quad |11\rangle \to |10\rangle \]
+    \[ \text{CNOT} = \begin{pmatrix} 1 & 0 & 0 & 0 \\ 0 & 1 & 0 & 0 \\ 0 & 0 & 0 & 1 \\ 0 & 0 & 1 & 0 \end{pmatrix} \]
+    <p>
+        The top-left block is \( I \) (control 0: do nothing), the bottom-right block is \( X \) (control 1:
+        flip). In bra-ket form, \( \text{CNOT} = |0\rangle\langle 0| \otimes I + |1\rangle\langle 1| \otimes X \),
+        which says the same thing in symbols. It is its own inverse: two CNOTs cancel.
+    </p>
+    <p>
+        On a classical computer CNOT is just "exclusive or" (XOR) written into the target:
+        \( |x\rangle|y\rangle \to |x\rangle|y \oplus x\rangle \), where \( \oplus \) means "add the two bits and drop
+        the 2", so \( 0 \oplus 0 = 0 \), \( 0 \oplus 1 = 1 \), \( 1 \oplus 0 = 1 \), \( 1 \oplus 1 = 0 \).
+        The quantum magic appears when the control is in a superposition.
+    </p>
+
+    <h2>Making a Bell pair</h2>
+    <p>Start with \( |00\rangle \). Apply \( H \) to qubit 0:</p>
+    \[ H|0\rangle \otimes |0\rangle = \tfrac{1}{\sqrt{2}}(|0\rangle + |1\rangle)|0\rangle = \tfrac{1}{\sqrt{2}}(|00\rangle + |10\rangle) \]
+    <p>Now apply CNOT (control 0, target 1) to each part. \( |00\rangle \) stays. \( |10\rangle \) becomes \( |11\rangle \):</p>
+    \[ |\Phi^+\rangle = \tfrac{1}{\sqrt{2}}(|00\rangle + |11\rangle) \]
+    <p>
+        This is a <strong>Bell pair</strong>, named after John Bell. Measure it: 00 with probability
+        \( \tfrac{1}{2} \), 11 with probability \( \tfrac{1}{2} \), and never 01 or 10. The two qubits always
+        agree.
+    </p>
+
+    <h2>Why it is called entangled</h2>
+    <p>
+        Try to write the Bell pair as "qubit 0 in some state" glued to "qubit 1 in some state". From the gluing
+        formula you would need
+    </p>
+    \[ \alpha\gamma = \tfrac{1}{\sqrt{2}}, \quad \alpha\delta = 0, \quad \beta\gamma = 0, \quad \beta\delta = \tfrac{1}{\sqrt{2}} \]
+    <p>
+        From \( \alpha\delta = 0 \), either \( \alpha = 0 \) or \( \delta = 0 \). But \( \alpha = 0 \) breaks the
+        first equation and \( \delta = 0 \) breaks the last. No solution. The Bell pair is <strong>not</strong> two
+        separate qubits. Neither qubit has a state of its own; only the pair does. That is what
+        <strong>entangled</strong> means.
+    </p>
+    <p>
+        Now the famous part. Give qubit 0 to Alice in London and qubit 1 to Bob in Tokyo. Alice measures hers
+        and sees 0. The state collapses to \( |00\rangle \), so Bob's qubit is now \( |0\rangle \), instantly. If
+        she had seen 1, Bob's would be \( |1\rangle \). Einstein called this "spooky action at a distance".
+    </p>
+    <p>
+        Is it just two coins that were secretly set the same way before they were separated? No, and you can see
+        why with Chapter 9. Alice and Bob can both measure in the <em>plus/minus</em> basis instead. Rewrite the
+        Bell pair using \( |0\rangle = \tfrac{1}{\sqrt{2}}(|+\rangle + |-\rangle) \) and \( |1\rangle = \tfrac{1}{\sqrt{2}}(|+\rangle - |-\rangle) \);
+        the cross terms cancel and you get
+    </p>
+    \[ |\Phi^+\rangle = \tfrac{1}{\sqrt{2}}(|{+}{+}\rangle + |{-}{-}\rangle) \]
+    <p>
+        They agree in that basis too. In fact, if Alice and Bob both measure at the <em>same</em> angle
+        anywhere in the \( x \)-\( z \) plane of the Bloch sphere, they always agree. Could pre-set coins do that?
+        Yes, if each coin secretly carried an answer for every possible angle. So agreement alone does not
+        settle it.
+    </p>
+    <p>
+        What pre-set answers cannot copy is how often Alice and Bob agree when they pick <em>different</em>
+        angles. Quantum mechanics says: if Alice measures at angle \( a \) and Bob at angle \( b \), they agree
+        with probability \( \cos^2\tfrac{a - b}{2} \). Now let each of them choose at random between three
+        angles, \( 0^\circ \), \( 120^\circ \) and \( 240^\circ \). When their choices differ, the gap is
+        \( 120^\circ \) either way, so they agree with probability \( \cos^2 60^\circ = \tfrac{1}{4} \).
+        Pre-set coins can never get that low: each coin carries three answers, each 0 or 1, so at least two
+        of the three must be equal, which means at least one of the three possible pairs of different
+        angles agrees, and over the three pairs the agreement rate is at least \( \tfrac{1}{3} \). One quarter is
+        less than one third. The quantum pair is <em>less</em> predictable from hidden answers than any
+        hidden-answer scheme allows. John Bell found this argument in 1964, experiments have confirmed the
+        quantum number, and the 2022 Nobel Prize in physics was for those experiments. Entanglement is real,
+        not a hidden-coin trick.
+    </p>
+    <div class="note">
+        <strong>No faster-than-light messages.</strong> Bob's results on their own look like fair coin flips
+        whether or not Alice has measured. The agreement only shows up when they compare notes by phone. So
+        nothing travels faster than light, and yet the correlation is stronger than anything classical.
+    </div>
+
+    <h2>Other useful two-qubit facts</h2>
+    <ul>
+        <li><strong>Four Bell states.</strong> Apply X to qubit 1 of \( |\Phi^+\rangle \) and you get \( \tfrac{1}{\sqrt{2}}(|01\rangle + |10\rangle) \); apply Z instead and you get \( \tfrac{1}{\sqrt{2}}(|00\rangle - |11\rangle) \); apply Z and then X and you get \( \tfrac{1}{\sqrt{2}}(|01\rangle - |10\rangle) \). Together with \( |\Phi^+\rangle \) they form an orthonormal basis of the two-qubit space. Chapter 15 has them as a project.</li>
+        <li><strong>CZ.</strong> Controlled-Z: flips the sign of \( |11\rangle \) only. Its matrix is \( I \) with the last entry \( -1 \). Symmetric in the two qubits. Chapter 13 uses it.</li>
+        <li><strong>Controlled phase, CP(\( \lambda \)).</strong> Multiplies the \( |11\rangle \) amplitude by \( e^{i\lambda} \) and leaves the other three alone. CZ is CP(\( \pi \)). The Lab has it as <code>qc.cp(lam, c, t)</code>.</li>
+        <li><strong>SWAP.</strong> Exchanges the two qubits: \( |01\rangle \leftrightarrow |10\rangle \). It equals three CNOTs in a row with control and target alternating. The Lab has it as a challenge.</li>
+        <li><strong>GHZ.</strong> Three qubits in \( \tfrac{1}{\sqrt{2}}(|000\rangle + |111\rangle) \): an H then two CNOTs. All three agree, always.</li>
+        <li><strong>Toffoli (CCX).</strong> Two controls, one target: flip the target only if both controls are 1. With it, a quantum computer can do every classical logic operation.</li>
+    </ul>
+
+    <h2>Counting amplitudes</h2>
+    <p>
+        One qubit: 2 amplitudes. Two: 4. Three: 8. Fifty: \( 2^{50} \), about a thousand trillion. A classical
+        computer simulating 50 qubits would need to store that many complex numbers, which is beyond almost any machine on Earth.
+        The quantum computer stores them "for free" in the physics. That is the real reason quantum computers
+        might be powerful, and also the reason they are hard to check.
+    </p>
+
+    <div class="try-it">
+        <strong>Try it.</strong> In the <a href="/programming">Quantum Lab</a>, solve <em>Bell pair</em> with
+        <code>qc.h(0)</code> then <code>qc.cx(0, 1)</code>. The probabilities should read 50 percent for 00 and
+        50 percent for 11, nothing for 01 or 10. Then try <em>GHZ state</em> (add <code>qc.cx(1, 2)</code> on a
+        three-qubit circuit) and <em>Swap two qubits</em>.
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> Apply CNOT (control 0, target 1) to \( |+\rangle|1\rangle \). Result?</p>
+        <p><strong>A1.</strong> \( |+\rangle|1\rangle = \tfrac{1}{\sqrt{2}}(|01\rangle + |11\rangle) \to \tfrac{1}{\sqrt{2}}(|01\rangle + |10\rangle) \). Entangled.</p>
+        <p><strong>Q2.</strong> Is \( \tfrac{1}{2}(|00\rangle + |01\rangle + |10\rangle + |11\rangle) \) entangled?</p>
+        <p><strong>A2.</strong> No. It is \( |+\rangle|+\rangle \), as worked above.</p>
+        <p><strong>Q3.</strong> Alice measures her half of a Bell pair and gets 1. What is Bob's qubit now?</p>
+        <p><strong>A3.</strong> \( |1\rangle \).</p>
+    </details>
+</div>
+{% endraw %}

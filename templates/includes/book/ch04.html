@@ -1,0 +1,103 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 4: How fast things change (derivatives)</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> A derivative is a speed. It tells you how fast one thing changes when
+        another thing changes. Quantum physics has one master equation, and it says how fast the state arrow
+        turns.
+    </div>
+
+    <h2>Speed is a derivative</h2>
+    <p>
+        A car's position changes with time. Its speed is "how much the position changes per second".
+        If the car is at 10 metres at time 2 s and 16 metres at time 3 s, it moved 6 metres in 1 second,
+        so its speed was about 6 m/s.
+    </p>
+    \[ \text{speed} = \frac{\text{change in position}}{\text{change in time}} = \frac{16 - 10}{3 - 2} = 6 \]
+    <p>
+        But "about" is not good enough if the car is speeding up. The true speed at exactly 2 s is what you
+        get when you make the time gap smaller and smaller. That limit is the <strong>derivative</strong> of
+        position with respect to time, written \( \frac{dx}{dt} \). The letter \( d \) just means "a tiny
+        change in".
+    </p>
+
+    <h2>Slope is a derivative</h2>
+    <p>
+        Draw position against time on a graph. The derivative at a point is the <strong>slope</strong> of the
+        graph there: how steep it is. Steep means fast. Flat means stopped. Sloping down means going backwards.
+    </p>
+    <p>
+        You can find derivatives of simple formulas with rules. The one rule you need for this book:
+    </p>
+    \[ \text{if } x = t^n \text{ then } \frac{dx}{dt} = n\,t^{\,n-1} \]
+    <p>
+        Examples: the derivative of \( t^2 \) is \( 2t \). The derivative of \( t^3 \) is \( 3t^2 \).
+        The derivative of \( 5t \) is \( 5 \) (a straight line has a constant slope). The derivative of a
+        constant like \( 7 \) is \( 0 \) (a flat line has no slope).
+    </p>
+    <p>
+        Try it on the car. Say its position is \( x = t^2 \) metres. Then its speed is \( \frac{dx}{dt} = 2t \).
+        At 2 s the speed is exactly 4 m/s, at 3 s it is 6 m/s. The car is speeding up.
+    </p>
+
+    <h2>The derivative of a derivative</h2>
+    <p>
+        Speeding up has a name: acceleration. It is "how fast the speed changes", which is the derivative of
+        the speed, which is the derivative of the derivative of position. We write it \( \frac{d^2x}{dt^2} \)
+        and call it the <strong>second derivative</strong>. For \( x = t^2 \), the speed is \( 2t \) and the
+        acceleration is \( 2 \): constant. This car gains 2 m/s every second.
+    </p>
+    <p>
+        The second derivative also tells you the <em>shape</em> of a graph. Positive means the curve bends
+        upward like a smile. Negative means it bends downward like a frown. Where the first derivative is
+        zero (flat) and the second is negative, you are at the top of a hill, a maximum. Where it is zero and
+        the second is positive, you are at the bottom of a valley, a minimum.
+    </p>
+
+    <h2>Where does quantum physics use this?</h2>
+    <p>
+        Everywhere, but you only need to know two places.
+    </p>
+    <p>
+        <strong>1. The master equation.</strong> In Chapter 1 we said a quantum state is an arrow and things
+        that happen are machines that turn the arrow. Erwin Schrödinger wrote the equation that says how fast
+        the arrow turns as time passes:
+    </p>
+    \[ i\hbar \frac{d}{dt}|\psi\rangle = H|\psi\rangle \]
+    <p>
+        Read it like this: "the rate of change of the state arrow (left side) equals a certain machine \( H \),
+        called the Hamiltonian, applied to the arrow (right side)". \( \hbar \) is a tiny fixed number from
+        nature, and \( i \) is the number you meet in the next chapter. That is the whole law of motion of the
+        quantum world. Every gate in a quantum computer is really this equation run for a short time with a
+        chosen \( H \). We will not solve it in this book, but now you can read it.
+    </p>
+    <p>
+        <strong>2. Learning.</strong> Modern quantum computers are often "trained" like a neural network. You
+        have a circuit with some adjustable angles, a score that says how well it is doing, and you adjust the
+        angles to improve the score. How do you know which way to turn each angle? Take the derivative of the
+        score with respect to the angle. Positive derivative: turning the angle up raises the score. Zero
+        derivative everywhere: the score is flat and you are stuck. (That "flat" problem has a name, a barren
+        plateau, and it is what the research on this site is about.)
+    </p>
+
+    <h2>Integrals, in one paragraph</h2>
+    <p>
+        A derivative takes you from position to speed. The reverse trip, from speed back to position, is an
+        <strong>integral</strong>: add up speed times tiny time steps to get total distance. The integral of
+        \( 2t \) is \( t^2 \) (plus a constant for where you started). On a graph it is the area under the
+        curve. Chapter 6 mentions them once, where a probability is spread over a line instead of a few
+        points, but in this book it is enough to know they undo derivatives.
+    </p>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> If \( x = t^3 \), what is the speed at \( t = 2 \)?</p>
+        <p><strong>A1.</strong> \( \frac{dx}{dt} = 3t^2 = 3 \times 4 = 12 \).</p>
+        <p><strong>Q2.</strong> What is the acceleration at \( t = 2 \)?</p>
+        <p><strong>A2.</strong> The derivative of \( 3t^2 \) is \( 6t = 12 \).</p>
+        <p><strong>Q3.</strong> In the Schrödinger equation, which side is "how fast the state changes"?</p>
+        <p><strong>A3.</strong> The left side, \( \frac{d}{dt}|\psi\rangle \).</p>
+    </details>
+</div>
+{% endraw %}

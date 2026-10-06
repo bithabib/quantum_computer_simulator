@@ -1,0 +1,131 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 8: The qubit</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> A bit is 0 or 1. A qubit is a unit arrow \( \alpha|0\rangle + \beta|1\rangle \)
+        that can lean towards both. The two complex numbers \( \alpha \) and \( \beta \) hold the whole state.
+        A picture called the Bloch sphere shows the arrow as a point on a ball.
+    </div>
+
+    <h2>Bits</h2>
+    <p>
+        Everything in an ordinary computer is bits. A bit is a switch: off or on, 0 or 1. Eight bits make a
+        byte, and a byte can be any of \( 2^8 = 256 \) patterns, but at any moment it <em>is</em> exactly one
+        of them.
+    </p>
+
+    <h2>Qubits</h2>
+    <p>
+        A <strong>qubit</strong> (quantum bit) is a physical thing with two basic states, which we name
+        \( |0\rangle \) and \( |1\rangle \). It could be an atom in its lowest or next-lowest energy level, a
+        photon polarised up or sideways, or a tiny electric current going one way or the other. The hardware
+        is not our concern. What matters is the rule from Part I: the state of the qubit is a unit vector
+    </p>
+    \[ |\psi\rangle = \alpha|0\rangle + \beta|1\rangle, \qquad |\alpha|^2 + |\beta|^2 = 1 \]
+    <p>
+        with \( \alpha \) and \( \beta \) complex. When \( \beta = 0 \) the qubit is simply \( |0\rangle \), a
+        plain bit. When \( \alpha = 0 \) it is \( |1\rangle \). In between, it is a mix, and the word for a mix
+        is <strong>superposition</strong>.
+    </p>
+    <p>
+        Superposition does <em>not</em> mean "it is secretly 0 or 1 and we don't know which". It means the
+        arrow genuinely points between them, and both parts can interfere with each other, as in Chapter 6.
+        Only when you look (Chapter 9) does it become 0 or 1.
+    </p>
+
+    <h2>Five states to remember</h2>
+    <p>These come up constantly. Each one is a unit vector; check one or two yourself.</p>
+    <table class="summary">
+        <tr><th>Name</th><th>Ket</th><th>Column</th><th>Chance of 0</th><th>Chance of 1</th></tr>
+        <tr><td>Zero</td><td>\( |0\rangle \)</td><td>\( \begin{pmatrix} 1 \\ 0 \end{pmatrix} \)</td><td>1</td><td>0</td></tr>
+        <tr><td>One</td><td>\( |1\rangle \)</td><td>\( \begin{pmatrix} 0 \\ 1 \end{pmatrix} \)</td><td>0</td><td>1</td></tr>
+        <tr><td>Plus</td><td>\( |+\rangle = \tfrac{1}{\sqrt{2}}(|0\rangle + |1\rangle) \)</td><td>\( \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ 1 \end{pmatrix} \)</td><td>\( \tfrac{1}{2} \)</td><td>\( \tfrac{1}{2} \)</td></tr>
+        <tr><td>Minus</td><td>\( |-\rangle = \tfrac{1}{\sqrt{2}}(|0\rangle - |1\rangle) \)</td><td>\( \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ -1 \end{pmatrix} \)</td><td>\( \tfrac{1}{2} \)</td><td>\( \tfrac{1}{2} \)</td></tr>
+        <tr><td>Plus-i</td><td>\( |{+i}\rangle = \tfrac{1}{\sqrt{2}}(|0\rangle + i|1\rangle) \)</td><td>\( \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ i \end{pmatrix} \)</td><td>\( \tfrac{1}{2} \)</td><td>\( \tfrac{1}{2} \)</td></tr>
+    </table>
+    <p>
+        Notice that plus, minus and plus-i all give a 50/50 chance of 0 or 1. If you only ever measured them,
+        you could not tell them apart. Yet they are different arrows, and gates treat them differently. The
+        difference is entirely in the <em>phase</em>, the angle between \( \alpha \) and \( \beta \). Phase is
+        invisible to a single measurement and essential to everything else.
+    </p>
+
+    <h2>A phase you can ignore, and one you cannot</h2>
+    <p>
+        Multiply the whole state by a unit complex number, say \( |\psi'\rangle = e^{i\theta}|\psi\rangle \).
+        Every amplitude turns by the same angle, so every \( |\alpha|^2 \) is unchanged, and so is every
+        interference term (the angle <em>difference</em> is what matters). The states \( |\psi\rangle \) and
+        \( -|\psi\rangle \) and \( i|\psi\rangle \) are physically the same. This is called a
+        <strong>global phase</strong>, and you may drop it.
+    </p>
+    <p>
+        But turning <em>only</em> \( \beta \), as in \( \alpha|0\rangle + e^{i\theta}\beta|1\rangle \), changes the
+        angle between the two parts. That is a <strong>relative phase</strong>, and it is real. The difference
+        between \( |+\rangle \) and \( |-\rangle \) is a relative phase of \( \pi \).
+    </p>
+
+    <h2>The Bloch sphere</h2>
+    <p>
+        Two complex numbers are four real numbers. The length rule removes one, and the global phase removes
+        another. Two real numbers are left, and two numbers can be drawn as a point on the surface of a ball.
+        That drawing is the <strong>Bloch sphere</strong>.
+    </p>
+    <div class="figure">
+        <img src="static/src/icon/bloch_sphere.png" alt="The Bloch sphere" style="max-width: 320px;">
+        <p class="caption">Figure 8.1: The Bloch sphere. North pole \( |0\rangle \), south pole \( |1\rangle \), equator for equal mixes.</p>
+    </div>
+    <div class="note">
+        <strong>New axes.</strong> The \( x \), \( y \), \( z \) of the Bloch sphere are <em>not</em> the \( \hat{x} \) and
+        \( \hat{y} \) of Chapter 2. There, \( |0\rangle \) and \( |1\rangle \) were two arrows at right angles on a flat
+        page. Here they are the north and south poles of a ball, on the \( z \) axis. The ball is a different
+        picture of the same two numbers \( \alpha, \beta \), chosen so that every qubit is one point on its surface.
+    </div>
+    <p>Any qubit can be written with two angles, \( \theta \) (down from the north pole) and \( \phi \) (around the equator):</p>
+    \[ |\psi\rangle = \cos\tfrac{\theta}{2}\,|0\rangle + e^{i\phi}\sin\tfrac{\theta}{2}\,|1\rangle \]
+    <ul>
+        <li>\( \theta = 0 \): \( \cos 0 = 1 \), \( \sin 0 = 0 \), so the state is \( |0\rangle \). The north pole.</li>
+        <li>\( \theta = \pi \): the state is \( |1\rangle \). The south pole.</li>
+        <li>\( \theta = \pi/2, \phi = 0 \): \( \cos\tfrac{\pi}{4} = \sin\tfrac{\pi}{4} = \tfrac{1}{\sqrt{2}} \), so the state is \( |+\rangle \). On the equator, pointing along \( +x \).</li>
+        <li>\( \theta = \pi/2, \phi = \pi \): \( e^{i\pi} = -1 \), so \( |-\rangle \). Equator, along \( -x \).</li>
+        <li>\( \theta = \pi/2, \phi = \pi/2 \): \( e^{i\pi/2} = i \), so \( |{+i}\rangle \). Equator, along \( +y \).</li>
+    </ul>
+    <p>
+        The chance of measuring 0 is \( \cos^2\tfrac{\theta}{2} \): 1 at the north pole, \( \tfrac{1}{2} \) on the
+        equator, 0 at the south pole. The angle \( \phi \) is the relative phase. Moving around the equator
+        changes the phase and nothing about the 0/1 chances.
+    </p>
+    <div class="note">
+        The halves in \( \theta/2 \) are not a typo. States that are opposite on the Bloch sphere, like
+        \( |0\rangle \) and \( |1\rangle \), are <em>orthogonal</em> as vectors (90 degrees apart in Chapter 2's
+        sense) but 180 degrees apart on the ball. The ball doubles all angles.
+    </div>
+
+    <h2>Why one qubit already beats one bit</h2>
+    <p>
+        You cannot read \( \alpha \) and \( \beta \) out of a single qubit; measurement gives you one bit, 0 or
+        1, and destroys the rest. So a qubit does not store "more information" in the everyday sense. What it
+        gives you is the ability to put a value into a superposition, apply gates that act on both parts at
+        once, and arrange interference so that the answer you want is the one you see. That is a different kind
+        of computing, and the next chapters build it up piece by piece.
+    </p>
+
+    <div class="try-it">
+        <strong>Try it.</strong> Open the <a href="/">Bloch Sphere Simulator</a>. The arrow starts at the north
+        pole, \( |0\rangle \). Press <strong>H</strong>: the arrow drops to the equator, \( |+\rangle \). Press
+        <strong>S</strong>: it slides a quarter turn around the equator to \( |{+i}\rangle \). Press
+        <strong>S</strong> again: \( |-\rangle \). Watch the probabilities shown on the page: on the equator they
+        stay 50/50 no matter how you turn.
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> Is \( \tfrac{1}{2}|0\rangle + \tfrac{1}{2}|1\rangle \) a valid qubit?</p>
+        <p><strong>A1.</strong> No. \( \tfrac{1}{4} + \tfrac{1}{4} = \tfrac{1}{2} \neq 1 \). Divide by its length \( \tfrac{1}{\sqrt{2}} \) to normalise it, and you get \( |+\rangle \).</p>
+        <p><strong>Q2.</strong> Are \( |+\rangle \) and \( -|+\rangle \) different qubits?</p>
+        <p><strong>A2.</strong> No. The \( -1 \) is a global phase. Both are the same point on the Bloch sphere.</p>
+        <p><strong>Q3.</strong> Where on the Bloch sphere is \( \tfrac{1}{\sqrt{2}}(|0\rangle - i|1\rangle) \)?</p>
+        <p><strong>A3.</strong> On the equator along \( -y \): \( \theta = \pi/2 \), \( \phi = 3\pi/2 \) (since \( e^{i3\pi/2} = -i \)).</p>
+    </details>
+</div>
+{% endraw %}

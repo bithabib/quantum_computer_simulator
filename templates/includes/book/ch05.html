@@ -1,0 +1,153 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 5: Numbers that turn (complex numbers)</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> There is a number \( i \) with \( i^2 = -1 \). Multiplying by \( i \) means
+        "turn a quarter circle". A complex number is an arrow in a flat plane, with a length and an angle.
+        Quantum amplitudes are complex numbers, and the angle is what makes quantum computing work.
+    </div>
+
+    <h2>A problem with no answer</h2>
+    <p>
+        Solve \( x^2 = -1 \). No ordinary number works: a positive number squared is positive, a negative
+        number squared is also positive, and zero squared is zero. Mathematicians were stuck on this for
+        centuries, until they simply decided to invent a new number and see what happened. They called it
+        \( i \) and gave it one rule:
+    </p>
+    \[ i^2 = -1 \]
+    <p>
+        Everything else follows from that rule and normal algebra. For example \( i^3 = i^2 \cdot i = -i \),
+        and \( i^4 = i^2 \cdot i^2 = (-1)(-1) = 1 \). So \( i, i^2, i^3, i^4 \) is \( i, -1, -i, 1 \), and then
+        it repeats. Four steps and you are back where you started. That is a big hint.
+    </p>
+
+    <h2>A complex number is an arrow</h2>
+    <p>
+        Write a <strong>complex number</strong> as \( z = a + bi \), with \( a \) and \( b \) ordinary numbers.
+        Call \( a \) the <strong>real part</strong> and \( b \) the <strong>imaginary part</strong>. Now draw it:
+        go \( a \) steps right and \( b \) steps up. The number \( 3 + 4i \) is an arrow to the point \( (3, 4) \).
+        Real numbers lie on the horizontal line (\( b = 0 \)). The number \( i \) itself is the arrow straight up
+        to \( (0, 1) \).
+    </p>
+    <p>
+        Everything you learned about arrows in Chapter 2 applies. The <strong>length</strong> of \( z \),
+        written \( |z| \), is
+    </p>
+    \[ |z| = \sqrt{a^2 + b^2}, \qquad |3 + 4i| = \sqrt{9 + 16} = 5 \]
+    <p>
+        and adding complex numbers is adding arrows: add the real parts, add the imaginary parts.
+    </p>
+    \[ (3 + 4i) + (1 - 2i) = 4 + 2i \]
+
+    <h2>Multiplying means turning</h2>
+    <p>
+        Multiply \( 1 \) by \( i \): you get \( i \). On the picture, the arrow pointing right (to 1) became the
+        arrow pointing up (to \( i \)). It turned a quarter circle anticlockwise. Multiply by \( i \) again:
+        \( i \cdot i = -1 \), the arrow pointing left. Another quarter turn. Again: \( -i \), pointing down.
+        Again: \( 1 \). Four quarter turns make a full circle, which is why the powers of \( i \) repeat every
+        four.
+    </p>
+    <div class="note">
+        Multiplying by \( i \) turns an arrow by 90 degrees. Multiplying by \( -1 \) turns it by 180 degrees.
+        That is all \( i^2 = -1 \) means: two quarter turns make a half turn.
+    </div>
+    <p>
+        To multiply two general complex numbers, use ordinary algebra and replace \( i^2 \) by \( -1 \):
+    </p>
+    \[ (a + bi)(c + di) = ac + adi + bci + bd\,i^2 = (ac - bd) + (ad + bc)i \]
+    \[ (1 + i)(1 + i) = 1 + 2i + i^2 = 1 + 2i - 1 = 2i \]
+    <p>
+        Look at that last one on the picture. \( 1 + i \) is the arrow at 45 degrees with length \( \sqrt{2} \).
+        Squaring it gave \( 2i \): the arrow at 90 degrees with length 2. The angles added (45 + 45 = 90) and
+        the lengths multiplied (\( \sqrt{2} \times \sqrt{2} = 2 \)). This is always true:
+    </p>
+    <div class="note">
+        When you multiply complex numbers, <strong>lengths multiply and angles add</strong>.
+    </div>
+
+    <h2>Length and angle form</h2>
+    <p>
+        Since a complex number is an arrow, we can describe it by its length \( r \) and its angle
+        \( \theta \) from the horizontal, instead of by \( a \) and \( b \). From the triangle,
+        \( a = r\cos\theta \) and \( b = r\sin\theta \), so
+    </p>
+    \[ z = r(\cos\theta + i\sin\theta) \]
+    <p>
+        Leonhard Euler found a shorter way to write the bracket. It turns out that
+        \( \cos\theta + i\sin\theta = e^{i\theta} \), where \( e \approx 2.718 \) is the number from
+        exponential growth. You do not need to know why for this book. Just read \( e^{i\theta} \) as
+        "the unit arrow at angle \( \theta \)". So every complex number is
+    </p>
+    \[ z = r\,e^{i\theta} \]
+    <p>
+        and "lengths multiply, angles add" is just the rule for multiplying powers:
+        \( r_1 e^{i\theta_1} \cdot r_2 e^{i\theta_2} = r_1 r_2\, e^{i(\theta_1 + \theta_2)} \).
+        In quantum computing, the angle \( \theta \) is called the <strong>phase</strong>. Several gates do
+        nothing but change the phase, and you will see in Chapter 12 that phase is where the power hides.
+    </p>
+    <p>Some unit arrows you will see often:</p>
+    \[ e^{i \cdot 0} = 1, \qquad e^{i\pi/2} = i, \qquad e^{i\pi} = -1, \qquad e^{i 3\pi/2} = -i \]
+    <p>
+        (Angles are in radians: \( \pi \) radians is 180 degrees, \( \pi/2 \) is 90 degrees.)
+    </p>
+
+    <h2>The mirror image: complex conjugate</h2>
+    <p>
+        Flip the sign of the imaginary part and you get the <strong>complex conjugate</strong>, written
+        \( z^* \) (some books write \( \bar{z} \)):
+    </p>
+    \[ z = a + bi \quad\Rightarrow\quad z^* = a - bi \]
+    <p>
+        On the picture, this reflects the arrow in the horizontal line: same length, opposite angle.
+        In length-and-angle form, \( (r e^{i\theta})^* = r e^{-i\theta} \).
+    </p>
+    <p>
+        Why do we care? Multiply a number by its own conjugate:
+    </p>
+    \[ z\,z^* = (a + bi)(a - bi) = a^2 - abi + abi - b^2 i^2 = a^2 + b^2 = |z|^2 \]
+    <p>
+        The imaginary parts cancel and you get the length squared, an ordinary positive number. This is the
+        single most used fact in this book. In the next chapter, the length squared of an amplitude is a
+        probability, and \( z z^* \) is how you compute it.
+    </p>
+    \[ |z|^2 = z\,z^* \]
+
+    <h2>Dividing</h2>
+    <p>
+        To divide by a complex number, multiply top and bottom by the conjugate of the bottom. The bottom
+        becomes a real number and you can split it up:
+    </p>
+    \[ \frac{1}{1 + i} = \frac{1 - i}{(1 + i)(1 - i)} = \frac{1 - i}{1 + 1} = \frac{1}{2} - \frac{1}{2}i \]
+    <p>You will rarely need this, but it is good to know it is possible.</p>
+
+    <h2>Complex arrows</h2>
+    <p>
+        Finally, nothing stops the entries of a vector being complex numbers. The arrow
+        \( \begin{pmatrix} 1 \\ i \end{pmatrix} \) is perfectly fine. Its length uses \( |z|^2 \) for each
+        entry: \( \sqrt{|1|^2 + |i|^2} = \sqrt{1 + 1} = \sqrt{2} \). Normalised, it is
+        \( \tfrac{1}{\sqrt{2}}\begin{pmatrix} 1 \\ i \end{pmatrix} \), a genuine qubit state you will build in the
+        Quantum Lab. Vectors with complex entries live in what physicists call a
+        <strong>Hilbert space</strong>. The name sounds grand. It just means "arrows with complex entries and
+        a dot product". Chapter 7 makes one small upgrade to the dot product so that it works with complex
+        entries; apart from that, you already know everything about it.
+    </p>
+
+    <div class="try-it">
+        <strong>Try it.</strong> In the <a href="/programming">Quantum Lab</a>, open the challenge
+        <em>The +i state</em>. Its goal is the arrow \( \tfrac{1}{\sqrt{2}}(|0\rangle + i|1\rangle) \).
+        You will solve it properly in Chapter 10. For now, read the hints and notice that the S gate
+        "adds a 90 degree phase": it multiplies one entry by \( i \).
+    </div>
+
+    <details class="check">
+        <summary>Check yourself</summary>
+        <p><strong>Q1.</strong> What is \( (2 + i)(2 - i) \)?</p>
+        <p><strong>A1.</strong> \( 4 - i^2 = 4 + 1 = 5 \). It is \( |2 + i|^2 \).</p>
+        <p><strong>Q2.</strong> What is \( i \times (3 + 4i) \), and what happened to the arrow?</p>
+        <p><strong>A2.</strong> \( 3i + 4i^2 = -4 + 3i \). The arrow \( (3, 4) \) turned a quarter circle to \( (-4, 3) \). Same length 5.</p>
+        <p><strong>Q3.</strong> What is \( e^{i\pi} + 1 \)?</p>
+        <p><strong>A3.</strong> \( -1 + 1 = 0 \). This is Euler's identity, often called the most beautiful equation in maths.</p>
+    </details>
+</div>
+{% endraw %}

@@ -1,0 +1,121 @@
+{% raw %}
+<div class="book-chapter">
+    <h1>Chapter 15: Build it yourself in the Quantum Lab</h1>
+
+    <div class="big-idea">
+        <strong>Big idea.</strong> The Quantum Lab on this site runs real Python against a statevector
+        simulator, the same maths as this book. This chapter is the command list, the challenges mapped to
+        chapters, some projects to try on your own, and a glossary of every word the book introduced.
+    </div>
+
+    <h2>How the Lab works</h2>
+    <p>
+        Open the <a href="/programming">Quantum Lab</a>, pick a challenge, and write Python in the box. Your
+        code must build a circuit in a variable called <code>qc</code>. Press run. The page shows the
+        measurement probabilities of every outcome, and the grader checks whether your state matches the
+        target, phase included. If it does not, read the hints and try again. Nothing you do can break
+        anything, so experiment.
+    </p>
+
+    <h2>The commands</h2>
+    <table class="summary">
+        <tr><th>Code</th><th>What it does</th><th>Chapter</th></tr>
+        <tr><td><code>qc = QuantumCircuit(n)</code></td><td>Make a circuit with \( n \) qubits, all starting in \( |0\rangle \)</td><td>8</td></tr>
+        <tr><td><code>qc.x(q)</code>, <code>qc.y(q)</code>, <code>qc.z(q)</code></td><td>Pauli gates on qubit \( q \)</td><td>10</td></tr>
+        <tr><td><code>qc.h(q)</code></td><td>Hadamard: \( |0\rangle \to |+\rangle \)</td><td>10</td></tr>
+        <tr><td><code>qc.s(q)</code>, <code>qc.sdg(q)</code></td><td>Quarter turn of phase, and its inverse</td><td>10</td></tr>
+        <tr><td><code>qc.t(q)</code>, <code>qc.tdg(q)</code></td><td>Eighth turn of phase, and its inverse</td><td>10</td></tr>
+        <tr><td><code>qc.rx(theta, q)</code>, <code>qc.ry(theta, q)</code>, <code>qc.rz(theta, q)</code></td><td>Rotation by angle <code>theta</code> (radians) about an axis</td><td>10</td></tr>
+        <tr><td><code>qc.p(lam, q)</code></td><td>Phase gate \( P(\lambda) \): multiply the \( |1\rangle \) amplitude by \( e^{i\lambda} \)</td><td>10</td></tr>
+        <tr><td><code>qc.cx(c, t)</code></td><td>CNOT with control \( c \), target \( t \)</td><td>11</td></tr>
+        <tr><td><code>qc.cz(c, t)</code></td><td>Controlled-Z: flip the sign of \( |11\rangle \)</td><td>11, 13</td></tr>
+        <tr><td><code>qc.cp(lam, c, t)</code></td><td>Controlled phase: multiply the \( |11\rangle \) amplitude by \( e^{i\lambda} \)</td><td>11</td></tr>
+        <tr><td><code>qc.swap(a, b)</code></td><td>Exchange two qubits</td><td>11</td></tr>
+        <tr><td><code>qc.ccx(c1, c2, t)</code></td><td>Toffoli: flip \( t \) if both controls are 1</td><td>11</td></tr>
+        <tr><td><code>qc.statevector()</code></td><td>The list of amplitudes, in order \( 00\ldots0 \) to \( 11\ldots1 \)</td><td>7</td></tr>
+        <tr><td><code>qc.probabilities()</code></td><td>The list of \( |\text{amplitude}|^2 \)</td><td>6</td></tr>
+        <tr><td><code>qc.draw()</code></td><td>Print the circuit</td><td>12</td></tr>
+    </table>
+    <p>
+        Qubit numbering starts at 0, and qubit 0 is the <em>left</em> digit of each outcome label (Chapter 11).
+        Angles are in radians: use <code>3.14159</code> for \( \pi \), or <code>import math</code> and
+        <code>math.pi</code>.
+    </p>
+
+    <h2>The challenges, by chapter</h2>
+    <table class="summary">
+        <tr><th>Challenge</th><th>Goal</th><th>You need</th></tr>
+        <tr><td>Flip the bit</td><td>\( |1\rangle \)</td><td>Chapter 10: X</td></tr>
+        <tr><td>Equal superposition</td><td>\( |+\rangle \)</td><td>Chapter 10: H</td></tr>
+        <tr><td>The minus state</td><td>\( |-\rangle \)</td><td>Chapter 10: X then H</td></tr>
+        <tr><td>The +i state</td><td>\( \tfrac{1}{\sqrt{2}}(|0\rangle + i|1\rangle) \)</td><td>Chapter 10: H then S</td></tr>
+        <tr><td>Bell pair</td><td>\( \tfrac{1}{\sqrt{2}}(|00\rangle + |11\rangle) \)</td><td>Chapter 11: H, CNOT</td></tr>
+        <tr><td>Swap two qubits</td><td>Exchange the states</td><td>Chapter 11: SWAP, or three CNOTs</td></tr>
+        <tr><td>GHZ state</td><td>\( \tfrac{1}{\sqrt{2}}(|000\rangle + |111\rangle) \)</td><td>Chapter 11: H, CNOT, CNOT</td></tr>
+        <tr><td>Grover search (2 qubits)</td><td>Find the marked item</td><td>Chapter 13</td></tr>
+    </table>
+
+    <h2>Projects with no grader</h2>
+    <p>Any challenge box will run any circuit of the right size; you can ignore the grader and just read the probabilities.</p>
+    <ol>
+        <li><strong>Set a chance.</strong> Make a one-qubit state that reads 1 exactly 25 percent of the time. (Chapter 10: \( R_y(\theta) \) with \( \sin^2\tfrac{\theta}{2} = \tfrac{1}{4} \), so \( \theta = \tfrac{\pi}{3} \).)</li>
+        <li><strong>See a phase.</strong> Build \( |+\rangle \), apply <code>qc.p(lam, 0)</code> for several values of <code>lam</code>, then apply H. Plot the probability of 1 against <code>lam</code>. You should get \( \sin^2\tfrac{\lambda}{2} \): interference turning a phase into a chance.</li>
+        <li><strong>All four Bell states.</strong> Start from the Bell pair and add X, or Z, or Z then X, on qubit 1. Check the amplitudes match Chapter 11's list.</li>
+        <li><strong>Deutsch for all four functions.</strong> Chapter 12 gives the code for one. Write the other three and confirm qubit 0 reads 0, 0, 1, 1.</li>
+        <li><strong>Grover with a different mark.</strong> Mark 00, 01 and 10 in turn (Chapter 13). Then try three qubits, \( N = 8 \): mark \( |111\rangle \) with a controlled-controlled-Z built as <code>qc.h(2); qc.ccx(0, 1, 2); qc.h(2)</code>. The diffusion step is the same pattern as before on all three qubits: H on all, X on all, that same controlled-controlled-Z, X on all, H on all. One step should give about 78 percent for 111 and two steps about 95 percent.</li>
+        <li><strong>Teleportation.</strong> Build Chapter 14's circuit on three qubits. The Lab has no measurement-controlled gates, so instead apply <code>qc.cx(1, 2)</code> and <code>qc.cz(0, 2)</code> at the end; that is the same fix applied "quantumly". Start with any one-qubit state on qubit 0 (for example <code>qc.ry(1.0, 0)</code>) and check that the probabilities of qubit 2 match it.</li>
+    </ol>
+
+    <h2>Glossary</h2>
+    <dl class="glossary">
+        <dt>Amplitude</dt><dd>A complex number attached to an outcome. Its length squared is the probability. (Ch. 6)</dd>
+        <dt>Basis</dt><dd>A set of arrows that can build every other arrow. \( \{|0\rangle, |1\rangle\} \) and \( \{|+\rangle, |-\rangle\} \) are both bases of a qubit. (Ch. 2)</dd>
+        <dt>Bell pair</dt><dd>The entangled state \( \tfrac{1}{\sqrt{2}}(|00\rangle + |11\rangle) \). (Ch. 11)</dd>
+        <dt>Bloch sphere</dt><dd>A ball whose surface shows every one-qubit state. (Ch. 8)</dd>
+        <dt>Born rule</dt><dd>Probability equals amplitude length squared. (Ch. 6)</dd>
+        <dt>Bra</dt><dd>\( \langle\psi| \): the transposed, conjugated row version of a ket. (Ch. 7)</dd>
+        <dt>CNOT</dt><dd>Controlled NOT: flip the target if the control is 1. (Ch. 11)</dd>
+        <dt>Collapse</dt><dd>After measurement, the state becomes the outcome you saw. (Ch. 9)</dd>
+        <dt>Complex conjugate</dt><dd>\( z^* \): flip the sign of the imaginary part. \( z z^* = |z|^2 \). (Ch. 5)</dd>
+        <dt>Complex number</dt><dd>\( a + bi \) with \( i^2 = -1 \); an arrow with a length and an angle. (Ch. 5)</dd>
+        <dt>Dagger</dt><dd>\( \dagger \): transpose and conjugate. For a gate, the dagger is the inverse. (Ch. 7)</dd>
+        <dt>Decoherence</dt><dd>Loss of superposition through contact with the outside world. (Ch. 14)</dd>
+        <dt>Derivative</dt><dd>Rate of change; the slope of a graph. (Ch. 4)</dd>
+        <dt>Diffusion</dt><dd>Grover's reflect-about-the-average step. (Ch. 13)</dd>
+        <dt>Dot product</dt><dd>Multiply matching entries and add. Measures how much two arrows agree. (Ch. 2)</dd>
+        <dt>Eigenvector, eigenvalue</dt><dd>An arrow a matrix only stretches, and the stretch factor. Measurement outcomes are eigenvectors. (Ch. 3, 9)</dd>
+        <dt>Entanglement</dt><dd>A multi-qubit state that cannot be split into one state per qubit. (Ch. 11)</dd>
+        <dt>Gate</dt><dd>A unitary matrix applied to qubits. (Ch. 10)</dd>
+        <dt>Global phase</dt><dd>A factor \( e^{i\theta} \) on the whole state; physically meaningless. (Ch. 8)</dd>
+        <dt>Hadamard (H)</dt><dd>The gate that turns \( |0\rangle \) into \( |+\rangle \) and back. (Ch. 10)</dd>
+        <dt>Hilbert space</dt><dd>Arrows with complex entries and an inner product. Where states live. (Ch. 5)</dd>
+        <dt>Inner product</dt><dd>\( \langle\phi|\psi\rangle \): the dot product with conjugation on the left. (Ch. 7)</dd>
+        <dt>Interference</dt><dd>Amplitudes for different paths adding or cancelling before squaring. (Ch. 6)</dd>
+        <dt>Ket</dt><dd>\( |\psi\rangle \): a column vector written in physicists' notation. (Ch. 2, 7)</dd>
+        <dt>Matrix</dt><dd>A grid of numbers that turns one arrow into another. (Ch. 3)</dd>
+        <dt>Measurement</dt><dd>Asking a qubit a question and getting a random answer with the Born rule's probabilities. (Ch. 9)</dd>
+        <dt>No-cloning</dt><dd>No gate can copy an unknown quantum state. (Ch. 9)</dd>
+        <dt>Normalise</dt><dd>Divide an arrow by its length so it has length 1. (Ch. 2)</dd>
+        <dt>Oracle</dt><dd>A gate that marks the answer to a yes/no question, usually by a sign flip. (Ch. 12, 13)</dd>
+        <dt>Orthogonal, orthonormal</dt><dd>At right angles; at right angles and of length 1. (Ch. 2)</dd>
+        <dt>Phase</dt><dd>The angle of a complex number. Relative phase between amplitudes is physical. (Ch. 5, 8)</dd>
+        <dt>Phase kickback</dt><dd>Moving a function's answer into the phase of the input qubit. (Ch. 12)</dd>
+        <dt>Qubit</dt><dd>A two-level quantum system; a unit arrow \( \alpha|0\rangle + \beta|1\rangle \). (Ch. 8)</dd>
+        <dt>Superposition</dt><dd>A state that is a mix of basis states. (Ch. 8)</dd>
+        <dt>Tensor product</dt><dd>\( \otimes \): gluing two systems into one by multiplying out the brackets. (Ch. 11)</dd>
+        <dt>Unitary</dt><dd>A matrix with \( U^\dagger U = I \). Keeps lengths. Every gate is one. (Ch. 3, 7)</dd>
+        <dt>Vector</dt><dd>An arrow; a list of numbers. (Ch. 2)</dd>
+    </dl>
+
+    <h2>References</h2>
+    <ul>
+        <li>Yanofsky and Mannucci, <em>Quantum Computing for Computer Scientists</em>, Cambridge University Press.</li>
+        <li>Nielsen and Chuang, <em>Quantum Computation and Quantum Information</em>, Cambridge University Press.</li>
+        <li>Artur Ekert and others, <em>The Qubit Guide</em>, <a href="https://qubit.guide/" target="_blank" rel="noopener">qubit.guide</a>.</li>
+        <li>Quantum Inspire knowledge base, <a href="https://www.quantum-inspire.com/kbase/introduction-to-quantum-computing" target="_blank" rel="noopener">Introduction to quantum computing</a>.</li>
+        <li>Quantum Untangled on Medium: <a href="https://medium.com/quantum-untangled/quantum-states-and-the-bloch-sphere-9f3c0c445ea3" target="_blank" rel="noopener">Quantum states and the Bloch sphere</a> and <a href="https://medium.com/quantum-untangled/visualizing-quantum-logic-gates-part-1-515bb7b58916" target="_blank" rel="noopener">Visualizing single-qubit gates</a>.</li>
+        <li>The <a href="/research">research page</a> on this site, for barren plateaus and the data behind Chapter 4's learning story.</li>
+    </ul>
+    <p class="end">That is the end of the book. Go and build something.</p>
+</div>
+{% endraw %}
