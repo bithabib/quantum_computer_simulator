@@ -10,3 +10,4 @@ qmi-submission.zip
 # figures used by the manuscript are tracked so that it builds from the repository
 !figs/*.pdf
 figs/training_outcome*
+submission/
