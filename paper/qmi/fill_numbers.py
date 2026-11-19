@@ -347,7 +347,7 @@ def main():
         # never let a generated table exceed the text width
         tables[t] = "\\fittable{%\n" + body + "%\n}"
 
-    for fname in ["main.tex", "response_to_reviewers.tex", "cover_letter.tex", "supplement.tex"]:
+    for fname in ["main.tex", "response_to_reviewers.tex", "response_round3.tex", "cover_letter.tex", "supplement.tex"]:
         path = os.path.join(HERE, fname)
         if not os.path.exists(path):
             continue

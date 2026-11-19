@@ -129,7 +129,7 @@ def write_table(R, outdir):
     lines = ["\\begin{tabular}{lccc}", "\\toprule",
              " & Named patterns & Shared parameters & Random graphs \\\\", "\\midrule",
              "Circuits & %d & %d & %d \\\\" % (M["n_rows"], R_t["rows"], R_g["rows"]),
-             "Exact Clifford shortcut & yes & no & yes \\\\",
+             "Clifford shortcut applies & yes & no & yes \\\\",
              "Noise ceiling on $R^2$ & %.3f & %.3f & -- \\\\" % (M["r2_ceiling"], R_t["r2_ceiling"]),
              "\\midrule", "\\multicolumn{4}{l}{\\emph{Unseen architectures, $R^2$}}\\\\",
              "\\quad HGB & %s & %s & %s \\\\" % (pm(mcv["Hist Gradient Boosting"]["r2"]), pm(R_t["cv"]["Hist Gradient Boosting"]), pm(R_g["cv"]["Hist Gradient Boosting"])),

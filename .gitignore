@@ -32,6 +32,7 @@ paper/qmi/reviews/
 reviewer_*_comments.pdf
 v1_covered_*.pdf
 paper/qmi/response_to_reviewers.*
+paper/qmi/response_round3.*
 paper/qmi/cover_letter.*
 
 # Training-outcome check (reported as limitation (viii)): results are tracked,
