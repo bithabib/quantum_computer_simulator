@@ -613,9 +613,9 @@ from their architecture, and how far beyond the training range such
 predictions can be trusted. We simulate \Nrows{} circuits with 2 to 12
 qubits; the label is the mean gradient variance over all parameters whose
 gradient does not vanish identically. Within the training range the label
-is predictable close to its noise ceiling: learners reach $R^2=\RsqCV$ on
-held-out architectures against a ceiling of \RsqCeiling{} and a structured
-linear model reaches \RsqStruct; the same holds for layer-shared parameters
+is predictable close to its noise ceiling: learners reach a coefficient of
+determination of \RsqCV{} on held-out architectures against a ceiling of
+\RsqCeiling, and a structured linear model reaches \RsqStruct; the same holds for layer-shared parameters
 and random entangling graphs. Two closed-form quantities, the weight of the
 observable after the last entangling layer and its causal cone, let
 predictions transfer to unseen entanglement patterns. With Clifford-sampled
@@ -672,8 +672,8 @@ We answer this question empirically for the hardware-efficient
 ansatz~\cite{kandala2017hardware}, in three variants. We treat trainability
 prediction as a supervised learning problem over circuit specifications. The
 features are cheap architectural descriptors: small integers and categories.
-The label is the gradient variance, computed once, offline, by exact
-statevector simulation. Throughout, we use two standard machine-learning
+The label is the gradient variance, estimated once, offline, from exact
+gradients on a statevector simulator. Throughout, we use two standard machine-learning
 scores. The coefficient of determination $R^2$ is the fraction of label
 variance a regressor explains; $R^2=1$ is perfect, $R^2=0$ is no better than
 predicting the mean of the test labels, and $R^2<0$ is worse than that,
@@ -704,8 +704,9 @@ particular budget, succeeds.
 
 The contributions are as follows.
 \begin{itemize}
-\item A labeled dataset of \Nrows{} hardware-efficient circuits with exact
-all-parameter gradient variances and structural zeros separated, with a
+\item A labeled dataset of \Nrows{} hardware-efficient circuits whose
+labels are empirical gradient-variance estimates obtained from exact
+gradient evaluations of every parameter, with structural zeros separated, with a
 reproducible pipeline, and the finding that on unseen architectures the
 label is predictable close to its noise ceiling ($R^2=\RsqCV$ against a ceiling of
 \RsqCeiling) by flexible learners and, nearly as well, by a structured linear
@@ -1227,7 +1228,7 @@ for the main grid, this measures interpolation across the design space. As a con
 a linear model in the cone-based size terms of Eq.~\eqref{eq:struct} and in
 the descriptors (\GraphRuleCoef{} coefficients).
 
-\subsection{Exact labels beyond statevector reach}\label{sec:cliffordmethod}
+\subsection{Labels beyond statevector reach from an exact identity}\label{sec:cliffordmethod}
 Statevector simulation limits the labeled circuits to $n\le14$. For this
 circuit family a second method, based on an exact identity, has no such
 limit. Every angle appears
@@ -1841,7 +1842,7 @@ architecture (mean $\pm$ standard deviation over ten folds).}
  & Named patterns & Shared parameters & Random graphs \\
 \midrule
 Circuits & 19858 & 9929 & 9949 \\
-Exact Clifford shortcut & yes & no & yes \\
+Clifford shortcut applies & yes & no & yes \\
 Noise ceiling on $R^2$ & 0.985 & 0.989 & -- \\
 \midrule
 \multicolumn{4}{l}{\emph{Unseen architectures, $R^2$}}\\
@@ -1971,7 +1972,7 @@ estimated from \Samples{} samples (mean absolute relabeling difference
 pattern is not part of the feature vector, which we quantified as a noise
 ceiling; and the barren cutoff $y<-2$ is a modeling choice that affects
 only the classification results (Supplementary Table~S3).
-(v)~\emph{Exact alternatives for this family.} Because every angle
+(v)~\emph{A sampling alternative for this family.} Because every angle
 appears once with a Pauli generator, the gradient variance of these
 circuits can be estimated without bias by Clifford sampling at any qubit
 count
@@ -2057,7 +2058,7 @@ content and takes full responsibility for the content of the publication.
 \item \textbf{Consent for publication.} Not applicable.
 \item \textbf{Data availability.} The dataset supporting this study is openly
 available in Zenodo at \url{https://doi.org/10.5281/zenodo.21446120}
-(release \texttt{v2.2-qmi-revision}) and in the repository at
+(release \texttt{v2.3-qmi-revision}) and in the repository at
 \url{https://github.com/bithabib/quantum_computer_simulator}. It
 contains the full labeled dataset of \Nrows{} variational circuits, including
 the per-circuit gradient-variance statistics, the datasets for the
